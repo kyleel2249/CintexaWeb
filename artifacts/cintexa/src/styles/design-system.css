@@ -1,0 +1,285 @@
+/**
+ * CINTEXA Design System
+ * Tokens: color, type, spacing, elevation, motion.
+ * Components: buttons (.cx-btn-*), cards, forms, nav, badges.
+ * Brand: amber square mark (#F5C518), deep ink background, teal + violet + sky
+ * as secondary accents pulled from the ecosystem/storefront scenes.
+ */
+
+:root {
+  /* --- Color (HSL channels, consumed as hsl(var(--token))) --- */
+  --bg: 210 33% 6%;               /* #0B0F14 deep ink */
+  --bg-raised: 212 28% 10%;       /* #131A22 panel */
+  --bg-inset: 213 26% 13%;        /* #1A2430 inset / shelf */
+  --fg: 40 30% 96%;               /* #F7F4EE near-white */
+  --fg-muted: 210 14% 68%;        /* #A6AEB8 secondary text */
+  --border: 213 20% 20%;          /* #2B3641 hairline */
+  --accent: 46 89% 55%;           /* #F5C518 amber (brand) */
+  --accent-ink: 210 40% 8%;       /* text on amber */
+  --teal: 168 39% 66%;            /* #7DD3C7 */
+  --sky: 212 100% 72%;            /* #6BB3FF */
+  --violet: 258 78% 82%;          /* #C4B5FD */
+  --success: 142 45% 63%;         /* #9AE6B4 */
+  --danger: 4 78% 63%;            /* #EF6F6C */
+
+  /* Compatibility aliases — some components (Storefront3D, AnimatedAdsFunnel)
+     use shadcn-style token names. Point them at the same channel values. */
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --muted-foreground: var(--fg-muted);
+
+  /* --- Spacing scale (4px base) --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+
+  /* --- Radius --- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  /* --- Elevation --- */
+  --shadow-sm: 0 1px 2px hsl(210 40% 2% / 0.4);
+  --shadow-md: 0 8px 24px hsl(210 40% 2% / 0.45);
+  --shadow-lg: 0 24px 64px hsl(210 40% 2% / 0.55);
+  --shadow-accent: 0 0 24px hsl(var(--accent) / 0.35);
+
+  /* --- Motion --- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+
+  /* --- Layout --- */
+  --content-max: 1180px;
+  --nav-height: 72px;
+}
+
+/* ============ Type ============ */
+.cx-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: hsl(var(--teal));
+}
+
+.cx-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+/* ============ Layout ============ */
+.cx-container {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--space-5);
+}
+
+@media (min-width: 768px) {
+  .cx-container { padding-inline: var(--space-6); }
+}
+
+.cx-section {
+  padding-block: var(--space-9);
+}
+
+@media (max-width: 767px) {
+  .cx-section { padding-block: var(--space-7); }
+}
+
+/* ============ Buttons ============ */
+.cx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.7rem 1.35rem;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cx-btn:active { transform: scale(0.97); }
+
+.cx-btn-primary {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-ink));
+  box-shadow: var(--shadow-accent);
+}
+.cx-btn-primary:hover {
+  background: hsl(var(--accent) / 0.9);
+  box-shadow: 0 0 32px hsl(var(--accent) / 0.5);
+}
+
+.cx-btn-secondary {
+  background: hsl(var(--bg-raised));
+  color: hsl(var(--fg));
+  border-color: hsl(var(--border));
+}
+.cx-btn-secondary:hover {
+  border-color: hsl(var(--accent) / 0.6);
+  background: hsl(var(--bg-inset));
+}
+
+.cx-btn-ghost {
+  background: transparent;
+  color: hsl(var(--fg-muted));
+}
+.cx-btn-ghost:hover {
+  color: hsl(var(--fg));
+  background: hsl(var(--fg) / 0.06);
+}
+
+.cx-btn-sm { padding: 0.45rem 1rem; font-size: 0.8125rem; }
+.cx-btn-lg { padding: 0.95rem 1.75rem; font-size: 1rem; }
+
+/* ============ Cards ============ */
+.cx-card {
+  background: hsl(var(--bg-raised));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+
+.cx-card-interactive:hover {
+  border-color: hsl(var(--accent) / 0.4);
+  transform: translateY(-2px);
+}
+
+.cx-card-inset {
+  background: hsl(var(--bg-inset));
+  border-radius: var(--radius-md);
+}
+
+/* ============ Forms ============ */
+.cx-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cx-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: hsl(var(--fg-muted));
+}
+
+.cx-input,
+.cx-select,
+.cx-textarea {
+  background: hsl(var(--bg-inset));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  color: hsl(var(--fg));
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.cx-input:focus,
+.cx-select:focus,
+.cx-textarea:focus {
+  border-color: hsl(var(--accent));
+  outline: none;
+}
+
+/* ============ Navigation ============ */
+.cx-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(14px);
+  background: hsl(var(--bg) / 0.72);
+  border-bottom: 1px solid hsl(var(--border) / 0.6);
+}
+
+.cx-nav-link {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: hsl(var(--fg-muted));
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-full);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.cx-nav-link:hover,
+.cx-nav-link[aria-current="page"] {
+  color: hsl(var(--fg));
+  background: hsl(var(--fg) / 0.06);
+}
+
+.cx-dropdown-panel {
+  background: hsl(var(--bg-raised));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============ Badges ============ */
+.cx-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: hsl(var(--fg) / 0.06);
+  color: hsl(var(--fg-muted));
+  border: 1px solid hsl(var(--border));
+}
+
+.cx-badge-accent {
+  background: hsl(var(--accent) / 0.12);
+  color: hsl(var(--accent));
+  border-color: hsl(var(--accent) / 0.3);
+}
+
+/* ============ Motion utilities ============ */
+.cx-motion-safe {
+  transition-property: transform, opacity;
+  transition-duration: var(--dur-base);
+  transition-timing-function: var(--ease-out);
+}
+
+.no-motion .cx-motion-safe,
+.no-motion [data-motion] {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* ============ Scrollbar ============ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: hsl(var(--bg)); }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--fg-muted) / 0.5); }

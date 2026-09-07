@@ -1,0 +1,177 @@
+openapi: 3.1.0
+info:
+  title: CINTEXA Growth Platform API
+  version: 0.1.0
+  description: >
+    Customer profile, contributions, and activity endpoints backing the
+    CINTEXA customer portal. Auth is via Clerk session tokens unless noted.
+servers:
+  - url: http://localhost:8080
+    description: Local development
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+                  timestamp: { type: string, format: date-time }
+  /api/customer/me:
+    get:
+      summary: Get the signed-in customer's profile
+      operationId: getMyProfile
+      security: [{ clerkAuth: [] }]
+      responses:
+        "200":
+          description: Current profile, or null if none exists yet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    oneOf:
+                      - $ref: "#/components/schemas/CustomerProfile"
+                      - type: "null"
+        "401":
+          description: Not authenticated
+    patch:
+      summary: Update the signed-in customer's profile (upserts)
+      operationId: updateMyProfile
+      security: [{ clerkAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName: { type: string, maxLength: 120 }
+                businessName: { type: string, maxLength: 160 }
+                country: { type: string, maxLength: 80 }
+                leaderboardVisible: { type: boolean }
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile: { $ref: "#/components/schemas/CustomerProfile" }
+        "400":
+          description: Validation error
+        "401":
+          description: Not authenticated
+  /api/contributions:
+    get:
+      summary: List the signed-in customer's contributions (most recent 50)
+      operationId: listMyContributions
+      security: [{ clerkAuth: [] }]
+      responses:
+        "200":
+          description: Contribution history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contributions:
+                    type: array
+                    items: { $ref: "#/components/schemas/Contribution" }
+        "401":
+          description: Not authenticated
+  /api/activity:
+    get:
+      summary: List the signed-in customer's activity events (most recent 50)
+      operationId: listMyActivity
+      security: [{ clerkAuth: [] }]
+      responses:
+        "200":
+          description: Activity feed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activity:
+                    type: array
+                    items: { $ref: "#/components/schemas/ActivityEvent" }
+        "401":
+          description: Not authenticated
+  /api/webhooks/contributions:
+    post:
+      summary: Receive a contribution/payment event from an external provider
+      operationId: receiveContributionWebhook
+      security: [{ webhookSignature: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, reference, amount, description]
+              properties:
+                userId: { type: string }
+                reference: { type: string }
+                amount: { type: string }
+                currency: { type: string, default: GHS }
+                description: { type: string }
+      responses:
+        "200":
+          description: Event recorded
+        "400":
+          description: Missing required fields
+        "401":
+          description: Missing or invalid signature
+components:
+  securitySchemes:
+    clerkAuth:
+      type: http
+      scheme: bearer
+      description: Clerk session token
+    webhookSignature:
+      type: apiKey
+      in: header
+      name: x-webhook-signature
+      description: HMAC-SHA256 of the raw request body, signed with WEBHOOK_SECRET
+  schemas:
+    CustomerProfile:
+      type: object
+      properties:
+        userId: { type: string }
+        displayName: { type: string, nullable: true }
+        businessName: { type: string, nullable: true }
+        country: { type: string, nullable: true }
+        leaderboardVisible: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Contribution:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string }
+        reference: { type: string }
+        type: { type: string }
+        amount: { type: string }
+        currency: { type: string }
+        status: { type: string }
+        description: { type: string }
+        createdAt: { type: string, format: date-time }
+    ActivityEvent:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string }
+        eventType: { type: string }
+        title: { type: string }
+        description: { type: string }
+        createdAt: { type: string, format: date-time }

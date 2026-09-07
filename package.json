@@ -8,8 +8,8 @@
   ],
   "scripts": {
     "dev:web": "npm run dev -w cintexa",
-    "dev:api": "npm run dev -w api-server",
-    "build": "npm run build -w api-server && npm run build -w cintexa",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "dev:api": "npm run build -w @cintexa/db && npm run dev -w api-server",
+    "build": "npm run build -w @cintexa/db && npm run build -w api-server && npm run build -w cintexa",
+    "typecheck": "npm run build -w @cintexa/db && npm run typecheck --workspaces --if-present"
   }
 }

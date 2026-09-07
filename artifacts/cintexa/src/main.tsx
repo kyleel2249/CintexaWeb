@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { ClerkProvider } from "@clerk/react";
+import { ClerkProvider } from "@clerk/clerk-react";
 import { dark } from "@clerk/themes";
 
 import App from "./App";

@@ -8,6 +8,13 @@
       "when": 1788766409062,
       "tag": "0000_free_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788768926345,
+      "tag": "0001_sweet_bishop",
+      "breakpoints": true
     }
   ]
 }

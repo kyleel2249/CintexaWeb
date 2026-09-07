@@ -1,0 +1,3 @@
+# SPA fallback — client-side routes (wouter) need every path to serve
+# index.html so the router can take over, not a 404 from Cloudflare Pages.
+/* /index.html 200

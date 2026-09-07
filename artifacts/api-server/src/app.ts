@@ -13,6 +13,7 @@ import { subscriptionsRouter } from "./routes/subscriptions.js";
 import { loyaltyRouter } from "./routes/loyalty.js";
 import { leaderboardRouter } from "./routes/leaderboard.js";
 import { adminRouter } from "./routes/admin.js";
+import { agentsRouter } from "./routes/agents.js";
 
 export function createApp() {
   const app = express();
@@ -65,6 +66,7 @@ export function createApp() {
 
   // Admin — gated by ADMIN_API_KEY (x-admin-key header), not Clerk.
   app.use("/api/admin", adminRouter);
+  app.use("/api/admin/agents", agentsRouter);
 
   app.use((_req, res) => {
     res.status(404).json({ error: "Not found" });

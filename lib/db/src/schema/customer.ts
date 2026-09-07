@@ -1,4 +1,4 @@
-import { index, uniqueIndex, numeric, pgTable, text, timestamp, uuid, boolean, integer, pgEnum } from "drizzle-orm/pg-core";
+import { index, uniqueIndex, numeric, pgTable, text, timestamp, uuid, boolean, integer, pgEnum, jsonb } from "drizzle-orm/pg-core";
 
 export const customerProfilesTable = pgTable(
   "customer_profiles",
@@ -108,3 +108,38 @@ export const loyaltyLedgerTable = pgTable(
 
 export type Subscription = typeof subscriptionsTable.$inferSelect;
 export type LoyaltyLedgerEntry = typeof loyaltyLedgerTable.$inferSelect;
+
+/* ============ AI agent orchestration ============ */
+
+export const agentRoleEnum = pgEnum("agent_role", [
+  "marketing",
+  "sales",
+  "consumer_simulation",
+  "engagement",
+  "content_idea",
+]);
+export const agentTaskStatusEnum = pgEnum("agent_task_status", ["queued", "completed", "failed"]);
+
+/**
+ * A single unit of work handed to an AI agent. `input`/`output` are JSONB so
+ * each agent role can define its own shape without a schema migration per role.
+ */
+export const agentTasksTable = pgTable(
+  "agent_tasks",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    role: agentRoleEnum("role").notNull(),
+    status: agentTaskStatusEnum("status").notNull().default("queued"),
+    input: jsonb("input").notNull(),
+    output: jsonb("output"),
+    requestedByUserId: text("requested_by_user_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("agent_tasks_role_idx").on(table.role),
+    index("agent_tasks_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export type AgentTask = typeof agentTasksTable.$inferSelect;

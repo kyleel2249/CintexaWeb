@@ -33,3 +33,22 @@
 
 ## Notes
 All performance figures on marketing/ads demos are clearly labeled sample data — not live platform metrics.
+
+## Advanced features build
+- Subscriptions & entitlements: `subscriptions` table (plan/status/period), `/api/subscriptions/me` (GET/POST),
+  Pricing page wired to a real mutation with per-plan current-plan state
+- Loyalty ledger: event-sourced `loyalty_ledger` table (append-only), `/api/loyalty/me`, balance shown on
+  dashboard Overview and used to compute Progress milestones
+- Public leaderboard: `/api/leaderboard` computes real rankings from opted-in customers' loyalty totals
+  (never exposes userId or contact info)
+- Admin routes: `/api/admin/customers` (aggregated plan + balance per customer), `/api/admin/loyalty/adjust`
+  (the only way points change) — both gated by the previously-unused `requireAdminKey` middleware
+- Dashboard fully live: Overview, Contributions, Progress, Leaderboard, and Settings all query the real API
+  via TanStack Query hooks (`useApi.ts`) instead of hardcoded sample arrays, with loading/empty/error states
+- Route-based code splitting: every page and dashboard tab is lazy-loaded; Three.js/Clerk/motion libraries
+  split into their own vendor chunks. Main entry chunk dropped from 1.3MB to 47.8KB
+- CI: GitHub Actions workflow runs typecheck + build on every push/PR
+- Docker: `artifacts/api-server/Dockerfile` for the API server (multi-stage, not yet verified with a live
+  Docker build — no Docker daemon in the build environment this was written in)
+- End-to-end verified against a real local Postgres 16 instance: migrations generated and applied, loyalty
+  adjustments, admin customer aggregation, and public leaderboard all smoke-tested against live data

@@ -10,6 +10,7 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@cintexa/db": "*",
     "@clerk/clerk-react": "^5.19.0",
     "@clerk/themes": "^2.2.14",
     "@react-three/drei": "^10.7.6",

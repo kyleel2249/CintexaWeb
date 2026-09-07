@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { DashboardShell } from "./DashboardShell";
+import { useMyProfile, useUpdateProfile } from "@/hooks/useApi";
 
 export function DashboardSettings() {
   const { user } = useUser();
+  const profile = useMyProfile();
+  const updateProfile = useUpdateProfile();
+
   const [businessName, setBusinessName] = useState("");
   const [leaderboardVisible, setLeaderboardVisible] = useState(false);
-  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (profile.data?.profile) {
+      setBusinessName(profile.data.profile.businessName ?? "");
+      setLeaderboardVisible(profile.data.profile.leaderboardVisible);
+    }
+  }, [profile.data]);
 
   return (
     <DashboardShell>
@@ -14,8 +24,11 @@ export function DashboardSettings() {
         className="cx-card flex max-w-md flex-col gap-5"
         onSubmit={(e) => {
           e.preventDefault();
-          setSaved(true);
-          setTimeout(() => setSaved(false), 2000);
+          updateProfile.mutate({
+            businessName: businessName || undefined,
+            displayName: user?.fullName ?? undefined,
+            leaderboardVisible,
+          });
         }}
       >
         <div className="cx-field">
@@ -41,10 +54,15 @@ export function DashboardSettings() {
           />
           Show me on the public leaderboard
         </label>
-        <button type="submit" className="cx-btn cx-btn-primary w-fit">
-          Save changes
+        <button type="submit" className="cx-btn cx-btn-primary w-fit" disabled={updateProfile.isPending}>
+          {updateProfile.isPending ? "Saving…" : "Save changes"}
         </button>
-        {saved && <p className="text-sm" style={{ color: "hsl(var(--success))" }}>Saved.</p>}
+        {updateProfile.isSuccess && <p className="text-sm" style={{ color: "hsl(var(--success))" }}>Saved.</p>}
+        {updateProfile.isError && (
+          <p className="text-sm" style={{ color: "hsl(var(--danger))" }}>
+            Couldn't save — try again.
+          </p>
+        )}
       </form>
     </DashboardShell>
   );

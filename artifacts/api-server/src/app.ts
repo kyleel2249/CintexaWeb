@@ -9,6 +9,10 @@ import { customerRouter } from "./routes/customer.js";
 import { contributionsRouter } from "./routes/contributions.js";
 import { activityRouter } from "./routes/activity.js";
 import { webhooksRouter } from "./routes/webhooks.js";
+import { subscriptionsRouter } from "./routes/subscriptions.js";
+import { loyaltyRouter } from "./routes/loyalty.js";
+import { leaderboardRouter } from "./routes/leaderboard.js";
+import { adminRouter } from "./routes/admin.js";
 
 export function createApp() {
   const app = express();
@@ -53,6 +57,14 @@ export function createApp() {
   app.use("/api/customer", clerkMiddleware(), customerRouter);
   app.use("/api/contributions", clerkMiddleware(), contributionsRouter);
   app.use("/api/activity", clerkMiddleware(), activityRouter);
+  app.use("/api/subscriptions", clerkMiddleware(), subscriptionsRouter);
+  app.use("/api/loyalty", clerkMiddleware(), loyaltyRouter);
+
+  // Public — opted-in customers only, no auth required to view rankings.
+  app.use("/api/leaderboard", leaderboardRouter);
+
+  // Admin — gated by ADMIN_API_KEY (x-admin-key header), not Clerk.
+  app.use("/api/admin", adminRouter);
 
   app.use((_req, res) => {
     res.status(404).json({ error: "Not found" });

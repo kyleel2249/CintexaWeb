@@ -21,5 +21,14 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-three": ["three", "@react-three/fiber", "@react-three/drei"],
+          "vendor-clerk": ["@clerk/clerk-react", "@clerk/themes"],
+          "vendor-motion": ["framer-motion", "gsap"],
+        },
+      },
+    },
   },
 });

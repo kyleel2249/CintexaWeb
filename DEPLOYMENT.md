@@ -1,73 +1,71 @@
-# Deploying CINTEXA
+# Deploying CINTEXA (fix Cloudflare 404)
 
-## Frontend — Cloudflare Pages
+## Why you see HTTP 404 on cintexa.com
 
-This is a monorepo. The deployable frontend lives in `artifacts/cintexa/`, not
-the repo root — if Cloudflare Pages is left on its default settings, it tries
-to build/serve from the repo root, finds nothing there, and nothing changes
-when you push. This is almost certainly why the live site hasn't reflected
-recent commits.
+This is a **monorepo**. The Vite app lives in `artifacts/cintexa/`, not the repo root.
 
-### One-time setup (Cloudflare dashboard)
+If Cloudflare Pages uses default settings (`Build output directory = dist` or `.`), the deploy has **no `index.html`** → **404**.
 
-Go to your Pages project → **Settings → Builds & deployments** and set:
+Also check:
+
+| Symptom | Likely cause |
+|--------|----------------|
+| Apex `cintexa.com` 404 | Pages project empty / wrong output dir / domain not attached to the project that has a successful build |
+| `www.cintexa.com` **522** | Cloudflare cannot reach origin (origin down, wrong DNS, or orange-cloud to a dead host) |
+| Direct path 404 but home works | Missing SPA `_redirects` (`/* /index.html 200`) |
+
+## Fix (Cloudflare dashboard) — do this once
+
+**Pages → your project → Settings → Builds & deployments**
 
 | Setting | Value |
-|---|---|
-| Framework preset | `Vite` (or `None`) |
-| Root directory | `/` (repo root — leave default) |
-| Build command | `npm install && npm run build -w @cintexa/db && npm run build -w cintexa` |
-| Build output directory | `artifacts/cintexa/dist` |
-| Node version | `22` (add env var `NODE_VERSION=22` if the build picks an older default and fails) |
+|---------|--------|
+| Framework preset | Vite or None |
+| Root directory | `/` (repo root) |
+| **Build command** | `npm ci && npm run build:pages` |
+| **Build output directory** | `artifacts/cintexa/dist` |
+| Node | **22** (`NODE_VERSION=22` env var) |
 
-### Required environment variables (Pages → Settings → Environment variables)
+**Environment variables (Production):**
 
-| Variable | Value |
-|---|---|
-| `VITE_CLERK_PUBLISHABLE_KEY` | Your real Clerk publishable key (`pk_live_...` in production) |
-| `VITE_API_BASE_URL` | The deployed API server's URL + `/api`, e.g. `https://api.yourdomain.com/api` |
+- `NODE_VERSION` = `22`
+- `VITE_CLERK_PUBLISHABLE_KEY` = your Clerk `pk_live_...` or test key
+- `VITE_API_BASE_URL` = API base including `/api` if needed
 
-Without `VITE_CLERK_PUBLISHABLE_KEY` set, the site will still build and serve,
-but sign-in and the customer dashboard won't work (Clerk will render with an
-empty key).
+Then **Retry deployment** or push a new commit. Changing settings alone does not rebuild an old failed deploy.
 
-### After changing these settings
+## Custom domain (cintexa.com)
 
-Trigger a fresh deployment — either push a new commit, or use **Retry
-deployment** / **Create deployment** in the Cloudflare dashboard. Changing
-build settings alone does not retroactively rebuild a deployment that already
-succeeded with the old (empty) settings.
+1. Pages → **Custom domains** → add `cintexa.com` and `www.cintexa.com`.
+2. DNS (Cloudflare DNS):
+   - Prefer **CNAME** `www` → `your-project.pages.dev`
+   - Apex: **CNAME flatten** to the same Pages target, or use Cloudflare’s “Pages” record UI.
+3. Avoid pointing `www` at a dead origin (causes **522**).
+4. Enable **Always Use HTTPS** and optional **www ↔ apex redirect** under Rules so both hostnames hit the same Pages deploy.
 
-### SPA routing
+## GitHub Action deploy (optional)
 
-`artifacts/cintexa/public/_redirects` (copied into `dist/` on every build)
-tells Cloudflare Pages to serve `index.html` for every path, so client-side
-routes (`/dashboard/settings`, `/solutions/ads-boost`, etc.) work on a hard
-refresh instead of 404ing. If you ever see 404s on a direct route visit but
-not on in-app navigation, check this file made it into the deployed output.
+Workflow: `.github/workflows/deploy-pages.yml`
 
-### Local verification
+Repo **Secrets**:
 
-Before trusting a Cloudflare config change, verify the exact same build
-command works locally:
+- `CLOUDFLARE_API_TOKEN` (Pages Edit permission)
+- `CLOUDFLARE_ACCOUNT_ID`
+- `VITE_CLERK_PUBLISHABLE_KEY`
+- `VITE_API_BASE_URL` (optional)
+
+Project name in the workflow: `cintexa-growth-platform` (must match the Pages project name).
+
+## Local verify before trusting Cloudflare
 
 ```bash
-npm install
-npm run build -w @cintexa/db
-npm run build -w cintexa
-npx serve artifacts/cintexa/dist   # or any static file server
+npm ci
+npm run build:pages
+npx serve artifacts/cintexa/dist
 ```
 
-If this doesn't produce a working site locally, changing Cloudflare settings
-won't fix it either — the build itself is broken first.
+If this fails locally, Cloudflare will also 404.
 
-## Backend — API server
+## API
 
-The API server (`artifacts/api-server/`) is a standard Node/Express app and
-is **not** served by Cloudflare Pages (Pages serves static output only).
-Deploy it separately — a `Dockerfile` is provided at
-`artifacts/api-server/Dockerfile` for any container host (Fly.io, Render,
-Railway, a VPS, etc.). Point the frontend's `VITE_API_BASE_URL` at wherever
-this ends up.
-
-Required environment variables are listed in `.env.example` at the repo root.
+Pages only serves the static frontend. Deploy `artifacts/api-server` separately (see Dockerfile).

@@ -1,21 +1,40 @@
-/* Hide Clerk development banner and "Secured by Clerk" branding chrome */
+/* Hide Clerk development banner, "Secured by Clerk", and related branding chrome */
 
 .cl-internal-b3fm6y,
 .cl-badge,
 [data-localization-key="badge__default"],
+[data-localization-key="badge__otherImpersonatorDevice"],
+[data-localization-key="footerPageLink__help"],
+[data-localization-key="footerPageLink__privacy"],
+[data-localization-key="footerPageLink__terms"],
 .cl-footer .cl-footerPages,
-a[href*="clerk.com"][target="_blank"] {
+.cl-footer,
+.cl-userButtonPopoverFooter,
+.cl-userButtonPopoverActionButton__manageAccount + .cl-userButtonPopoverFooter,
+a[href*="clerk.com"][target="_blank"],
+a[href*="clerk.dev"][target="_blank"],
+a[href*="accounts.dev"][target="_blank"] {
   display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
 }
 
 /* Development mode notice strip (class names can vary by Clerk version) */
 .cl-card > div:has([data-localization-key*="development"]),
 .cl-rootBox [class*="development"],
-.cl-signIn-start > div:first-child:has(svg) {
-  /* keep form usable if selector is too broad — prefer appearance prop */
+.cl-signIn-start > div:first-child:has(svg),
+[class*="cl-internal"][class*="development"],
+div[class*="cl-"] a[href*="clerk.com"] {
+  display: none !important;
 }
 
-/* Footer row that often contains Secured by Clerk */
-.cl-footer {
+/* Extra safety: any element whose visible text is the Clerk marketing lines */
+.cl-rootBox [data-localization-key="unstable__errors.captcha_invalid"],
+.cl-modalCloseButton + div a[href*="clerk"] {
   display: none !important;
 }

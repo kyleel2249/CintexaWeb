@@ -12,16 +12,18 @@ import {
   readPromoCode,
 } from "@/lib/platform-economics";
 
+const DEFAULT_PCT = (PLATFORM_FEE_RATE_DEFAULT * 100).toFixed(0);
+const PROMO_PCT = (PLATFORM_FEE_RATE_PROMO * 100).toFixed(0);
+
 /**
- * Plan presentation uses quiet reference points (higher figures nearby)
- * so the active price reads as the natural choice — without calling out "discount".
+ * Plans are framed only in percentages (no currency amounts).
+ * Quiet anchoring: higher industry-style % nearby so the platform rate feels natural.
  */
 const PLANS: {
   id: SubscriptionPlan;
   name: string;
-  /** Primary price shown large */
-  price: string;
-  /** Soft reference line (anchoring) — muted, not labeled as a sale */
+  /** Primary figure — percentage only */
+  rateLabel: string;
   reference?: string;
   tagline: string;
   features: string[];
@@ -30,27 +32,27 @@ const PLANS: {
   {
     id: "starter",
     name: "Starter",
-    price: "$0",
-    reference: "Workspace tools that often start near $49/mo elsewhere",
+    rateLabel: "0%",
+    reference: "Subscription charge on this plan",
     tagline: "Full access to get moving",
     features: [
       "1 workspace",
       "Core marketing & posting tools",
-      `Sales fee ${(PLATFORM_FEE_RATE_DEFAULT * 100).toFixed(0)}% · ${(PLATFORM_FEE_RATE_PROMO * 100).toFixed(0)}% with code ${PROMO_CODE}`,
+      `Platform fee on sales: ${DEFAULT_PCT}% · ${PROMO_PCT}% with ${PROMO_CODE}`,
       "Community support",
     ],
   },
   {
     id: "growth",
     name: "Growth",
-    price: "$149",
-    reference: "Teams replacing separate stacks often budget $250–$400/mo",
+    rateLabel: `${DEFAULT_PCT}%`,
+    reference: `Standard platform share · ${PROMO_PCT}% with ${PROMO_CODE}. Many commerce stacks land closer to 10–15%.`,
     tagline: "One connected growth system",
     features: [
       "Unlimited workspaces",
       "Ads Boost, e-commerce & social scheduling",
       "Loyalty ledger",
-      `Sales fee ${(PLATFORM_FEE_RATE_DEFAULT * 100).toFixed(0)}% · ${(PLATFORM_FEE_RATE_PROMO * 100).toFixed(0)}% with ${PROMO_CODE}`,
+      `Platform fee on sales: ${DEFAULT_PCT}% · ${PROMO_PCT}% with ${PROMO_CODE}`,
       "Priority support",
     ],
     highlighted: true,
@@ -58,10 +60,15 @@ const PLANS: {
   {
     id: "enterprise",
     name: "Enterprise",
-    price: "Custom",
-    reference: "Programs for larger orgs typically run from $2,400/yr",
+    rateLabel: "Custom %",
+    reference: "Volume terms negotiated from the standard platform rate",
     tagline: "Architecture, SLA, and dedicated ops",
-    features: ["Custom modules", "Dedicated infrastructure", "SLA + onboarding", "Fee terms tailored to volume"],
+    features: [
+      "Custom modules",
+      "Dedicated infrastructure",
+      "SLA + onboarding",
+      "Fee percentage tailored to volume",
+    ],
   },
 ];
 
@@ -90,7 +97,7 @@ function PlanButton({ plan }: { plan: (typeof PLANS)[number] }) {
         : setSubscription.isPending
           ? "Updating…"
           : plan.id === "starter"
-            ? "Start at $0"
+            ? "Start free"
             : "Continue with Growth"}
     </button>
   );
@@ -105,11 +112,10 @@ export function Pricing() {
     <div className="cx-section">
       <div className="cx-container">
         <p className="cx-eyebrow">Pricing</p>
-        <h1 className="cx-display mt-3 text-3xl sm:text-4xl">Simple plans. Clear fees on every sale.</h1>
+        <h1 className="cx-display mt-3 text-3xl sm:text-4xl">Clear percentages on every sale.</h1>
         <p className="mt-4 max-w-2xl text-sm text-[hsl(var(--fg-muted))]">
-          Platform fee is <strong>{(PLATFORM_FEE_RATE_DEFAULT * 100).toFixed(0)}%</strong> on sales by default. Apply{" "}
-          <strong>{PROMO_CODE}</strong> for a <strong>{(PLATFORM_FEE_RATE_PROMO * 100).toFixed(0)}%</strong> fee. Starter
-          stays at $0.
+          Platform fee is <strong>{DEFAULT_PCT}%</strong> on sales by default. Apply <strong>{PROMO_CODE}</strong> for{" "}
+          <strong>{PROMO_PCT}%</strong>. Starter has a <strong>0%</strong> subscription charge.
         </p>
 
         <div className="cx-card mt-8 flex max-w-md flex-col gap-3">
@@ -139,7 +145,7 @@ export function Pricing() {
           {msg && <p className="text-sm text-[hsl(var(--fg-muted))]">{msg}</p>}
           {promoOn && (
             <p className="text-sm font-medium" style={{ color: "hsl(var(--success))" }}>
-              {PROMO_CODE} active — platform fee {(PLATFORM_FEE_RATE_PROMO * 100).toFixed(0)}% on sales.
+              {PROMO_CODE} active — platform fee {PROMO_PCT}% on sales.
             </p>
           )}
         </div>
@@ -157,12 +163,7 @@ export function Pricing() {
               <h3 className="cx-display text-xl">{p.name}</h3>
               <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">{p.tagline}</p>
               <div className="mt-5">
-                <p className="cx-display text-3xl">
-                  {p.price}
-                  {p.id === "growth" && (
-                    <span className="ml-1 text-base font-normal text-[hsl(var(--fg-muted))]">/mo</span>
-                  )}
-                </p>
+                <p className="cx-display text-3xl">{p.rateLabel}</p>
                 {p.reference && (
                   <p className="mt-2 text-xs leading-relaxed text-[hsl(var(--fg-muted))]">{p.reference}</p>
                 )}

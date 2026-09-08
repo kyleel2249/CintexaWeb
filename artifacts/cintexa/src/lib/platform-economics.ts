@@ -1,4 +1,4 @@
-/** Platform fee & promo rules. */
+/** Platform fee & promo rules — rates only (percentages), no currency amounts. */
 
 export const ADMIN_USERNAME = "FREE2026";
 export const PROMO_CODE = "FREE2026";
@@ -25,7 +25,7 @@ export function applyPromoCode(code: string): { ok: boolean; message: string } {
     localStorage.setItem(PROMO_KEY, PROMO_CODE);
     return {
       ok: true,
-      message: `Promo applied — platform fee set to ${(PLATFORM_FEE_RATE_PROMO * 100).toFixed(0)}% on sales. Starter remains free.`,
+      message: `Promo applied — platform fee ${(PLATFORM_FEE_RATE_PROMO * 100).toFixed(0)}% on sales. Starter stays at 0% plan charge.`,
     };
   }
   return { ok: false, message: "Invalid promo code." };
@@ -43,6 +43,7 @@ export function currentPlatformFeeRate(): number {
   return hasActivePromo() ? PLATFORM_FEE_RATE_PROMO : PLATFORM_FEE_RATE_DEFAULT;
 }
 
+/** Returns fee breakdown as rates + computed portions (callers may show % only). */
 export function applyPlatformFee(gross: number) {
   const rate = currentPlatformFeeRate();
   const fee = Math.round(gross * rate * 100) / 100;

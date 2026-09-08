@@ -11,6 +11,7 @@ const AdsBoost = lazy(() => import("@/pages/AdsBoost").then((m) => ({ default: m
 const Ecommerce = lazy(() => import("@/pages/Ecommerce").then((m) => ({ default: m.Ecommerce })));
 const Platform = lazy(() => import("@/pages/Platform").then((m) => ({ default: m.Platform })));
 const Pricing = lazy(() => import("@/pages/Pricing").then((m) => ({ default: m.Pricing })));
+const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
 const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DashboardOverview = lazy(() => import("@/pages/dashboard/Overview").then((m) => ({ default: m.DashboardOverview })));
 const DashboardContributions = lazy(() => import("@/pages/dashboard/Contributions").then((m) => ({ default: m.DashboardContributions })));
@@ -45,6 +46,9 @@ export default function App() {
               <Route path="/solutions/ecommerce" component={Ecommerce} />
               <Route path="/platform" component={Platform} />
               <Route path="/pricing" component={Pricing} />
+              <Route path="/get-started" component={GetStarted} />
+              <Route path="/sign-in" component={GetStarted} />
+              <Route path="/sign-up" component={GetStarted} />
               <Route path="/dashboard" component={DashboardOverview} />
               <Route path="/dashboard/contributions" component={DashboardContributions} />
               <Route path="/dashboard/progress" component={DashboardProgress} />

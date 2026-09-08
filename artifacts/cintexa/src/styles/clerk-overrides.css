@@ -1,0 +1,21 @@
+/* Hide Clerk development banner and "Secured by Clerk" branding chrome */
+
+.cl-internal-b3fm6y,
+.cl-badge,
+[data-localization-key="badge__default"],
+.cl-footer .cl-footerPages,
+a[href*="clerk.com"][target="_blank"] {
+  display: none !important;
+}
+
+/* Development mode notice strip (class names can vary by Clerk version) */
+.cl-card > div:has([data-localization-key*="development"]),
+.cl-rootBox [class*="development"],
+.cl-signIn-start > div:first-child:has(svg) {
+  /* keep form usable if selector is too broad — prefer appearance prop */
+}
+
+/* Footer row that often contains Secured by Clerk */
+.cl-footer {
+  display: none !important;
+}

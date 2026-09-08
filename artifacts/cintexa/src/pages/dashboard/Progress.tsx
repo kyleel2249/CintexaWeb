@@ -24,7 +24,8 @@ export function DashboardProgress() {
   );
 
   const hasActivity = (activity.data?.activity.length ?? 0) > 0;
-  const hasContribution = activity.data?.activity.some((a) => a.eventType.startsWith("contribution")) ?? false;
+  const hasContribution =
+    activity.data?.activity.some((a) => a.eventType.startsWith("contribution")) ?? false;
   const plan = subscription.data?.subscription?.plan;
   const balance = loyalty.data?.balance ?? 0;
 
@@ -46,7 +47,7 @@ export function DashboardProgress() {
         <div className="cx-card">
           <div className="flex items-center justify-between">
             <p className="cx-eyebrow">Growth journey</p>
-            <span className="text-sm text-[hsl(var(--fg-muted))]">{loading ? "…" : `${pct}%`}</span>
+            <span className="text-sm text-[hsl(var(--fg-muted))]">{loading ? "..." : `${pct}%`}</span>
           </div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-[hsl(var(--bg-inset))]">
             <div
@@ -64,7 +65,7 @@ export function DashboardProgress() {
                     color: m.done ? "hsl(var(--accent-ink))" : "hsl(var(--fg-muted))",
                   }}
                 >
-                  {m.done ? "\u2713" : ""}
+                  {m.done ? "OK" : ""}
                 </span>
                 <span className={m.done ? "" : "text-[hsl(var(--fg-muted))]">{m.title}</span>
               </li>
@@ -80,12 +81,12 @@ export function DashboardProgress() {
                 Current: <span style={{ color: badge.color }}>{badge.label}</span>
               </>
             ) : (
-              "No badge yet \u2014 check in daily"
+              "No badge yet - check in daily"
             )}
           </h2>
           <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-            <strong>{streakDays}</strong> consecutive day{streakDays === 1 ? "" : "s"}. Miss a day and you drop to
-            the previous badge (or zero). Check in by visiting the dashboard each day.
+            <strong>{streakDays}</strong> consecutive day{streakDays === 1 ? "" : "s"}. Miss a day and you
+            drop to the previous badge (or zero). Check in by visiting the dashboard each day.
           </p>
 
           <ol className="mt-6 flex flex-col gap-3">
@@ -98,7 +99,9 @@ export function DashboardProgress() {
                   className="flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-sm"
                   style={{
                     borderColor: isCurrent ? t.color : "hsl(var(--border))",
-                    background: earned ? `color-mix(in srgb, ${t.color} 12%, transparent)` : "transparent",
+                    background: earned
+                      ? `color-mix(in srgb, ${t.color} 12%, transparent)`
+                      : "transparent",
                   }}
                 >
                   <div className="flex items-center gap-2">
@@ -106,11 +109,16 @@ export function DashboardProgress() {
                       className="h-2.5 w-2.5 rounded-full"
                       style={{ background: earned ? t.color : "hsl(var(--fg-muted))" }}
                     />
-                    <span style={{ color: earned ? t.color : undefined, fontWeight: isCurrent ? 600 : 400 }}>
+                    <span
+                      style={{
+                        color: earned ? t.color : undefined,
+                        fontWeight: isCurrent ? 600 : 400,
+                      }}
+                    >
                       {t.label}
                     </span>
                   </div>
-                  <span className="text-xs text-[hsl(var(--fg-muted))]" >{t.minDays}+ days</span>
+                  <span className="text-xs text-[hsl(var(--fg-muted))]">{t.minDays}+ days</span>
                 </li>
               );
             })}

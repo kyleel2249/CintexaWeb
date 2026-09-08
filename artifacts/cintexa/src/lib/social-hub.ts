@@ -90,13 +90,17 @@ export function createPost(input: { body: string; scheduledFor?: string; boost?:
 export function shareUrls(url: string, text: string) {
   const u = encodeURIComponent(url);
   const t = encodeURIComponent(text);
+  const combined = encodeURIComponent(`${text} ${url}`);
   return {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${u}`,
     x: `https://twitter.com/intent/tweet?url=${u}&text=${t}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
-    whatsapp: `https://wa.me/?text=${t}%20${u}`,
+    whatsapp: `https://wa.me/?text=${combined}`,
     telegram: `https://t.me/share/url?url=${u}&text=${t}`,
+    reddit: `https://www.reddit.com/submit?url=${u}&title=${t}`,
     email: `mailto:?subject=${t}&body=${u}`,
+    // Instagram / TikTok have no public web share endpoint — copy link for those apps
+    copy: url,
   };
 }
 

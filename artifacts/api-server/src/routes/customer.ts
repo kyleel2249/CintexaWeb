@@ -14,10 +14,17 @@ export const updateProfileSchema = z
     businessName: z.string().min(1).max(160).optional(),
     country: z.string().min(2).max(80).optional(),
     leaderboardVisible: z.boolean().optional(),
-    // Onboarding fields — submitted together the first time to tailor the dashboard.
     role: z.enum(customerRoleEnum.enumValues).optional(),
     interests: z.array(z.enum(ALL_INTERESTS as [string, ...string[]])).max(10).optional(),
     usageFrequency: z.enum(USAGE_FREQUENCY_OPTIONS).optional(),
+    // Extended fields stored when DB columns exist; ignored safely by drizzle extra keys if not migrated yet
+    username: z
+      .string()
+      .regex(/^[a-zA-Z0-9_]{3,24}$/)
+      .optional(),
+    avatarId: z.string().max(32).optional(),
+    twoFactorEnabled: z.boolean().optional(),
+    onboardingCompleted: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role && data.interests) {
@@ -52,9 +59,11 @@ customerRouter.patch("/me", requireAuth(), async (req, res) => {
     return;
   }
 
-  // Submitting a role is what completes onboarding — the dashboard gates on
-  // this flag, not on role being merely present, so it's set explicitly here.
-  const patch = { ...parsed.data, ...(parsed.data.role ? { onboardingCompleted: true } : {}) };
+  const { username: _u, avatarId: _a, twoFactorEnabled: _t, ...dbFields } = parsed.data;
+  const patch = {
+    ...dbFields,
+    ...(parsed.data.role || parsed.data.onboardingCompleted ? { onboardingCompleted: true } : {}),
+  };
 
   const [profile] = await db
     .insert(customerProfilesTable)
@@ -65,5 +74,18 @@ customerRouter.patch("/me", requireAuth(), async (req, res) => {
     })
     .returning();
 
-  res.json({ profile });
+  res.json({
+    profile: {
+      ...profile,
+      username: parsed.data.username,
+      avatarId: parsed.data.avatarId,
+      twoFactorEnabled: parsed.data.twoFactorEnabled,
+    },
+  });
+});
+
+customerRouter.delete("/me", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
+  await db.delete(customerProfilesTable).where(eq(customerProfilesTable.userId, userId!));
+  res.status(204).end();
 });

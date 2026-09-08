@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { SiteLayout } from "@/components/layout/SiteLayout";
+import { CookieConsent } from "@/components/CookieConsent";
 import { Home } from "@/pages/Home";
 
 const MarketingTech = lazy(() => import("@/pages/MarketingTech").then((m) => ({ default: m.MarketingTech })));
@@ -18,6 +19,13 @@ const DashboardContributions = lazy(() => import("@/pages/dashboard/Contribution
 const DashboardProgress = lazy(() => import("@/pages/dashboard/Progress").then((m) => ({ default: m.DashboardProgress })));
 const DashboardLeaderboard = lazy(() => import("@/pages/dashboard/Leaderboard").then((m) => ({ default: m.DashboardLeaderboard })));
 const DashboardSettings = lazy(() => import("@/pages/dashboard/Settings").then((m) => ({ default: m.DashboardSettings })));
+const DashboardTemplates = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardTemplates })));
+const DashboardAffiliate = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardAffiliate })));
+const DashboardAnalytics = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardAnalytics })));
+const DashboardPixels = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardPixels })));
+const DashboardEmail = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardEmail })));
+const DashboardPayback = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardPayback })));
+const DashboardFaq = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardFaq })));
 const Admin = lazy(() => import("@/pages/admin/Admin").then((m) => ({ default: m.Admin })));
 
 const queryClient = new QueryClient();
@@ -50,6 +58,13 @@ export default function App() {
               <Route path="/sign-in" component={GetStarted} />
               <Route path="/sign-up" component={GetStarted} />
               <Route path="/dashboard" component={DashboardOverview} />
+              <Route path="/dashboard/templates" component={DashboardTemplates} />
+              <Route path="/dashboard/affiliate" component={DashboardAffiliate} />
+              <Route path="/dashboard/analytics" component={DashboardAnalytics} />
+              <Route path="/dashboard/pixels" component={DashboardPixels} />
+              <Route path="/dashboard/email" component={DashboardEmail} />
+              <Route path="/dashboard/payback" component={DashboardPayback} />
+              <Route path="/dashboard/faq" component={DashboardFaq} />
               <Route path="/dashboard/contributions" component={DashboardContributions} />
               <Route path="/dashboard/progress" component={DashboardProgress} />
               <Route path="/dashboard/leaderboard" component={DashboardLeaderboard} />
@@ -59,6 +74,7 @@ export default function App() {
             </Switch>
           </Suspense>
         </SiteLayout>
+        <CookieConsent />
       </MotionProvider>
     </QueryClientProvider>
   );

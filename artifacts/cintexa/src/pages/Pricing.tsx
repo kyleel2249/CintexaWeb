@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
-import type { SubscriptionPlan } from "@cintexa/db";
+import type { SubscriptionPlan } from "@cintexa/db/schema";
 import { useMySubscription, useSetSubscription } from "@/hooks/useApi";
 
 const PLANS: { id: SubscriptionPlan; name: string; price: string; tagline: string; features: string[]; highlighted?: boolean }[] = [

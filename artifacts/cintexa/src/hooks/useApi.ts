@@ -8,7 +8,7 @@ import type {
   LoyaltyLedgerEntry,
   Subscription,
   SubscriptionPlan,
-} from "@cintexa/db";
+} from "@cintexa/db/schema";
 
 /** Wraps a Clerk-authenticated GET as a TanStack Query hook. */
 function useAuthedQuery<T>(key: string[], path: string) {
@@ -31,7 +31,11 @@ export function useUpdateProfile() {
   const { getToken } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (body: Partial<Pick<CustomerProfile, "displayName" | "businessName" | "country" | "leaderboardVisible">>) => {
+    mutationFn: async (
+      body: Partial<
+        Pick<CustomerProfile, "displayName" | "businessName" | "country" | "leaderboardVisible" | "role" | "interests" | "usageFrequency">
+      >,
+    ) => {
       const token = await getToken();
       return apiFetch<{ profile: CustomerProfile }>("/customer/me", { method: "PATCH", body, token });
     },

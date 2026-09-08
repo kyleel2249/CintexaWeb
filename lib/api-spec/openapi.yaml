@@ -53,6 +53,11 @@ paths:
     patch:
       summary: Update the signed-in customer's profile (upserts)
       operationId: updateMyProfile
+      description: >
+        Also used to complete onboarding — submitting `role` sets
+        `onboardingCompleted` to true server-side. `interests` are validated
+        against the selected role's allowed options (see the role-specific
+        lists at lib/db's ROLE_INTEREST_OPTIONS).
       security: [{ clerkAuth: [] }]
       requestBody:
         required: true
@@ -65,6 +70,13 @@ paths:
                 businessName: { type: string, maxLength: 160 }
                 country: { type: string, maxLength: 80 }
                 leaderboardVisible: { type: boolean }
+                role: { type: string, enum: [creator, seller, buyer, consumer] }
+                interests:
+                  type: array
+                  maxItems: 10
+                  items: { type: string }
+                  description: Must belong to the selected role's option list when role is also present in the same request
+                usageFrequency: { type: string, enum: [Daily, "A few times a week", Occasionally] }
       responses:
         "200":
           description: Updated profile
@@ -424,6 +436,12 @@ components:
         businessName: { type: string, nullable: true }
         country: { type: string, nullable: true }
         leaderboardVisible: { type: boolean }
+        role: { type: string, enum: [creator, seller, buyer, consumer], nullable: true }
+        interests:
+          type: array
+          items: { type: string }
+        usageFrequency: { type: string, nullable: true }
+        onboardingCompleted: { type: boolean }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
     Subscription:

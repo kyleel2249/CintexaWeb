@@ -1,6 +1,8 @@
 import { Link, useRoute } from "wouter";
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import type { ReactNode } from "react";
+import { useMyProfile } from "@/hooks/useApi";
+import { OnboardingFlow } from "./onboarding/OnboardingFlow";
 
 const TABS = [
   { label: "Overview", href: "/dashboard" },
@@ -31,6 +33,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const [, params] = useRoute("/dashboard/:tab?");
   const activeHref = params?.tab ? `/dashboard/${params.tab}` : "/dashboard";
   const { user } = useUser();
+  const profile = useMyProfile();
 
   return (
     <>
@@ -38,34 +41,42 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         <SignedOutPrompt />
       </SignedOut>
       <SignedIn>
-        <div className="cx-section !pt-10">
-          <div className="cx-container">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="cx-eyebrow">Customer portal</p>
-                <h1 className="cx-display mt-2 text-2xl sm:text-3xl">
-                  Welcome back{user?.firstName ? `, ${user.firstName}` : ""}.
-                </h1>
-              </div>
-              <UserButton afterSignOutUrl="/" />
-            </div>
-
-            <nav className="mt-8 flex flex-wrap gap-1 border-b border-[hsl(var(--border))] pb-1" aria-label="Dashboard sections">
-              {TABS.map((t) => (
-                <Link
-                  key={t.href}
-                  href={t.href}
-                  className="cx-nav-link"
-                  aria-current={activeHref === t.href ? "page" : undefined}
-                >
-                  {t.label}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="mt-8">{children}</div>
+        {profile.isLoading ? (
+          <div className="cx-section flex justify-center !pt-16">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[hsl(var(--accent))] border-t-transparent" />
           </div>
-        </div>
+        ) : profile.data?.profile?.onboardingCompleted ? (
+          <div className="cx-section !pt-10">
+            <div className="cx-container">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="cx-eyebrow">Customer portal</p>
+                  <h1 className="cx-display mt-2 text-2xl sm:text-3xl">
+                    Welcome back{user?.firstName ? `, ${user.firstName}` : ""}.
+                  </h1>
+                </div>
+                <UserButton afterSignOutUrl="/" />
+              </div>
+
+              <nav className="mt-8 flex flex-wrap gap-1 border-b border-[hsl(var(--border))] pb-1" aria-label="Dashboard sections">
+                {TABS.map((t) => (
+                  <Link
+                    key={t.href}
+                    href={t.href}
+                    className="cx-nav-link"
+                    aria-current={activeHref === t.href ? "page" : undefined}
+                  >
+                    {t.label}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="mt-8">{children}</div>
+            </div>
+          </div>
+        ) : (
+          <OnboardingFlow />
+        )}
       </SignedIn>
     </>
   );

@@ -89,3 +89,34 @@ All performance figures on marketing/ads demos are clearly labeled sample data �
 - jsdom test setup gained an `IntersectionObserver` stub (same category as the earlier `matchMedia` stub)
   so the new motion components don't crash under test
 - Re-verified: 36 tests passing (26 backend + 10 frontend), typecheck clean, full build clean
+
+## Round 6
+- Structured logging: console.log/console.error replaced everywhere with pino (JSON in production, pretty
+  in dev, silent in tests), pino-http request logging with trimmed serializers and health-check spam
+  filtered out
+- Pagination added to all four previously-hard-capped-at-50 list endpoints (contributions, activity,
+  admin/customers, admin/agents/tasks) via a shared parsePageParams/buildPaginationMeta helper — each now
+  returns `pagination: {limit, offset, total, hasMore}` alongside the existing array key
+- **Role-based onboarding**: new customers pick Creator/Seller/Buyer/Consumer, then answer role-specific
+  interest questions and a usage-frequency question, in a 3-step wizard (`OnboardingFlow`). This actually
+  reshapes the dashboard — Overview now shows a "Tailored for you" panel with concrete page recommendations
+  computed from the person's selected interests (e.g. a seller who picked "Physical products" gets pointed
+  at the E-commerce solution page), not just a cosmetic role label
+  - Schema: `customer_profiles` gained `role`, `interests` (jsonb), `usageFrequency`, `onboardingCompleted`
+  - `PATCH /api/customer/me` extended to accept these fields, with server-side cross-field validation
+    (interests must belong to the selected role's option list) — 6 new unit tests for this validation
+  - `DashboardShell` gates on `onboardingCompleted`, showing the wizard instead of dashboard tabs until done
+  - 3 new frontend tests for the wizard's step logic (role selection -> filtered interests -> frequency)
+- **Caught and fixed a real bundling bug before it reached production**: `lib/roles.ts` imported runtime
+  constants from `@cintexa/db`'s main barrel, which also exports the live Postgres client — Vite tried to
+  bundle the `postgres` npm package for the browser and the production build failed outright. Fixed by
+  giving `@cintexa/db` a `./schema` subpath export (pure constants/types, no Postgres) and moving every
+  frontend import to it. This would have broken the live Cloudflare deploy if it had shipped — caught
+  because the actual `build:pages` command was run before pushing, not just typecheck
+- Also fixed: `AnimatePresence mode="wait"` in the onboarding wizard could hang indefinitely under limited
+  animation environments (confirmed failing under jsdom) since it waits for an exit animation to resolve
+  before mounting the next step — removed `mode="wait"`, steps now cross-fade instead of blocking
+- Verified against a real local Postgres: migration generated and applied (customer_profiles grew from 7 to
+  11 columns), onboarding fields confirmed to read/write correctly
+- Re-verified: 52 tests passing (39 backend + 13 frontend) from a clean install, typecheck clean, both
+  build:pages and api-server builds clean, OpenAPI spec updated and re-validated (13 paths, 7 schemas)

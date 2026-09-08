@@ -1,5 +1,7 @@
 import { index, uniqueIndex, numeric, pgTable, text, timestamp, uuid, boolean, integer, pgEnum, jsonb } from "drizzle-orm/pg-core";
 
+export const customerRoleEnum = pgEnum("customer_role", ["creator", "seller", "buyer", "consumer"]);
+
 export const customerProfilesTable = pgTable(
   "customer_profiles",
   {
@@ -8,6 +10,11 @@ export const customerProfilesTable = pgTable(
     businessName: text("business_name"),
     country: text("country"),
     leaderboardVisible: boolean("leaderboard_visible").notNull().default(false),
+    // Onboarding — captured once at signup/first sign-in to tailor the dashboard.
+    role: customerRoleEnum("role"),
+    interests: jsonb("interests").$type<string[]>().notNull().default([]),
+    usageFrequency: text("usage_frequency"),
+    onboardingCompleted: boolean("onboarding_completed").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -51,6 +58,20 @@ export const activityEventsTable = pgTable(
 );
 
 export type CustomerProfile = typeof customerProfilesTable.$inferSelect;
+export type CustomerRole = (typeof customerRoleEnum.enumValues)[number];
+
+/** Interest options offered during onboarding, per role — shared by the API's
+ * validation schema and the frontend's question UI, so they can never drift. */
+export const ROLE_INTEREST_OPTIONS: Record<CustomerRole, string[]> = {
+  creator: ["Content & media", "Software & tools", "Courses & education", "Art & design", "Music & audio"],
+  seller: ["Physical products", "Digital products", "Services", "Subscriptions"],
+  buyer: ["Marketing tools", "E-commerce tools", "Ad campaigns", "Analytics & BI"],
+  consumer: ["Product updates", "Community & rewards", "Deals & discounts", "Educational content"],
+};
+
+export const USAGE_FREQUENCY_OPTIONS = ["Daily", "A few times a week", "Occasionally"] as const;
+export type UsageFrequency = (typeof USAGE_FREQUENCY_OPTIONS)[number];
+
 export type Contribution = typeof contributionsTable.$inferSelect;
 export type ActivityEvent = typeof activityEventsTable.$inferSelect;
 

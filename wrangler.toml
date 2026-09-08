@@ -1,20 +1,14 @@
-# Cloudflare Pages configuration.
+# Cloudflare Pages — monorepo frontend output
 #
-# This repo is a monorepo — the deployable frontend lives in
-# artifacts/cintexa/, not at the repo root. If Cloudflare Pages' dashboard
-# build settings are left at their defaults, it looks for a build at the repo
-# root, finds nothing to build, and serves nothing (or a stale/empty
-# result) — which is what "changes aren't reflecting" usually means.
+# Dashboard → Settings → Builds & deployments MUST be:
+#   Framework preset:       Vite (or None)
+#   Root directory:         /  (repo root)
+#   Build command:          npm ci && npm run build:pages
+#   Build output directory: artifacts/cintexa/dist
+#   Environment variable:   NODE_VERSION=22
 #
-# Recommended Cloudflare Pages dashboard settings (Settings > Builds & deployments):
-#   Framework preset:        Vite
-#   Root directory:          / (repo root — leave as default)
-#   Build command:           npm install && npm run build -w @cintexa/db && npm run build -w cintexa
-#   Build output directory:  artifacts/cintexa/dist
-#   Node version:             22 (set NODE_VERSION env var if the build picks an older default)
-#
-# See DEPLOYMENT.md for the full walkthrough, including required environment
-# variables (VITE_CLERK_PUBLISHABLE_KEY, VITE_API_BASE_URL).
+# If Build output directory is left as "dist" or ".", Cloudflare serves an
+# empty project → HTTP 404 on https://cintexa.com
 
 name = "cintexa-growth-platform"
 pages_build_output_dir = "artifacts/cintexa/dist"

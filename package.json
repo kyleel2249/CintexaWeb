@@ -1,6 +1,9 @@
 {
   "name": "cintexa-growth-platform",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "workspaces": [
     "artifacts/*",
     "lib/*",
@@ -10,6 +13,7 @@
     "dev:web": "npm run dev -w cintexa",
     "dev:api": "npm run build -w @cintexa/db && npm run dev -w api-server",
     "build": "npm run build -w @cintexa/db && npm run build -w api-server && npm run build -w cintexa",
+    "build:pages": "npm run build -w @cintexa/db && npm run build -w cintexa",
     "typecheck": "npm run build -w @cintexa/db && npm run typecheck --workspaces --if-present",
     "test": "npm run build -w @cintexa/db && npm run test -w api-server && npm run test -w cintexa"
   }

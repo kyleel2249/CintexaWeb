@@ -6,13 +6,17 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  message: string;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false };
+  state: State = { hasError: false, message: "" };
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error): State {
+    return {
+      hasError: true,
+      message: error?.message || "Unknown render error",
+    };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
@@ -20,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   handleReload = () => {
-    this.setState({ hasError: false });
+    this.setState({ hasError: false, message: "" });
     window.location.reload();
   };
 
@@ -43,14 +47,45 @@ export class ErrorBoundary extends Component<Props, State> {
           padding: "2rem",
         }}
       >
-        <p className="cx-eyebrow">SOMETHING WENT WRONG</p>
-        <h1 className="cx-display" style={{ fontSize: "1.75rem", margin: 0 }}>
+        <p style={{ fontSize: 11, letterSpacing: "0.2em", color: "#F5C518" }}>SOMETHING WENT WRONG</p>
+        <h1 style={{ fontSize: "1.75rem", margin: 0, fontFamily: "Space Grotesk, system-ui, sans-serif" }}>
           This page hit a snag.
         </h1>
         <p style={{ color: "#A6AEB8", maxWidth: 420 }}>
-          Reloading usually fixes it. If it keeps happening, the issue has been logged.
+          Reloading usually fixes it. If it keeps happening, check the browser console and Cloudflare
+          env vars (especially VITE_CLERK_PUBLISHABLE_KEY).
         </p>
-        <button className="cx-btn cx-btn-primary" onClick={this.handleReload}>
+        {this.state.message ? (
+          <pre
+            style={{
+              maxWidth: 520,
+              overflow: "auto",
+              textAlign: "left",
+              fontSize: 12,
+              color: "#A6AEB8",
+              background: "#141A22",
+              padding: "12px 14px",
+              borderRadius: 12,
+              border: "1px solid #2A3340",
+            }}
+          >
+            {this.state.message}
+          </pre>
+        ) : null}
+        <button
+          type="button"
+          onClick={this.handleReload}
+          style={{
+            marginTop: 8,
+            border: "none",
+            borderRadius: 999,
+            padding: "12px 20px",
+            fontWeight: 700,
+            cursor: "pointer",
+            background: "#F5C518",
+            color: "#0B0F14",
+          }}
+        >
           Reload page
         </button>
       </div>

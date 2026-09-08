@@ -143,7 +143,7 @@ export function DashboardSettings() {
           <section className="cx-card space-y-3">
             <h2 className="cx-display text-lg">Security · two-factor authentication</h2>
             <p className="text-sm text-[hsl(var(--fg-muted))]">
-              Enable TOTP / 2FA in your account security center. Clerk manages factors for this deployment.
+              Enable TOTP / 2FA in your account security center. Multi-factor options are managed by your identity provider for this deployment.
             </p>
             <button
               type="button"

@@ -3,15 +3,15 @@
 const BY_INTEREST: Record<string, { q: string; a: string }[]> = {
   "Content & media": [
     { q: "How do I publish content templates?", a: "Open Dashboard → Templates, pick a content kit, and adapt it to your brand voice." },
-    { q: "Can I schedule posts?", a: "Use Email & engagement tools together with your social pixel setup for timed campaigns." },
+    { q: "Can I schedule posts?", a: "Use Dashboard → Social to connect networks, schedule posts, and boost ads. Share links work across platforms." },
   ],
   "Digital products": [
-    { q: "How are sales fees calculated?", a: "CINTEXA retains a 5% platform fee on each successful payment; the rest is yours after processor costs." },
+    { q: "How are sales fees calculated?", a: "Platform fee is a percentage of each sale. Default is 7%; apply promo FREE2026 for 5%. Processor costs are separate." },
     { q: "Which payout methods are supported?", a: "Cards, Mobile Money, and bank transfer are available under Payback." },
   ],
   "Affiliate links & referrals": [
-    { q: "Where is my affiliate link?", a: "Dashboard → Affiliate shows your referral code and tracked conversions (demo data until campaigns go live)." },
-    { q: "How do commissions appear?", a: "Affiliate earnings show net of the 5% platform fee on attributed sales." },
+    { q: "Where is my affiliate link?", a: "Dashboard → Affiliate shows your referral code and tracked conversions (demo data until campaigns go live). Every account is linked to referrer FREE2026." },
+    { q: "How do commissions appear?", a: "Affiliate earnings show net of the active platform fee percentage on attributed sales." },
   ],
   "Ad campaigns": [
     { q: "How do Facebook pixels work here?", a: "Dashboard → Pixels lets you store Pixel IDs. Firing respects your marketing cookie consent." },
@@ -22,9 +22,9 @@ const BY_INTEREST: Record<string, { q: string; a: string }[]> = {
   ],
   default: [
     { q: "How do I change my username or avatar?", a: "Go to Dashboard → Settings. Username binds to your account on this device and syncs when the API is available." },
-    { q: "How do I enable two-factor authentication?", a: "Settings → Security links to your account security center (Clerk) for TOTP / 2FA." },
+    { q: "How do I enable two-factor authentication?", a: "Settings → Security opens your account security center for TOTP / 2FA." },
     { q: "How do I export or delete my data?", a: "Settings → Privacy: export downloads a JSON file; delete asks for confirmation then clears local data and requests server deletion." },
-    { q: "What is the platform fee?", a: "5% of each sale or payout is retained by CINTEXA to operate the platform." },
+    { q: "What is the platform fee?", a: "Platform fee is a percentage of each sale. Default is 7%; apply promo FREE2026 for 5%. Starter has a 0% subscription charge." },
   ],
 };
 

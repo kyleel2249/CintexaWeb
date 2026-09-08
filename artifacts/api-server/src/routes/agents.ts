@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { z } from "zod";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { requireAdminKey } from "../middleware/adminAuth.js";
 import { db, agentTasksTable, agentRoleEnum } from "@cintexa/db";
 import { AGENT_ROLES, AgentValidationError, runAgentTask } from "../agents/orchestrator.js";
+import { parsePageParams, buildPaginationMeta } from "../lib/pagination.js";
 
 export const agentsRouter = Router();
 agentsRouter.use(requireAdminKey);
@@ -44,14 +45,19 @@ agentsRouter.get("/tasks", async (req, res) => {
   const roleFilter = agentRoleEnum.enumValues.includes(req.query.role as never)
     ? (req.query.role as (typeof agentRoleEnum.enumValues)[number])
     : undefined;
-  const limit = Math.min(Number(req.query.limit) || 50, 200);
+  const page = parsePageParams(req);
+  const whereClause = roleFilter ? eq(agentTasksTable.role, roleFilter) : undefined;
 
-  const rows = await db
-    .select()
-    .from(agentTasksTable)
-    .where(roleFilter ? eq(agentTasksTable.role, roleFilter) : undefined)
-    .orderBy(desc(agentTasksTable.createdAt))
-    .limit(limit);
+  const [rows, [{ count }]] = await Promise.all([
+    db
+      .select()
+      .from(agentTasksTable)
+      .where(whereClause)
+      .orderBy(desc(agentTasksTable.createdAt))
+      .limit(page.limit)
+      .offset(page.offset),
+    db.select({ count: sql<number>`count(*)::int` }).from(agentTasksTable).where(whereClause),
+  ]);
 
-  res.json({ tasks: rows });
+  res.json({ tasks: rows, pagination: buildPaginationMeta(page, rows.length, count) });
 });

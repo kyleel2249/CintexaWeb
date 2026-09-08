@@ -1,8 +1,9 @@
 import { createApp } from "./app.js";
 import { env } from "./lib/env.js";
+import { logger } from "./lib/logger.js";
 
 const app = createApp();
 
 app.listen(env.PORT, () => {
-  console.log(`CINTEXA API listening on :${env.PORT} (${env.NODE_ENV})`);
+  logger.info({ port: env.PORT, env: env.NODE_ENV }, "CINTEXA API listening");
 });

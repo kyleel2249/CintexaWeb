@@ -21,6 +21,7 @@ describeIfDb("API integration", () => {
     process.env.WEBHOOK_SECRET ??= "test-webhook-secret-16-chars";
     process.env.CLERK_SECRET_KEY ??= "sk_test_placeholder";
     process.env.CLERK_PUBLISHABLE_KEY ??= "pk_test_placeholder";
+    process.env.NODE_ENV ??= "test";
 
     const { createApp } = await import("../app.js");
     request = (await import("supertest")).default;

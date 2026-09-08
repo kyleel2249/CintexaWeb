@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { desc, eq, sql } from "drizzle-orm";
 import { requireAdminKey } from "../middleware/adminAuth.js";
+import { parsePageParams, buildPaginationMeta } from "../lib/pagination.js";
 import {
   db,
   customerProfilesTable,
@@ -15,33 +16,39 @@ adminRouter.use(requireAdminKey);
 
 /** List customers with their subscription plan and loyalty balance, most recently updated first. */
 adminRouter.get("/customers", async (req, res) => {
-  const limit = Math.min(Number(req.query.limit) || 50, 200);
+  const page = parsePageParams(req);
 
-  const rows = await db
-    .select({
-      userId: customerProfilesTable.userId,
-      displayName: customerProfilesTable.displayName,
-      businessName: customerProfilesTable.businessName,
-      plan: subscriptionsTable.plan,
-      status: subscriptionsTable.status,
-      balance: sql<number>`coalesce(sum(${loyaltyLedgerTable.delta}), 0)::int`,
-      updatedAt: customerProfilesTable.updatedAt,
-    })
-    .from(customerProfilesTable)
-    .leftJoin(subscriptionsTable, eq(subscriptionsTable.userId, customerProfilesTable.userId))
-    .leftJoin(loyaltyLedgerTable, eq(loyaltyLedgerTable.userId, customerProfilesTable.userId))
-    .groupBy(
-      customerProfilesTable.userId,
-      customerProfilesTable.displayName,
-      customerProfilesTable.businessName,
-      subscriptionsTable.plan,
-      subscriptionsTable.status,
-      customerProfilesTable.updatedAt,
-    )
-    .orderBy(desc(customerProfilesTable.updatedAt))
-    .limit(limit);
+  const [rows, [{ count }]] = await Promise.all([
+    db
+      .select({
+        userId: customerProfilesTable.userId,
+        displayName: customerProfilesTable.displayName,
+        businessName: customerProfilesTable.businessName,
+        plan: subscriptionsTable.plan,
+        status: subscriptionsTable.status,
+        balance: sql<number>`coalesce(sum(${loyaltyLedgerTable.delta}), 0)::int`,
+        updatedAt: customerProfilesTable.updatedAt,
+      })
+      .from(customerProfilesTable)
+      .leftJoin(subscriptionsTable, eq(subscriptionsTable.userId, customerProfilesTable.userId))
+      .leftJoin(loyaltyLedgerTable, eq(loyaltyLedgerTable.userId, customerProfilesTable.userId))
+      .groupBy(
+        customerProfilesTable.userId,
+        customerProfilesTable.displayName,
+        customerProfilesTable.businessName,
+        subscriptionsTable.plan,
+        subscriptionsTable.status,
+        customerProfilesTable.updatedAt,
+      )
+      .orderBy(desc(customerProfilesTable.updatedAt))
+      .limit(page.limit)
+      .offset(page.offset),
+    // userId is customer_profiles' primary key, so a plain row count here
+    // equals the group count of the joined query above.
+    db.select({ count: sql<number>`count(*)::int` }).from(customerProfilesTable),
+  ]);
 
-  res.json({ customers: rows });
+  res.json({ customers: rows, pagination: buildPaginationMeta(page, rows.length, count) });
 });
 
 const adjustSchema = z.object({

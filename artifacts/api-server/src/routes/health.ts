@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { sql } from "drizzle-orm";
 import { db } from "@cintexa/db";
+import { logger } from "../lib/logger.js";
 
 export const healthRouter = Router();
 
@@ -14,7 +15,7 @@ healthRouter.get("/", async (_req, res) => {
     await db.execute(sql`select 1`);
     res.json({ status: "ok", database: "connected", timestamp: new Date().toISOString() });
   } catch (err) {
-    console.error("Health check: database unreachable", err);
+    logger.error({ err }, "Health check: database unreachable");
     res.status(503).json({ status: "degraded", database: "unreachable", timestamp: new Date().toISOString() });
   }
 });

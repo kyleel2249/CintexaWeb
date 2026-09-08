@@ -150,9 +150,16 @@ paths:
       summary: List the signed-in customer's contributions (most recent 50)
       operationId: listMyContributions
       security: [{ clerkAuth: [] }]
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50, maximum: 200 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
       responses:
         "200":
-          description: Contribution history
+          description: A page of contribution history, most recent first
           content:
             application/json:
               schema:
@@ -161,6 +168,7 @@ paths:
                   contributions:
                     type: array
                     items: { $ref: "#/components/schemas/Contribution" }
+                  pagination: { $ref: "#/components/schemas/PaginationMeta" }
         "401":
           description: Not authenticated
 
@@ -169,9 +177,16 @@ paths:
       summary: List the signed-in customer's activity events (most recent 50)
       operationId: listMyActivity
       security: [{ clerkAuth: [] }]
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50, maximum: 200 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
       responses:
         "200":
-          description: Activity feed
+          description: A page of the activity feed, most recent first
           content:
             application/json:
               schema:
@@ -180,6 +195,7 @@ paths:
                   activity:
                     type: array
                     items: { $ref: "#/components/schemas/ActivityEvent" }
+                  pagination: { $ref: "#/components/schemas/PaginationMeta" }
         "401":
           description: Not authenticated
 
@@ -240,9 +256,12 @@ paths:
         - name: limit
           in: query
           schema: { type: integer, default: 50, maximum: 200 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
       responses:
         "200":
-          description: Customer list, most recently updated first
+          description: A page of customers, most recently updated first
           content:
             application/json:
               schema:
@@ -260,6 +279,7 @@ paths:
                         status: { type: string, nullable: true }
                         balance: { type: integer }
                         updatedAt: { type: string, format: date-time }
+                  pagination: { $ref: "#/components/schemas/PaginationMeta" }
         "401":
           description: Missing or invalid admin key
 
@@ -361,9 +381,12 @@ paths:
         - name: limit
           in: query
           schema: { type: integer, default: 50, maximum: 200 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
       responses:
         "200":
-          description: Task history, most recent first
+          description: A page of task history, most recent first
           content:
             application/json:
               schema:
@@ -372,6 +395,7 @@ paths:
                   tasks:
                     type: array
                     items: { $ref: "#/components/schemas/AgentTask" }
+                  pagination: { $ref: "#/components/schemas/PaginationMeta" }
         "401":
           description: Missing or invalid admin key
 
@@ -441,6 +465,13 @@ components:
         title: { type: string }
         description: { type: string }
         createdAt: { type: string, format: date-time }
+    PaginationMeta:
+      type: object
+      properties:
+        limit: { type: integer }
+        offset: { type: integer }
+        total: { type: integer }
+        hasMore: { type: boolean }
     AgentTask:
       type: object
       properties:

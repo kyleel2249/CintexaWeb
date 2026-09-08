@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { DashboardShell } from "./DashboardShell";
 import { useMyProfile } from "@/hooks/useApi";
-import { applyPlatformFee, PLATFORM_FEE_RATE } from "@/lib/local-profile";
+import { applyPlatformFee, currentPlatformFeeRate } from "@/lib/platform-economics";
 import { faqForInterests } from "@/lib/interest-faq";
 
 const TEMPLATES = [
@@ -33,10 +33,13 @@ export function DashboardTemplates() {
 
 export function DashboardAffiliate() {
   const code = "CX-" + (typeof window !== "undefined" ? (localStorage.getItem("cintexa.aff") ?? "DEMO01") : "DEMO01");
+  const feePct = (currentPlatformFeeRate() * 100).toFixed(0);
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Affiliate marketing</h2>
-      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Share your link, track referrals, and view commission after the 5% platform fee.</p>
+      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
+        Share your link, track referrals, and view commission after the {feePct}% platform fee.
+      </p>
       <div className="cx-card mt-6 max-w-lg">
         <p className="text-xs uppercase tracking-wider text-[hsl(var(--fg-muted))]">Your referral code</p>
         <p className="mt-2 font-mono text-lg">{code}</p>
@@ -125,12 +128,13 @@ export function DashboardPayback() {
   const [amount, setAmount] = useState(100);
   const [method, setMethod] = useState<"card" | "momo" | "bank">("momo");
   const breakdown = applyPlatformFee(amount);
+  const feePct = (breakdown.rate * 100).toFixed(0);
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Payback</h2>
       <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-        Payouts via card, Mobile Money, or bank transfer. Platform retains{" "}
-        <strong>{(PLATFORM_FEE_RATE * 100).toFixed(0)}%</strong> of each sale or payment.
+        Payouts via card, Mobile Money, or bank transfer. Platform retains <strong>{feePct}%</strong> of each sale or
+        payment{breakdown.promo ? " (promo active)" : ""}.
       </p>
       <div className="cx-card mt-6 max-w-md space-y-4">
         <label className="cx-field">
@@ -167,7 +171,7 @@ export function DashboardPayback() {
             <dd>GH₵ {breakdown.gross.toFixed(2)}</dd>
           </div>
           <div className="flex justify-between text-[hsl(var(--fg-muted))]">
-            <dt>Platform fee (5%)</dt>
+            <dt>Platform fee ({feePct}%)</dt>
             <dd>− GH₵ {breakdown.fee.toFixed(2)}</dd>
           </div>
           <div className="flex justify-between font-semibold">

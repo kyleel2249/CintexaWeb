@@ -6,8 +6,8 @@ export const PROMO_CODE = "FREE2026";
 /** Default platform fee on sales / payouts. */
 export const PLATFORM_FEE_RATE_DEFAULT = 0.07;
 
-/** With valid promo FREE2026, platform fee is waived (0%). */
-export const PLATFORM_FEE_RATE_PROMO = 0;
+/** With valid promo FREE2026, platform fee is 5%. */
+export const PLATFORM_FEE_RATE_PROMO = 0.05;
 
 const PROMO_KEY = "cintexa.promo.code";
 
@@ -23,7 +23,10 @@ export function applyPromoCode(code: string): { ok: boolean; message: string } {
   const normalized = code.trim().toUpperCase();
   if (normalized === PROMO_CODE) {
     localStorage.setItem(PROMO_KEY, PROMO_CODE);
-    return { ok: true, message: "Promo applied — platform fee waived (0%). Starter remains free." };
+    return {
+      ok: true,
+      message: `Promo applied — platform fee set to ${(PLATFORM_FEE_RATE_PROMO * 100).toFixed(0)}% on sales. Starter remains free.`,
+    };
   }
   return { ok: false, message: "Invalid promo code." };
 }

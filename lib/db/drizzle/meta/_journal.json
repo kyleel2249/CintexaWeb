@@ -22,6 +22,13 @@
       "when": 1788859930598,
       "tag": "0002_material_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788896622833,
+      "tag": "0003_glossy_christian_walker",
+      "breakpoints": true
     }
   ]
 }

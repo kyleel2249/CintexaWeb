@@ -9,10 +9,14 @@ export const ROLE_META: Record<CustomerRole, { label: string; blurb: string; col
   creator: { label: "Creator", blurb: "You make things — content, products, or tools for others.", color: "violet" },
   seller: { label: "Seller", blurb: "You sell products or services and want to grow revenue.", color: "accent" },
   buyer: { label: "Buyer", blurb: "You're evaluating tools and services to bring in.", color: "sky" },
-  consumer: { label: "Consumer", blurb: "You use CINTEXA products and want rewards, updates, and deals.", color: "teal" },
+  affiliate: {
+    label: "Affiliate",
+    blurb: "Promote offers, products, services, and earn commissions on every sale.",
+    color: "teal",
+  },
 };
 
-export const ROLE_ORDER: CustomerRole[] = ["creator", "seller", "buyer", "consumer"];
+export const ROLE_ORDER: CustomerRole[] = ["creator", "seller", "buyer", "affiliate"];
 
 interface Recommendation {
   title: string;
@@ -36,10 +40,10 @@ const INTEREST_RECOMMENDATIONS: Record<string, Recommendation> = {
   "E-commerce tools": { title: "E-commerce", description: "Explore the commerce toolkit.", href: "/solutions/ecommerce" },
   "Ad campaigns": { title: "Ads Boost", description: "See the campaign lifecycle view.", href: "/solutions/ads-boost" },
   "Analytics & BI": { title: "Platform overview", description: "See what's available today vs. on the roadmap.", href: "/platform" },
-  "Product updates": { title: "Platform overview", description: "Track what's shipped across every module.", href: "/platform" },
-  "Community & rewards": { title: "Leaderboard", description: "See where you rank and opt in from Settings.", href: "/dashboard/leaderboard" },
-  "Deals & discounts": { title: "Pricing", description: "Compare plans and what's included.", href: "/pricing" },
-  "Educational content": { title: "Marketing technology", description: "See how the content pipeline works.", href: "/solutions/marketing" },
+  "Product promotion": { title: "Marketing technology", description: "Promote products and offers across channels.", href: "/solutions/marketing" },
+  "Affiliate links & referrals": { title: "Sales technology", description: "Track referral-driven leads through the pipeline.", href: "/solutions/sales" },
+  "Commission tracking": { title: "Contributions", description: "See your commission payouts as they come in.", href: "/dashboard/contributions" },
+  "Partner programs": { title: "Pricing", description: "See plans built for partners and affiliates.", href: "/pricing" },
 };
 
 /** Deduplicates by destination page, in case multiple interests point at the same place. */

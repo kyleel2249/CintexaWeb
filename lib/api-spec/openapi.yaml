@@ -70,7 +70,7 @@ paths:
                 businessName: { type: string, maxLength: 160 }
                 country: { type: string, maxLength: 80 }
                 leaderboardVisible: { type: boolean }
-                role: { type: string, enum: [creator, seller, buyer, consumer] }
+                role: { type: string, enum: [creator, seller, buyer, affiliate] }
                 interests:
                   type: array
                   maxItems: 10
@@ -436,7 +436,7 @@ components:
         businessName: { type: string, nullable: true }
         country: { type: string, nullable: true }
         leaderboardVisible: { type: boolean }
-        role: { type: string, enum: [creator, seller, buyer, consumer], nullable: true }
+        role: { type: string, enum: [creator, seller, buyer, affiliate], nullable: true }
         interests:
           type: array
           items: { type: string }

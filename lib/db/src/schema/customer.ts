@@ -1,6 +1,6 @@
 import { index, uniqueIndex, numeric, pgTable, text, timestamp, uuid, boolean, integer, pgEnum, jsonb } from "drizzle-orm/pg-core";
 
-export const customerRoleEnum = pgEnum("customer_role", ["creator", "seller", "buyer", "consumer"]);
+export const customerRoleEnum = pgEnum("customer_role", ["creator", "seller", "buyer", "affiliate"]);
 
 export const customerProfilesTable = pgTable(
   "customer_profiles",
@@ -66,7 +66,7 @@ export const ROLE_INTEREST_OPTIONS: Record<CustomerRole, string[]> = {
   creator: ["Content & media", "Software & tools", "Courses & education", "Art & design", "Music & audio"],
   seller: ["Physical products", "Digital products", "Services", "Subscriptions"],
   buyer: ["Marketing tools", "E-commerce tools", "Ad campaigns", "Analytics & BI"],
-  consumer: ["Product updates", "Community & rewards", "Deals & discounts", "Educational content"],
+  affiliate: ["Product promotion", "Affiliate links & referrals", "Commission tracking", "Partner programs"],
 };
 
 export const USAGE_FREQUENCY_OPTIONS = ["Daily", "A few times a week", "Occasionally"] as const;

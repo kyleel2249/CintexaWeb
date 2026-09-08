@@ -26,7 +26,7 @@ describe("OnboardingFlow", () => {
     expect(screen.getByRole("button", { name: /creator/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /seller/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /buyer/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /consumer/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /affiliate/i })).toBeInTheDocument();
   });
 
   it("shows role-specific interests after picking a role", () => {

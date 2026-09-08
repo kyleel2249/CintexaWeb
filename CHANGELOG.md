@@ -97,7 +97,7 @@ All performance figures on marketing/ads demos are clearly labeled sample data �
 - Pagination added to all four previously-hard-capped-at-50 list endpoints (contributions, activity,
   admin/customers, admin/agents/tasks) via a shared parsePageParams/buildPaginationMeta helper — each now
   returns `pagination: {limit, offset, total, hasMore}` alongside the existing array key
-- **Role-based onboarding**: new customers pick Creator/Seller/Buyer/Consumer, then answer role-specific
+- **Role-based onboarding**: new customers pick Creator/Seller/Buyer/Affiliate, then answer role-specific
   interest questions and a usage-frequency question, in a 3-step wizard (`OnboardingFlow`). This actually
   reshapes the dashboard — Overview now shows a "Tailored for you" panel with concrete page recommendations
   computed from the person's selected interests (e.g. a seller who picked "Physical products" gets pointed

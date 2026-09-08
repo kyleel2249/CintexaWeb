@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { DashboardShell } from "./DashboardShell";
 import { useMyProfile } from "@/hooks/useApi";
-import { applyPlatformFee, currentPlatformFeeRate } from "@/lib/platform-economics";
+import { currentPlatformFeeRate } from "@/lib/platform-economics";
 import { faqForInterests } from "@/lib/interest-faq";
 
 const TEMPLATES = [
@@ -34,16 +34,17 @@ export function DashboardTemplates() {
 export function DashboardAffiliate() {
   const code = "CX-" + (typeof window !== "undefined" ? (localStorage.getItem("cintexa.aff") ?? "DEMO01") : "DEMO01");
   const feePct = (currentPlatformFeeRate() * 100).toFixed(0);
+  const keepPct = (100 - currentPlatformFeeRate() * 100).toFixed(0);
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Affiliate marketing</h2>
       <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-        Share your link, track referrals, and view commission after the {feePct}% platform fee.
+        Share your link and track referrals. Platform fee {feePct}% · you keep {keepPct}% of attributed sales.
       </p>
       <div className="cx-card mt-6 max-w-lg">
         <p className="text-xs uppercase tracking-wider text-[hsl(var(--fg-muted))]">Your referral code</p>
         <p className="mt-2 font-mono text-lg">{code}</p>
-        <p className="mt-4 text-sm text-[hsl(var(--fg-muted))]">Sample attributed sales: 12 · Net after fee shown in Payback.</p>
+        <p className="mt-4 text-sm text-[hsl(var(--fg-muted))]">Sample share of attributed volume shown as percentages in Payback.</p>
       </div>
     </DashboardShell>
   );
@@ -53,12 +54,12 @@ export function DashboardAnalytics() {
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Analytics</h2>
-      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Demo metrics — connect live sources when your API is deployed.</p>
+      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Demo rates — connect live sources when your API is deployed.</p>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         {[
-          { l: "Visitors (7d)", v: "4,280" },
-          { l: "Conversions", v: "186" },
-          { l: "Revenue (sample)", v: "GH₵ 12.4k" },
+          { l: "Conversion rate (7d)", v: "4.3%" },
+          { l: "Engagement rate", v: "12%" },
+          { l: "Repeat purchase share", v: "28%" },
         ].map((m) => (
           <div key={m.l} className="cx-card">
             <p className="text-xs text-[hsl(var(--fg-muted))]">{m.l}</p>
@@ -125,28 +126,17 @@ export function DashboardEmail() {
 }
 
 export function DashboardPayback() {
-  const [amount, setAmount] = useState(100);
   const [method, setMethod] = useState<"card" | "momo" | "bank">("momo");
-  const breakdown = applyPlatformFee(amount);
-  const feePct = (breakdown.rate * 100).toFixed(0);
+  const feePct = (currentPlatformFeeRate() * 100).toFixed(0);
+  const keepPct = (100 - currentPlatformFeeRate() * 100).toFixed(0);
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Payback</h2>
       <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-        Payouts via card, Mobile Money, or bank transfer. Platform retains <strong>{feePct}%</strong> of each sale or
-        payment{breakdown.promo ? " (promo active)" : ""}.
+        Payouts via card, Mobile Money, or bank transfer. All figures are shown as <strong>percentages</strong> of each
+        sale.
       </p>
       <div className="cx-card mt-6 max-w-md space-y-4">
-        <label className="cx-field">
-          <span className="cx-label">Gross amount (demo)</span>
-          <input
-            type="number"
-            min={1}
-            className="cx-input"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value) || 0)}
-          />
-        </label>
         <div className="flex flex-wrap gap-2">
           {(
             [
@@ -167,16 +157,16 @@ export function DashboardPayback() {
         </div>
         <dl className="space-y-1 text-sm">
           <div className="flex justify-between">
-            <dt>Gross</dt>
-            <dd>GH₵ {breakdown.gross.toFixed(2)}</dd>
+            <dt>Gross sale</dt>
+            <dd>100%</dd>
           </div>
           <div className="flex justify-between text-[hsl(var(--fg-muted))]">
-            <dt>Platform fee ({feePct}%)</dt>
-            <dd>− GH₵ {breakdown.fee.toFixed(2)}</dd>
+            <dt>Platform fee</dt>
+            <dd>−{feePct}%</dd>
           </div>
           <div className="flex justify-between font-semibold">
             <dt>You receive</dt>
-            <dd>GH₵ {breakdown.net.toFixed(2)}</dd>
+            <dd>{keepPct}%</dd>
           </div>
         </dl>
         <button type="button" className="cx-btn cx-btn-primary">

@@ -11,6 +11,6 @@
     "dev:api": "npm run build -w @cintexa/db && npm run dev -w api-server",
     "build": "npm run build -w @cintexa/db && npm run build -w api-server && npm run build -w cintexa",
     "typecheck": "npm run build -w @cintexa/db && npm run typecheck --workspaces --if-present",
-    "test": "npm run build -w @cintexa/db && npm run test -w api-server"
+    "test": "npm run build -w @cintexa/db && npm run test -w api-server && npm run test -w cintexa"
   }
 }

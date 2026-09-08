@@ -1,0 +1,10 @@
+{
+  "name": "CINTEXA",
+  "short_name": "CINTEXA",
+  "description": "A growth platform for technology, commerce, motion, and intelligence.",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }],
+  "theme_color": "#0B0F14",
+  "background_color": "#0B0F14",
+  "display": "standalone",
+  "start_url": "/"
+}

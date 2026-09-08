@@ -26,6 +26,7 @@ const DashboardPixels = lazy(() => import("@/pages/dashboard/Modules").then((m) 
 const DashboardEmail = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardEmail })));
 const DashboardPayback = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardPayback })));
 const DashboardFaq = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardFaq })));
+const DashboardSocial = lazy(() => import("@/pages/dashboard/Social").then((m) => ({ default: m.DashboardSocial })));
 const Admin = lazy(() => import("@/pages/admin/Admin").then((m) => ({ default: m.Admin })));
 
 const queryClient = new QueryClient();
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="/sign-in" component={GetStarted} />
               <Route path="/sign-up" component={GetStarted} />
               <Route path="/dashboard" component={DashboardOverview} />
+              <Route path="/dashboard/social" component={DashboardSocial} />
               <Route path="/dashboard/templates" component={DashboardTemplates} />
               <Route path="/dashboard/affiliate" component={DashboardAffiliate} />
               <Route path="/dashboard/analytics" component={DashboardAnalytics} />

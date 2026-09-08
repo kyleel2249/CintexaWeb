@@ -1,12 +1,16 @@
 import { Link, useRoute } from "wouter";
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useMyProfile } from "@/hooks/useApi";
 import { OnboardingFlow } from "./onboarding/OnboardingFlow";
 import { AVATAR_OPTIONS } from "@/lib/local-profile";
+import { badgeMeta, checkInStreak, type BadgeId } from "@/lib/streak-badges";
+import { ensureAdminReferrer } from "@/lib/social-hub";
+import { ADMIN_USERNAME } from "@/lib/platform-economics";
 
 const TABS = [
   { label: "Overview", href: "/dashboard" },
+  { label: "Social", href: "/dashboard/social" },
   { label: "Templates", href: "/dashboard/templates" },
   { label: "Affiliate", href: "/dashboard/affiliate" },
   { label: "Analytics", href: "/dashboard/analytics" },
@@ -27,10 +31,12 @@ function SignedOutPrompt() {
         <p className="cx-eyebrow">Customer portal</p>
         <h1 className="cx-display mt-3 text-3xl">Sign in to see your dashboard.</h1>
         <p className="mt-3 max-w-sm text-[hsl(var(--fg-muted))]">
-          Templates, affiliate tools, analytics, pixels, payouts, and your personalized FAQ live here after sign-in.
+          Social scheduling, boosts, templates, affiliate tools, and personalized FAQ live here after sign-in.
         </p>
         <SignInButton mode="modal">
-          <button type="button" className="cx-btn cx-btn-primary mt-6">Sign in</button>
+          <button type="button" className="cx-btn cx-btn-primary mt-6">
+            Sign in
+          </button>
         </SignInButton>
       </div>
     </div>
@@ -44,6 +50,17 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const profile = useMyProfile();
   const avatar = AVATAR_OPTIONS.find((a) => a.id === (profile.data?.profile as { avatarId?: string } | null)?.avatarId);
   const username = (profile.data?.profile as { username?: string } | null)?.username;
+  const [streakDays, setStreakDays] = useState(0);
+  const [badgeId, setBadgeId] = useState<BadgeId>(null);
+
+  useEffect(() => {
+    ensureAdminReferrer();
+    const s = checkInStreak();
+    setStreakDays(s.consecutiveDays);
+    setBadgeId(s.badgeId);
+  }, []);
+
+  const badge = badgeMeta(badgeId);
 
   return (
     <>
@@ -68,16 +85,33 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                     {(username ?? user?.firstName ?? "C").slice(0, 1).toUpperCase()}
                   </div>
                   <div>
-                    <p className="cx-eyebrow">Customer portal</p>
+                    <p className="cx-eyebrow">Customer portal · ref @{ADMIN_USERNAME}</p>
                     <h1 className="cx-display mt-1 text-2xl sm:text-3xl">
                       {username ? `@${username}` : `Welcome back${user?.firstName ? `, ${user.firstName}` : ""}`}
                     </h1>
+                    <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">
+                      Daily streak: <strong>{streakDays}</strong> day{streakDays === 1 ? "" : "s"}
+                      {badge ? (
+                        <>
+                          {" "}
+                          · Badge{" "}
+                          <span style={{ color: badge.color }}>{badge.label}</span>
+                        </>
+                      ) : (
+                        " · Check in daily to earn badges"
+                      )}
+                      {" "}
+                      · Miss a day and you drop to the previous badge (or zero).
+                    </p>
                   </div>
                 </div>
                 <UserButton afterSignOutUrl="/" />
               </div>
 
-              <nav className="mt-8 flex flex-wrap gap-1 border-b border-[hsl(var(--border))] pb-1" aria-label="Dashboard sections">
+              <nav
+                className="mt-8 flex flex-wrap gap-1 border-b border-[hsl(var(--border))] pb-1"
+                aria-label="Dashboard sections"
+              >
                 {TABS.map((t) => (
                   <Link
                     key={t.href}

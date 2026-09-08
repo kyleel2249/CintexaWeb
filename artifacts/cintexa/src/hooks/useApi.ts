@@ -1,6 +1,13 @@
 import { useAuth } from "@clerk/clerk-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
+import {
+  clearLocalProfile,
+  exportLocalData,
+  readLocalProfile,
+  writeLocalProfile,
+  type LocalProfile,
+} from "@/lib/local-profile";
 import type {
   ActivityEvent,
   Contribution,
@@ -10,7 +17,6 @@ import type {
   SubscriptionPlan,
 } from "@cintexa/db/schema";
 
-/** Wraps a Clerk-authenticated GET as a TanStack Query hook. */
 function useAuthedQuery<T>(key: string[], path: string) {
   const { getToken, isSignedIn } = useAuth();
   return useQuery({
@@ -23,23 +29,133 @@ function useAuthedQuery<T>(key: string[], path: string) {
   });
 }
 
-export function useMyProfile() {
-  return useAuthedQuery<{ profile: CustomerProfile | null }>(["customer", "me"], "/customer/me");
+function mergeProfile(api: CustomerProfile | null | undefined, local: LocalProfile | null) {
+  if (!api && !local) return null;
+  return {
+    ...(api ?? {
+      userId: local?.userId ?? "local",
+      displayName: null,
+      businessName: null,
+      country: null,
+      leaderboardVisible: false,
+      role: null,
+      interests: [],
+      usageFrequency: null,
+      onboardingCompleted: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }),
+    ...local,
+    onboardingCompleted: Boolean(api?.onboardingCompleted || local?.onboardingCompleted),
+    interests: (local?.interests ?? api?.interests ?? []) as string[],
+  } as CustomerProfile & LocalProfile;
 }
 
+export function useMyProfile() {
+  const { getToken, isSignedIn, userId } = useAuth();
+  return useQuery({
+    queryKey: ["customer", "me"],
+    enabled: isSignedIn,
+    queryFn: async () => {
+      const local = readLocalProfile();
+      try {
+        const token = await getToken();
+        const data = await apiFetch<{ profile: CustomerProfile | null }>("/customer/me", { token });
+        return { profile: mergeProfile(data.profile, local), source: "api" as const };
+      } catch {
+        // API down / not deployed — still allow dashboard from local onboarding
+        const profile = mergeProfile(null, local ? { ...local, userId: userId ?? local.userId } : null);
+        return { profile, source: "local" as const };
+      }
+    },
+  });
+}
+
+type ProfilePatch = Partial<
+  Pick<
+    CustomerProfile,
+    "displayName" | "businessName" | "country" | "leaderboardVisible" | "role" | "interests" | "usageFrequency"
+  >
+> & {
+  username?: string;
+  avatarId?: string;
+  twoFactorEnabled?: boolean;
+  onboardingCompleted?: boolean;
+};
+
 export function useUpdateProfile() {
+  const { getToken, userId } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: ProfilePatch) => {
+      const localPatch: LocalProfile = {
+        userId: userId ?? undefined,
+        ...body,
+        onboardingCompleted: body.role ? true : body.onboardingCompleted,
+      };
+      // Always persist locally first so onboarding never blocks on a missing API
+      const local = writeLocalProfile(localPatch);
+
+      try {
+        const token = await getToken();
+        const data = await apiFetch<{ profile: CustomerProfile }>("/customer/me", {
+          method: "PATCH",
+          body,
+          token,
+        });
+        return { profile: mergeProfile(data.profile, local)!, source: "api" as const };
+      } catch {
+        // Treat local save as success so the user can enter the dashboard
+        return {
+          profile: mergeProfile(null, local)!,
+          source: "local" as const,
+        };
+      }
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["customer", "me"], data);
+      queryClient.invalidateQueries({ queryKey: ["customer", "me"] });
+    },
+  });
+}
+
+export function useExportMyData() {
+  const { getToken } = useAuth();
+  return useMutation({
+    mutationFn: async () => {
+      try {
+        const token = await getToken();
+        const remote = await apiFetch<{ profile: CustomerProfile | null }>("/customer/me", { token });
+        return JSON.stringify(
+          { exportedAt: new Date().toISOString(), profile: remote.profile, local: readLocalProfile() },
+          null,
+          2,
+        );
+      } catch {
+        return exportLocalData();
+      }
+    },
+  });
+}
+
+export function useDeleteMyData() {
   const { getToken } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (
-      body: Partial<
-        Pick<CustomerProfile, "displayName" | "businessName" | "country" | "leaderboardVisible" | "role" | "interests" | "usageFrequency">
-      >,
-    ) => {
-      const token = await getToken();
-      return apiFetch<{ profile: CustomerProfile }>("/customer/me", { method: "PATCH", body, token });
+    mutationFn: async () => {
+      clearLocalProfile();
+      try {
+        const token = await getToken();
+        await apiFetch("/customer/me", { method: "DELETE", token });
+      } catch {
+        // local clear already done
+      }
+      return true;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["customer", "me"] }),
+    onSuccess: () => {
+      queryClient.setQueryData(["customer", "me"], { profile: null });
+      queryClient.invalidateQueries({ queryKey: ["customer"] });
+    },
   });
 }
 
@@ -71,7 +187,6 @@ export function useMyActivity() {
   return useAuthedQuery<{ activity: ActivityEvent[] }>(["activity"], "/activity");
 }
 
-/** Public — no auth needed. */
 export function useLeaderboard() {
   return useQuery({
     queryKey: ["leaderboard"],

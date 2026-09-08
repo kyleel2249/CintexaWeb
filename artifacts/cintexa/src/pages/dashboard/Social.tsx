@@ -47,7 +47,6 @@ export function DashboardSocial() {
     setSchedule("");
     setBoost(false);
     const urls = shareUrls(post.shareUrl, post.body.slice(0, 120));
-    // Open share sheet intent for X as quick path; user can use all links below
     void urls;
   }
 
@@ -93,7 +92,7 @@ export function DashboardSocial() {
         })}
       </div>
 
-      <h2 className="cx-display mt-10 text-xl">Post, schedule &amp; boost</h2>
+      <h2 className="cx-display mt-10 text-xl">Post, schedule & boost</h2>
       <form className="cx-card mt-4 max-w-xl space-y-3" onSubmit={handlePost}>
         <textarea
           className="cx-input min-h-[100px]"
@@ -131,11 +130,24 @@ export function DashboardSocial() {
               </p>
               <p className="mt-1 font-mono text-xs text-[hsl(var(--accent))]">{p.shareUrl}</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {Object.entries(urls).map(([name, href]) => (
-                  <a key={name} className="cx-btn cx-btn-secondary cx-btn-sm" href={href} target="_blank" rel="noreferrer">
-                    Share {name}
-                  </a>
-                ))}
+                {Object.entries(urls).map(([name, href]) =>
+                  name === "copy" ? (
+                    <button
+                      key={name}
+                      type="button"
+                      className="cx-btn cx-btn-secondary cx-btn-sm"
+                      onClick={() => {
+                        void navigator.clipboard?.writeText(href);
+                      }}
+                    >
+                      Copy link (Instagram / TikTok)
+                    </button>
+                  ) : (
+                    <a key={name} className="cx-btn cx-btn-secondary cx-btn-sm" href={href} target="_blank" rel="noreferrer">
+                      Share {name}
+                    </a>
+                  ),
+                )}
               </div>
             </article>
           );

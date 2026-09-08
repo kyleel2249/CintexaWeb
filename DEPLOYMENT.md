@@ -56,6 +56,12 @@ Repo **Secrets**:
 
 Project name in the workflow: `cintexa-growth-platform` (must match the Pages project name).
 
+Without `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` set, the workflow still
+builds the frontend (so build breakage is still caught) but skips the actual
+publish step with a notice instead of failing — safe to leave this workflow
+enabled even before you've decided whether to use it over Cloudflare's own
+dashboard-based GitHub integration. Using both isn't harmful, just redundant.
+
 ## Local verify before trusting Cloudflare
 
 ```bash

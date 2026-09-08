@@ -1,4 +1,4 @@
-import { Suspense, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, RoundedBox, Html } from "@react-three/drei";
 import * as THREE from "three";
@@ -82,11 +82,29 @@ function EcosystemScene() {
   );
 }
 
-/** Interactive 3D business ecosystem — hero scene for the homepage. */
+/**
+ * Interactive 3D business ecosystem — hero scene for the homepage. Pauses
+ * its render loop entirely when scrolled off-screen (IntersectionObserver +
+ * R3F's `frameloop="demand"`), per MOTION.md's off-screen canvas rule —
+ * this is a real GPU/battery cost, not just a nice-to-have, on a scene that
+ * often sits below the fold on mobile.
+ */
 export function BusinessEcosystem3D() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), {
+      threshold: 0.05,
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="aspect-square w-full max-w-[480px] mx-auto">
-      <Canvas camera={{ position: [0, 1.6, 4], fov: 42 }} dpr={[1, 1.75]}>
+    <div ref={containerRef} className="aspect-square w-full max-w-[480px] mx-auto">
+      <Canvas camera={{ position: [0, 1.6, 4], fov: 42 }} dpr={[1, 1.75]} frameloop={isVisible ? "always" : "never"}>
         <Suspense fallback={null}>
           <EcosystemScene />
         </Suspense>

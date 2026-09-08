@@ -66,3 +66,26 @@ All performance figures on marketing/ads demos are clearly labeled sample data �
   cards now carry distinct accent colors (sky/teal/amber/violet) instead of being monochrome
 - Re-verified: 35 tests passing (26 backend + 9 frontend), typecheck clean, full build clean, main JS chunk
   still 50.7KB after the Home page changes
+
+## Round 5
+- Closed a real doc-vs-code gap: MOTION.md named GSAP+ScrollTrigger, `ScrollReveal`, `PointerParallax`, and
+  off-screen canvas pausing as part of the stack, but none of them existed. Built all four for real and
+  wired them into actual pages rather than leaving them as unused dependencies:
+  - `ScrollReveal` — fade/slide-in on scroll via IntersectionObserver, used on the Home page pillar cards
+  - `PointerParallax` — subtle cursor-follow depth, wraps the hero's ecosystem visual
+  - `GsapStagger` — the one place GSAP + ScrollTrigger is actually used, staggers the Platform page's
+    module grid into view
+  - `BusinessEcosystem3D` now pauses its R3F render loop entirely (`frameloop="never"`) when scrolled
+    off-screen, verified via IntersectionObserver
+- Fixed a related doc/reality mismatch on the Platform page: subscriptions, loyalty, and the AI module were
+  still labeled "Foundation" even though they're fully implemented — relabeled to "Available"
+- Merged in two commits pushed directly by Kyle while this work was in progress: a proper Cloudflare Pages
+  404 fix (explicit build script, `_routes.json`, direct-deploy GitHub Action, DNS notes) and a boot-crash
+  fix for when `VITE_CLERK_PUBLISHABLE_KEY` is missing. Resolved one merge conflict in DEPLOYMENT.md by
+  combining both sets of content; re-verified full build/typecheck/test after merging
+- `deploy-pages.yml` (from the merge) now skips its Cloudflare publish step gracefully with a clear notice
+  when `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets aren't set, instead of failing the whole
+  workflow on every push
+- jsdom test setup gained an `IntersectionObserver` stub (same category as the earlier `matchMedia` stub)
+  so the new motion components don't crash under test
+- Re-verified: 36 tests passing (26 backend + 10 frontend), typecheck clean, full build clean

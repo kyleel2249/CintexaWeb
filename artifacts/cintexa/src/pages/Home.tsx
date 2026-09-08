@@ -2,6 +2,8 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { EcosystemHero } from "@/components/hero/EcosystemHero";
 import { GlowField } from "@/components/decorative/GlowField";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
+import { PointerParallax } from "@/components/motion/PointerParallax";
 import { useMotion } from "@/components/motion/MotionProvider";
 
 const WORDS = ["TECHNOLOGY", "COMMERCE", "MOTION", "INTELLIGENCE", "GROWTH", "PRECISION", "TRUST", "SPEED", "INNOVATION"];
@@ -50,7 +52,9 @@ export function Home() {
               </Link>
             </div>
           </motion.div>
-          <EcosystemHero />
+          <PointerParallax strength={14}>
+            <EcosystemHero />
+          </PointerParallax>
         </div>
       </section>
 
@@ -81,19 +85,21 @@ export function Home() {
         <div className="cx-container">
           <h2 className="cx-display text-2xl sm:text-3xl">Four surfaces, one platform</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {PILLARS.map((p) => (
-              <Link key={p.href} href={p.href}>
-                <div
-                  className="cx-card cx-card-interactive h-full border-t-2"
-                  style={{ borderTopColor: `hsl(var(--${p.accent}))` }}
-                >
-                  <h3 className="cx-display text-lg">{p.title}</h3>
-                  <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">{p.copy}</p>
-                  <span className="mt-4 inline-block text-sm font-medium" style={{ color: `hsl(var(--${p.accent}))` }}>
-                    Explore
-                  </span>
-                </div>
-              </Link>
+            {PILLARS.map((p, i) => (
+              <ScrollReveal key={p.href} delay={i * 0.08}>
+                <Link href={p.href}>
+                  <div
+                    className="cx-card cx-card-interactive h-full border-t-2"
+                    style={{ borderTopColor: `hsl(var(--${p.accent}))` }}
+                  >
+                    <h3 className="cx-display text-lg">{p.title}</h3>
+                    <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">{p.copy}</p>
+                    <span className="mt-4 inline-block text-sm font-medium" style={{ color: `hsl(var(--${p.accent}))` }}>
+                      Explore
+                    </span>
+                  </div>
+                </Link>
+              </ScrollReveal>
             ))}
           </div>
         </div>

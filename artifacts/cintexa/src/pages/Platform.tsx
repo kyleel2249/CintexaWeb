@@ -1,10 +1,12 @@
+import { GsapStagger } from "@/components/motion/GsapStagger";
+
 const MODULES = [
-  { name: "Subscriptions & entitlements", status: "Foundation" },
-  { name: "Loyalty ledger", status: "Foundation" },
+  { name: "Subscriptions & entitlements", status: "Available" },
+  { name: "Loyalty ledger", status: "Available" },
   { name: "E-commerce module", status: "Available" },
   { name: "Ads module", status: "Available" },
   { name: "CRM module", status: "Foundation" },
-  { name: "AI module", status: "Foundation" },
+  { name: "AI module", status: "Available" },
   { name: "BI module", status: "Foundation" },
   { name: "Customer portals", status: "Available" },
 ];
@@ -21,14 +23,14 @@ export function Platform() {
           Every module shares the same customer identity, billing, and activity ledger, so new
           capability doesn't mean a new system.
         </p>
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <GsapStagger className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {MODULES.map((m) => (
             <div key={m.name} className="cx-card cx-card-inset flex flex-col justify-between gap-4">
               <p className="text-sm font-medium">{m.name}</p>
               <span className={`cx-badge ${m.status === "Available" ? "cx-badge-accent" : ""}`}>{m.status}</span>
             </div>
           ))}
-        </div>
+        </GsapStagger>
       </div>
     </div>
   );

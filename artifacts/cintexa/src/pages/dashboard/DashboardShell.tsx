@@ -3,9 +3,17 @@ import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/c
 import type { ReactNode } from "react";
 import { useMyProfile } from "@/hooks/useApi";
 import { OnboardingFlow } from "./onboarding/OnboardingFlow";
+import { AVATAR_OPTIONS } from "@/lib/local-profile";
 
 const TABS = [
   { label: "Overview", href: "/dashboard" },
+  { label: "Templates", href: "/dashboard/templates" },
+  { label: "Affiliate", href: "/dashboard/affiliate" },
+  { label: "Analytics", href: "/dashboard/analytics" },
+  { label: "Pixels", href: "/dashboard/pixels" },
+  { label: "Email", href: "/dashboard/email" },
+  { label: "Payback", href: "/dashboard/payback" },
+  { label: "FAQ", href: "/dashboard/faq" },
   { label: "Contributions", href: "/dashboard/contributions" },
   { label: "Progress", href: "/dashboard/progress" },
   { label: "Leaderboard", href: "/dashboard/leaderboard" },
@@ -19,10 +27,10 @@ function SignedOutPrompt() {
         <p className="cx-eyebrow">Customer portal</p>
         <h1 className="cx-display mt-3 text-3xl">Sign in to see your dashboard.</h1>
         <p className="mt-3 max-w-sm text-[hsl(var(--fg-muted))]">
-          Your contributions, progress, and leaderboard standing live here once you're signed in.
+          Templates, affiliate tools, analytics, pixels, payouts, and your personalized FAQ live here after sign-in.
         </p>
         <SignInButton mode="modal">
-          <button className="cx-btn cx-btn-primary mt-6">Sign in</button>
+          <button type="button" className="cx-btn cx-btn-primary mt-6">Sign in</button>
         </SignInButton>
       </div>
     </div>
@@ -34,6 +42,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const activeHref = params?.tab ? `/dashboard/${params.tab}` : "/dashboard";
   const { user } = useUser();
   const profile = useMyProfile();
+  const avatar = AVATAR_OPTIONS.find((a) => a.id === (profile.data?.profile as { avatarId?: string } | null)?.avatarId);
+  const username = (profile.data?.profile as { username?: string } | null)?.username;
 
   return (
     <>
@@ -49,11 +59,20 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           <div className="cx-section !pt-10">
             <div className="cx-container">
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <p className="cx-eyebrow">Customer portal</p>
-                  <h1 className="cx-display mt-2 text-2xl sm:text-3xl">
-                    Welcome back{user?.firstName ? `, ${user.firstName}` : ""}.
-                  </h1>
+                <div className="flex items-center gap-3">
+                  <div
+                    className="grid h-12 w-12 place-items-center rounded-2xl text-sm font-bold text-[hsl(var(--bg))]"
+                    style={{ background: avatar?.color ?? "hsl(var(--accent))" }}
+                    aria-hidden
+                  >
+                    {(username ?? user?.firstName ?? "C").slice(0, 1).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="cx-eyebrow">Customer portal</p>
+                    <h1 className="cx-display mt-1 text-2xl sm:text-3xl">
+                      {username ? `@${username}` : `Welcome back${user?.firstName ? `, ${user.firstName}` : ""}`}
+                    </h1>
+                  </div>
                 </div>
                 <UserButton afterSignOutUrl="/" />
               </div>

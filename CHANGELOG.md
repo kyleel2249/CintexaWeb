@@ -52,3 +52,17 @@ All performance figures on marketing/ads demos are clearly labeled sample data �
   Docker build — no Docker daemon in the build environment this was written in)
 - End-to-end verified against a real local Postgres 16 instance: migrations generated and applied, loyalty
   adjustments, admin customer aggregation, and public leaderboard all smoke-tested against live data
+
+## Round 4
+- OpenAPI spec (`lib/api-spec/openapi.yaml`) rewritten to cover every implemented endpoint — was 5 paths,
+  now 13 paths / 6 schemas, matching subscriptions, loyalty, leaderboard, admin, and agent routes
+- `/health` now actually pings the database (`select 1`) instead of just confirming the process is alive —
+  returns 503 "degraded" if the DB is unreachable. Verified both paths live (DB up -> 200 connected, DB
+  down -> 503 unreachable after connection timeout)
+- `docker-compose.yml` added: one-command Postgres + API server for local dev (frontend intentionally
+  excluded — Vite's hot reload works better run directly on the host)
+- Visual pass on the Home page per the original brief's "colourful, highly responsive" ask: new `GlowField`
+  ambient background component (motion-aware, respects reduced-motion), a metrics band, and the four pillar
+  cards now carry distinct accent colors (sky/teal/amber/violet) instead of being monochrome
+- Re-verified: 35 tests passing (26 backend + 9 frontend), typecheck clean, full build clean, main JS chunk
+  still 50.7KB after the Home page changes

@@ -1,29 +1,36 @@
 openapi: 3.1.0
 info:
   title: CINTEXA Growth Platform API
-  version: 0.1.0
+  version: 0.2.0
   description: >
-    Customer profile, contributions, and activity endpoints backing the
-    CINTEXA customer portal. Auth is via Clerk session tokens unless noted.
+    Customer profile, subscriptions, loyalty, contributions, activity, public
+    leaderboard, and admin (customers, loyalty adjustment, AI agents)
+    endpoints backing the CINTEXA customer portal and admin panel. Customer
+    routes authenticate via Clerk session tokens; admin routes authenticate
+    via a static x-admin-key header.
 servers:
   - url: http://localhost:8080
     description: Local development
 paths:
   /health:
     get:
-      summary: Health check
+      summary: Health check (verifies the database connection too)
       operationId: getHealth
       security: []
       responses:
         "200":
-          description: Service is healthy
+          description: Service and database are both healthy
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   status: { type: string, example: ok }
+                  database: { type: string, example: connected }
                   timestamp: { type: string, format: date-time }
+        "503":
+          description: Database is unreachable
+
   /api/customer/me:
     get:
       summary: Get the signed-in customer's profile
@@ -71,6 +78,73 @@ paths:
           description: Validation error
         "401":
           description: Not authenticated
+
+  /api/subscriptions/me:
+    get:
+      summary: Get the signed-in customer's subscription
+      operationId: getMySubscription
+      security: [{ clerkAuth: [] }]
+      responses:
+        "200":
+          description: Current subscription, or null if none exists yet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription:
+                    oneOf:
+                      - $ref: "#/components/schemas/Subscription"
+                      - type: "null"
+        "401":
+          description: Not authenticated
+    post:
+      summary: Set the signed-in customer's plan (creates or upgrades/downgrades)
+      operationId: setMySubscription
+      security: [{ clerkAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [plan]
+              properties:
+                plan: { type: string, enum: [starter, growth, enterprise] }
+      responses:
+        "200":
+          description: Updated subscription
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription: { $ref: "#/components/schemas/Subscription" }
+        "400":
+          description: Invalid plan
+        "401":
+          description: Not authenticated
+
+  /api/loyalty/me:
+    get:
+      summary: Get the signed-in customer's loyalty balance and ledger history
+      operationId: getMyLoyalty
+      security: [{ clerkAuth: [] }]
+      responses:
+        "200":
+          description: Balance plus the 50 most recent ledger entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance: { type: integer }
+                  entries:
+                    type: array
+                    items: { $ref: "#/components/schemas/LoyaltyLedgerEntry" }
+        "401":
+          description: Not authenticated
+
   /api/contributions:
     get:
       summary: List the signed-in customer's contributions (most recent 50)
@@ -89,6 +163,7 @@ paths:
                     items: { $ref: "#/components/schemas/Contribution" }
         "401":
           description: Not authenticated
+
   /api/activity:
     get:
       summary: List the signed-in customer's activity events (most recent 50)
@@ -107,6 +182,29 @@ paths:
                     items: { $ref: "#/components/schemas/ActivityEvent" }
         "401":
           description: Not authenticated
+
+  /api/leaderboard:
+    get:
+      summary: Public leaderboard — opted-in customers only
+      operationId: getLeaderboard
+      security: []
+      responses:
+        "200":
+          description: Top 20 by loyalty points, never exposes userId or contact info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  leaderboard:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rank: { type: integer }
+                        name: { type: string }
+                        score: { type: integer }
+
   /api/webhooks/contributions:
     post:
       summary: Receive a contribution/payment event from an external provider
@@ -132,6 +230,151 @@ paths:
           description: Missing required fields
         "401":
           description: Missing or invalid signature
+
+  /api/admin/customers:
+    get:
+      summary: List customers with plan and loyalty balance (admin)
+      operationId: listCustomersAdmin
+      security: [{ adminKey: [] }]
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50, maximum: 200 }
+      responses:
+        "200":
+          description: Customer list, most recently updated first
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        userId: { type: string }
+                        displayName: { type: string, nullable: true }
+                        businessName: { type: string, nullable: true }
+                        plan: { type: string, nullable: true }
+                        status: { type: string, nullable: true }
+                        balance: { type: integer }
+                        updatedAt: { type: string, format: date-time }
+        "401":
+          description: Missing or invalid admin key
+
+  /api/admin/loyalty/adjust:
+    post:
+      summary: Append a loyalty ledger entry for a customer (admin, the only way points change)
+      operationId: adjustLoyaltyAdmin
+      security: [{ adminKey: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, delta, reason]
+              properties:
+                userId: { type: string }
+                delta: { type: integer, description: "Positive to award, negative to deduct. Must not be zero." }
+                reason: { type: string, maxLength: 200 }
+      responses:
+        "200":
+          description: The appended ledger entry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entry: { $ref: "#/components/schemas/LoyaltyLedgerEntry" }
+        "400":
+          description: Validation error
+        "401":
+          description: Missing or invalid admin key
+
+  /api/admin/agents/roles:
+    get:
+      summary: List available AI agent roles (admin)
+      operationId: listAgentRoles
+      security: [{ adminKey: [] }]
+      responses:
+        "200":
+          description: Array of role identifiers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roles:
+                    type: array
+                    items: { type: string, enum: [marketing, sales, consumer_simulation, engagement, content_idea] }
+        "401":
+          description: Missing or invalid admin key
+
+  /api/admin/agents/run:
+    post:
+      summary: Run one AI agent task synchronously (admin)
+      description: >
+        Every role is a deterministic, pure function — a foundation ready to
+        be swapped for a real LLM-backed implementation later. The
+        `engagement` role only produces a scheduling plan; it never executes
+        actions against real platforms.
+      operationId: runAgentTask
+      security: [{ adminKey: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role, input]
+              properties:
+                role: { type: string, enum: [marketing, sales, consumer_simulation, engagement, content_idea] }
+                input:
+                  description: Shape depends on `role` — see each role's input schema in artifacts/api-server/src/agents/roles
+                  type: object
+                requestedByUserId: { type: string }
+      responses:
+        "200":
+          description: The persisted, completed (or failed) task
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task: { $ref: "#/components/schemas/AgentTask" }
+        "400":
+          description: Invalid role or invalid input for that role
+        "401":
+          description: Missing or invalid admin key
+
+  /api/admin/agents/tasks:
+    get:
+      summary: List recent agent tasks, optionally filtered by role (admin)
+      operationId: listAgentTasks
+      security: [{ adminKey: [] }]
+      parameters:
+        - name: role
+          in: query
+          schema: { type: string, enum: [marketing, sales, consumer_simulation, engagement, content_idea] }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50, maximum: 200 }
+      responses:
+        "200":
+          description: Task history, most recent first
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items: { $ref: "#/components/schemas/AgentTask" }
+        "401":
+          description: Missing or invalid admin key
+
 components:
   securitySchemes:
     clerkAuth:
@@ -143,6 +386,11 @@ components:
       in: header
       name: x-webhook-signature
       description: HMAC-SHA256 of the raw request body, signed with WEBHOOK_SECRET
+    adminKey:
+      type: apiKey
+      in: header
+      name: x-admin-key
+      description: Static admin key, matches ADMIN_API_KEY on the server
   schemas:
     CustomerProfile:
       type: object
@@ -154,6 +402,24 @@ components:
         leaderboardVisible: { type: boolean }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
+    Subscription:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string }
+        plan: { type: string, enum: [starter, growth, enterprise] }
+        status: { type: string, enum: [active, past_due, canceled] }
+        currentPeriodEnd: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    LoyaltyLedgerEntry:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string }
+        delta: { type: integer }
+        reason: { type: string }
+        createdAt: { type: string, format: date-time }
     Contribution:
       type: object
       properties:
@@ -175,3 +441,14 @@ components:
         title: { type: string }
         description: { type: string }
         createdAt: { type: string, format: date-time }
+    AgentTask:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        role: { type: string, enum: [marketing, sales, consumer_simulation, engagement, content_idea] }
+        status: { type: string, enum: [queued, completed, failed] }
+        input: { type: object }
+        output: { type: object, nullable: true }
+        requestedByUserId: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }

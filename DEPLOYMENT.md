@@ -71,3 +71,19 @@ Railway, a VPS, etc.). Point the frontend's `VITE_API_BASE_URL` at wherever
 this ends up.
 
 Required environment variables are listed in `.env.example` at the repo root.
+
+## Local development
+
+A `docker-compose.yml` at the repo root starts Postgres + the API server
+together:
+
+```bash
+cp .env.example .env   # fill in real values
+docker compose up -d
+npm run migrate -w @cintexa/db   # first time only
+npm run dev:web                  # in a separate terminal — Vite dev server
+```
+
+The frontend isn't containerized here on purpose — Vite's hot reload is
+smoother run directly on the host. Compose only covers the two backend
+dependencies (Postgres + API).

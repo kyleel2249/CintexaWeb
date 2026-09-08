@@ -1,0 +1,50 @@
+# One-command local dev stack: Postgres + the API server.
+#
+# The frontend is NOT included here — run it separately with `npm run dev:web`
+# so Vite's hot reload keeps working (Vite dev server doesn't play well
+# inside a container for local iteration; this compose file is for the
+# backend dependencies, not full containerized dev).
+#
+# Usage:
+#   docker compose up -d          # start Postgres + API server
+#   npm run migrate -w @cintexa/db  # first time only, against this Postgres
+#   npm run dev:web                 # in a separate terminal
+#
+# Requires a .env file at the repo root (copy .env.example) — compose reads
+# it automatically for the api-server service.
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cintexa
+    ports:
+      - "5432:5432"
+    volumes:
+      - cintexa-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-server:
+    build:
+      context: .
+      dockerfile: artifacts/api-server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/cintexa
+    ports:
+      - "8080:8080"
+
+volumes:
+  cintexa-postgres-data:

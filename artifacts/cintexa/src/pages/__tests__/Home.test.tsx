@@ -11,7 +11,7 @@ describe("Home page", () => {
       </MotionProvider>,
     );
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/one connected core/i);
-    expect(screen.getByRole("link", { name: /start building/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /get started/i })).toHaveAttribute("href", "/get-started");
     expect(screen.getByRole("link", { name: /see the platform/i })).toBeInTheDocument();
   });
 

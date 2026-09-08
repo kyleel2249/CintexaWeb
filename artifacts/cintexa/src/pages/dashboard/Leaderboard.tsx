@@ -1,52 +1,73 @@
+import { useState } from "react";
 import { DashboardShell } from "./DashboardShell";
-import { useLeaderboard, useMyProfile } from "@/hooks/useApi";
+import { useMyProfile } from "@/hooks/useApi";
+import { ADMIN_USERNAME } from "@/lib/platform-economics";
+import { demoLeaderboard, readFollowing, toggleFollow } from "@/lib/social-hub";
+
+const COLUMNS = [
+  { key: "mostReferrer" as const, title: "Most referrer" },
+  { key: "mostCreator" as const, title: "Most creator" },
+  { key: "mostUser" as const, title: "Most user of the platform" },
+];
 
 export function DashboardLeaderboard() {
-  const { data, isLoading } = useLeaderboard();
+  const board = demoLeaderboard();
   const profile = useMyProfile();
-  const rows = data?.leaderboard ?? [];
-  const myName = profile.data?.profile?.displayName;
+  const self = (profile.data?.profile as { username?: string } | null)?.username;
+  const [following, setFollowing] = useState(() => readFollowing());
+
+  function onFollow(username: string) {
+    if (username.toUpperCase() === ADMIN_USERNAME) return;
+    setFollowing(toggleFollow(username));
+  }
 
   return (
     <DashboardShell>
-      {isLoading && (
-        <div className="cx-card !p-0 overflow-hidden">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="border-b border-[hsl(var(--border))] px-5 py-3 last:border-0">
-              <span className="inline-block h-4 w-2/3 animate-pulse rounded bg-[hsl(var(--bg-inset))]" />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {!isLoading && rows.length === 0 && (
-        <div className="cx-card text-center">
-          <p className="text-sm text-[hsl(var(--fg-muted))]">
-            No one's opted into the public leaderboard yet — be the first from Settings.
-          </p>
-        </div>
-      )}
-
-      {!isLoading && rows.length > 0 && (
-        <div className="cx-card !p-0 overflow-hidden">
-          {rows.map((r) => (
-            <div
-              key={r.rank}
-              className="flex items-center justify-between border-b border-[hsl(var(--border))] px-5 py-3 last:border-0"
-              style={r.name === myName ? { background: "hsl(var(--accent) / 0.08)" } : undefined}
-            >
-              <div className="flex items-center gap-4">
-                <span className="w-6 font-mono text-sm text-[hsl(var(--fg-muted))]">#{r.rank}</span>
-                <span className="text-sm font-medium">{r.name}</span>
-              </div>
-              <span className="text-sm text-[hsl(var(--fg-muted))]">{r.score.toLocaleString()} pts</span>
-            </div>
-          ))}
-        </div>
-      )}
-      <p className="mt-4 text-xs text-[hsl(var(--fg-muted))]">
-        Visible only to customers who opt in from Settings.
+      <h2 className="cx-display text-xl">Leaderboard</h2>
+      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
+        Rankings by referrals, creators, and platform usage. Admin account @{ADMIN_USERNAME} is never listed.
       </p>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+        {COLUMNS.map((col) => (
+          <div key={col.key} className="cx-card !p-0 overflow-hidden">
+            <div className="border-b border-[hsl(var(--border))] px-4 py-3">
+              <h3 className="text-sm font-semibold">{col.title}</h3>
+            </div>
+            <ul>
+              {board[col.key]
+                .filter((r) => r.username.toUpperCase() !== ADMIN_USERNAME)
+                .map((r, i) => {
+                  const isSelf = self && r.username === self;
+                  const isFollowing = following.some((f) => f.username === r.username);
+                  return (
+                    <li
+                      key={r.username}
+                      className="flex items-center justify-between gap-2 border-b border-[hsl(var(--border))] px-4 py-3 last:border-0"
+                      style={isSelf ? { background: "hsl(var(--accent) / 0.08)" } : undefined}
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">
+                          #{i + 1} @{r.username}
+                        </p>
+                        <p className="text-xs text-[hsl(var(--fg-muted))]">{r.score.toLocaleString()} pts</p>
+                      </div>
+                      {!isSelf && (
+                        <button
+                          type="button"
+                          className={`cx-btn cx-btn-sm ${isFollowing ? "cx-btn-secondary" : "cx-btn-primary"}`}
+                          onClick={() => onFollow(r.username)}
+                        >
+                          {isFollowing ? "Following" : "Follow"}
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
+        ))}
+      </div>
     </DashboardShell>
   );
 }

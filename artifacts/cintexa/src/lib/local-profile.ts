@@ -1,5 +1,7 @@
 /** Local profile store — lets onboarding and settings work when the API is offline. */
 
+import { applyPlatformFee as feeCalc, ensureReferrerBootstrap } from "./platform-bridge";
+
 export type LocalProfile = {
   userId?: string;
   username?: string;
@@ -13,6 +15,7 @@ export type LocalProfile = {
   usageFrequency?: string | null;
   onboardingCompleted?: boolean;
   twoFactorEnabled?: boolean;
+  referrer?: string;
   updatedAt?: string;
 };
 
@@ -30,9 +33,11 @@ export function readLocalProfile(): LocalProfile | null {
 
 export function writeLocalProfile(patch: LocalProfile): LocalProfile {
   const prev = readLocalProfile() ?? {};
+  const referrer = patch.referrer ?? prev.referrer ?? ensureReferrerBootstrap();
   const next: LocalProfile = {
     ...prev,
     ...patch,
+    referrer,
     updatedAt: new Date().toISOString(),
   };
   localStorage.setItem(KEY, JSON.stringify(next));
@@ -53,13 +58,11 @@ export function exportLocalData(): string {
   return JSON.stringify(payload, null, 2);
 }
 
-/** Platform fee retained on sales / payouts. */
-export const PLATFORM_FEE_RATE = 0.05;
+/** @deprecated use platform-economics — kept for older imports */
+export const PLATFORM_FEE_RATE = 0.07;
 
 export function applyPlatformFee(gross: number) {
-  const fee = Math.round(gross * PLATFORM_FEE_RATE * 100) / 100;
-  const net = Math.round((gross - fee) * 100) / 100;
-  return { gross, fee, net, rate: PLATFORM_FEE_RATE };
+  return feeCalc(gross);
 }
 
 export const AVATAR_OPTIONS = [

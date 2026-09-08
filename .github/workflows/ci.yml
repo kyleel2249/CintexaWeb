@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Migrate database
+        run: npm run migrate -w @cintexa/db
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cintexa
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cintexa
+          ADMIN_API_KEY: ci-test-admin-key-16-chars
+          WEBHOOK_SECRET: ci-test-webhook-secret-16
+          CLERK_SECRET_KEY: sk_test_placeholder
+          CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+
+      - name: Build
+        run: npm run build
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cintexa
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5

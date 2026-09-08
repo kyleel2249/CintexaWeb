@@ -6,9 +6,22 @@ const hasClerk =
   typeof import.meta.env.VITE_CLERK_PUBLISHABLE_KEY === "string" &&
   Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY.trim());
 
+const clerkAppearance = {
+  layout: {
+    unsafe_disableDevelopmentModeWarnings: true,
+  },
+  elements: {
+    rootBox: "w-full",
+    card: "bg-[hsl(var(--bg-raised))] border border-[hsl(var(--border))] shadow-none",
+    footer: { display: "none" },
+    footerAction: { display: "none" },
+    badge: { display: "none" },
+  },
+} as const;
+
 /**
  * Get Started — sign-in / sign-up entry (not pricing).
- * Uses Clerk when VITE_CLERK_PUBLISHABLE_KEY is configured at build time.
+ * Clerk branding / development notices are suppressed via appearance props.
  */
 export function GetStarted() {
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-up");
@@ -41,31 +54,21 @@ export function GetStarted() {
           </button>
         </div>
 
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-center [&.cl-internal-b3fm6y]:hidden">
           {hasClerk ? (
             mode === "sign-up" ? (
               <SignUp
                 routing="hash"
                 signInUrl="/get-started#sign-in"
                 fallbackRedirectUrl="/dashboard"
-                appearance={{
-                  elements: {
-                    rootBox: "w-full",
-                    card: "bg-[hsl(var(--bg-raised))] border border-[hsl(var(--border))] shadow-none",
-                  },
-                }}
+                appearance={clerkAppearance}
               />
             ) : (
               <SignIn
                 routing="hash"
                 signUpUrl="/get-started#sign-up"
                 fallbackRedirectUrl="/dashboard"
-                appearance={{
-                  elements: {
-                    rootBox: "w-full",
-                    card: "bg-[hsl(var(--bg-raised))] border border-[hsl(var(--border))] shadow-none",
-                  },
-                }}
+                appearance={clerkAppearance}
               />
             )
           ) : (

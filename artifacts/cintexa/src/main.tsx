@@ -13,8 +13,7 @@ const publishableKey = (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | u
 
 /**
  * Clerk throws if publishableKey is missing/invalid.
- * Production Pages deploys often omit the env var → empty string → white-screen ErrorBoundary.
- * Boot the marketing site without Clerk; sign-in routes will need the key set in Cloudflare.
+ * Boot the marketing site without Clerk when the key is absent.
  */
 function AuthRoot({ children }: { children: ReactNode }) {
   if (!publishableKey) {
@@ -29,7 +28,21 @@ function AuthRoot({ children }: { children: ReactNode }) {
   return (
     <ClerkProvider
       publishableKey={publishableKey}
-      appearance={{ baseTheme: dark }}
+      appearance={{
+        baseTheme: dark,
+        layout: {
+          // Hides the "Development mode" strip on SignIn / SignUp while using pk_test_ keys
+          unsafe_disableDevelopmentModeWarnings: true,
+        },
+        elements: {
+          // Hide "Secured by Clerk" footer badge in the component chrome
+          footer: { display: "none" },
+          footerAction: { display: "none" },
+          badge: { display: "none" },
+          // Development mode banner (when still rendered by older builds)
+          internal: { display: "none" },
+        },
+      }}
       afterSignOutUrl="/"
     >
       {children}

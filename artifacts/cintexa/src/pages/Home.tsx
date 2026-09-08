@@ -35,7 +35,7 @@ export function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p className="cx-eyebrow">A growth platform, not a static site</p>
+            <p className="cx-eyebrow">A growth platform for teams building their next stage of scale</p>
             <h1 className="cx-display mt-4 text-4xl sm:text-5xl lg:text-6xl">
               Run technology, commerce, and marketing from one connected core.
             </h1>
@@ -44,8 +44,8 @@ export function Home() {
               and the tooling that turns first-time visitors into a loyal customer base.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/pricing" className="cx-btn cx-btn-primary cx-btn-lg">
-                Start building
+              <Link href="/get-started" className="cx-btn cx-btn-primary cx-btn-lg">
+                Get started
               </Link>
               <Link href="/platform" className="cx-btn cx-btn-secondary cx-btn-lg">
                 See the platform

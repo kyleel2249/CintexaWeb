@@ -29,6 +29,7 @@ export function PrimaryNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { allowMotion } = useMotion();
   const [onDashboard] = useRoute("/dashboard/:rest*");
+  const [onGetStarted] = useRoute("/get-started");
 
   return (
     <header className="cx-nav">
@@ -88,7 +89,7 @@ export function PrimaryNav() {
           <Link href="/dashboard" className={`cx-btn cx-btn-secondary cx-btn-sm ${onDashboard ? "border-[hsl(var(--accent)/.6)]" : ""}`}>
             Dashboard
           </Link>
-          <Link href="/pricing" className="cx-btn cx-btn-primary cx-btn-sm">
+          <Link href="/get-started" className={`cx-btn cx-btn-primary cx-btn-sm ${onGetStarted ? "ring-2 ring-[hsl(var(--accent)/.4)]" : ""}`}>
             Get started
           </Link>
         </div>
@@ -126,7 +127,7 @@ export function PrimaryNav() {
               <Link href="/dashboard" className="cx-btn cx-btn-secondary mt-2 w-full" onClick={() => setMobileOpen(false)}>
                 Dashboard
               </Link>
-              <Link href="/pricing" className="cx-btn cx-btn-primary w-full" onClick={() => setMobileOpen(false)}>
+              <Link href="/get-started" className="cx-btn cx-btn-primary w-full" onClick={() => setMobileOpen(false)}>
                 Get started
               </Link>
             </div>

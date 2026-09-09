@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireAuth, getAuth } from "@clerk/express";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, ne, and } from "drizzle-orm";
 import { db, customerProfilesTable, customerRoleEnum, ROLE_INTEREST_OPTIONS, USAGE_FREQUENCY_OPTIONS } from "@cintexa/db";
 
 export const customerRouter = Router();
@@ -14,10 +14,16 @@ export const updateProfileSchema = z
     businessName: z.string().min(1).max(160).optional(),
     country: z.string().min(2).max(80).optional(),
     leaderboardVisible: z.boolean().optional(),
-    // Onboarding fields — submitted together the first time to tailor the dashboard.
     role: z.enum(customerRoleEnum.enumValues).optional(),
     interests: z.array(z.enum(ALL_INTERESTS as [string, ...string[]])).max(10).optional(),
     usageFrequency: z.enum(USAGE_FREQUENCY_OPTIONS).optional(),
+    username: z
+      .string()
+      .regex(/^[a-zA-Z0-9_]{3,24}$/, "3–24 characters: letters, numbers, underscore")
+      .optional(),
+    avatarId: z.string().max(32).optional(),
+    twoFactorEnabled: z.boolean().optional(),
+    onboardingCompleted: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role && data.interests) {
@@ -52,9 +58,21 @@ customerRouter.patch("/me", requireAuth(), async (req, res) => {
     return;
   }
 
-  // Submitting a role is what completes onboarding — the dashboard gates on
-  // this flag, not on role being merely present, so it's set explicitly here.
-  const patch = { ...parsed.data, ...(parsed.data.role ? { onboardingCompleted: true } : {}) };
+  if (parsed.data.username) {
+    const [taken] = await db
+      .select({ userId: customerProfilesTable.userId })
+      .from(customerProfilesTable)
+      .where(and(eq(customerProfilesTable.username, parsed.data.username), ne(customerProfilesTable.userId, userId!)));
+    if (taken) {
+      res.status(400).json({ error: { fieldErrors: { username: ["That username is already taken"] } } });
+      return;
+    }
+  }
+
+  const patch = {
+    ...parsed.data,
+    ...(parsed.data.role || parsed.data.onboardingCompleted ? { onboardingCompleted: true } : {}),
+  };
 
   const [profile] = await db
     .insert(customerProfilesTable)
@@ -66,4 +84,10 @@ customerRouter.patch("/me", requireAuth(), async (req, res) => {
     .returning();
 
   res.json({ profile });
+});
+
+customerRouter.delete("/me", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
+  await db.delete(customerProfilesTable).where(eq(customerProfilesTable.userId, userId!));
+  res.status(204).end();
 });

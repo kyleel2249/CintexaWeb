@@ -14,6 +14,13 @@ export const customerProfilesTable = pgTable(
     role: customerRoleEnum("role"),
     interests: jsonb("interests").$type<string[]>().notNull().default([]),
     usageFrequency: text("usage_frequency"),
+    // Identity — username binds the account to a public handle; avatar is a
+    // preset ID (no file upload infra), not an image URL. 2FA enrollment
+    // itself is handled by Clerk (see Settings) — this flag just lets the
+    // dashboard reflect status without an extra round trip to Clerk's API.
+    username: text("username"),
+    avatarId: text("avatar_id"),
+    twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
     onboardingCompleted: boolean("onboarding_completed").notNull().default(false),
     // Analytics — self-reported pixel IDs the customer wants attached to their
     // own storefront/campaign pages once those pages render this (see PLATFORM.md).
@@ -25,7 +32,10 @@ export const customerProfilesTable = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("customer_profiles_updated_at_idx").on(table.updatedAt)],
+  (table) => [
+    index("customer_profiles_updated_at_idx").on(table.updatedAt),
+    uniqueIndex("customer_profiles_username_uidx").on(table.username),
+  ],
 );
 
 export const contributionsTable = pgTable(

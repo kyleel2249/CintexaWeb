@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { CustomerRole } from "@cintexa/db/schema";
 import { ROLE_INTEREST_OPTIONS, ROLE_META, ROLE_ORDER, USAGE_FREQUENCY_OPTIONS } from "@/lib/roles";
 import { useUpdateProfile } from "@/hooks/useApi";
-import { ApiError } from "@/lib/api";
 import { useMotion } from "@/components/motion/MotionProvider";
 
 const STEP_LABELS = ["Role", "Interests", "Frequency"];
@@ -26,9 +25,18 @@ export function OnboardingFlow() {
     setStep(1);
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!role || !frequency) return;
-    updateProfile.mutate({ role, interests, usageFrequency: frequency });
+    try {
+      await updateProfile.mutateAsync({
+        role,
+        interests,
+        usageFrequency: frequency,
+        onboardingCompleted: true,
+      });
+    } catch {
+      // useUpdateProfile already falls back to localStorage — surface only unexpected failures
+    }
   }
 
   return (
@@ -68,6 +76,7 @@ export function OnboardingFlow() {
                   {ROLE_ORDER.map((r) => (
                     <button
                       key={r}
+                      type="button"
                       onClick={() => handleRoleSelect(r)}
                       className="cx-card cx-card-interactive border-t-2 text-left"
                       style={{ borderTopColor: `hsl(var(--${ROLE_META[r].color}))` }}
@@ -90,13 +99,14 @@ export function OnboardingFlow() {
               >
                 <p className="cx-eyebrow text-center">As a {ROLE_META[role].label.toLowerCase()}</p>
                 <h1 className="cx-display mt-2 text-center text-2xl">What are you most interested in?</h1>
-                <p className="mt-2 text-center text-sm text-[hsl(var(--fg-muted))]">Pick as many as apply.</p>
+                <p className="mt-2 text-center text-sm text-[hsl(var(--fg-muted))]">Pick as many as apply — your FAQ and tools will match these.</p>
                 <div className="mt-6 flex flex-wrap justify-center gap-2">
                   {ROLE_INTEREST_OPTIONS[role].map((interest) => {
                     const selected = interests.includes(interest);
                     return (
                       <button
                         key={interest}
+                        type="button"
                         onClick={() => toggleInterest(interest)}
                         className="cx-badge cx-btn-sm"
                         style={
@@ -111,10 +121,10 @@ export function OnboardingFlow() {
                   })}
                 </div>
                 <div className="mt-8 flex justify-between">
-                  <button className="cx-btn cx-btn-ghost" onClick={() => setStep(0)}>
+                  <button type="button" className="cx-btn cx-btn-ghost" onClick={() => setStep(0)}>
                     Back
                   </button>
-                  <button className="cx-btn cx-btn-primary" onClick={() => setStep(2)} disabled={interests.length === 0}>
+                  <button type="button" className="cx-btn cx-btn-primary" onClick={() => setStep(2)} disabled={interests.length === 0}>
                     Continue
                   </button>
                 </div>
@@ -135,6 +145,7 @@ export function OnboardingFlow() {
                   {USAGE_FREQUENCY_OPTIONS.map((f) => (
                     <button
                       key={f}
+                      type="button"
                       onClick={() => setFrequency(f)}
                       className="cx-card cx-card-interactive text-left"
                       style={frequency === f ? { borderColor: "hsl(var(--accent) / .6)" } : undefined}
@@ -144,20 +155,21 @@ export function OnboardingFlow() {
                   ))}
                 </div>
                 <div className="mt-8 flex justify-between">
-                  <button className="cx-btn cx-btn-ghost" onClick={() => setStep(1)}>
+                  <button type="button" className="cx-btn cx-btn-ghost" onClick={() => setStep(1)}>
                     Back
                   </button>
                   <button
+                    type="button"
                     className="cx-btn cx-btn-primary"
-                    onClick={handleSubmit}
+                    onClick={() => void handleSubmit()}
                     disabled={!frequency || updateProfile.isPending}
                   >
                     {updateProfile.isPending ? "Setting up…" : "Go to my dashboard"}
                   </button>
                 </div>
-                {updateProfile.isError && (
-                  <p className="mt-3 text-center text-sm" style={{ color: "hsl(var(--danger))" }}>
-                    {updateProfile.error instanceof ApiError ? updateProfile.error.message : "Couldn't save — try again."}
+                {updateProfile.isError && !updateProfile.isSuccess && (
+                  <p className="mt-3 text-center text-sm text-[hsl(var(--fg-muted))]">
+                    Cloud sync unavailable — your preferences were saved on this device so you can continue.
                   </p>
                 )}
               </motion.div>

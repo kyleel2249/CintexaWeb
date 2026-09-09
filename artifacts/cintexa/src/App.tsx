@@ -18,6 +18,7 @@ const DashboardContributions = lazy(() => import("@/pages/dashboard/Contribution
 const DashboardProgress = lazy(() => import("@/pages/dashboard/Progress").then((m) => ({ default: m.DashboardProgress })));
 const DashboardLeaderboard = lazy(() => import("@/pages/dashboard/Leaderboard").then((m) => ({ default: m.DashboardLeaderboard })));
 const DashboardSettings = lazy(() => import("@/pages/dashboard/Settings").then((m) => ({ default: m.DashboardSettings })));
+const DashboardFaq = lazy(() => import("@/pages/dashboard/Faq").then((m) => ({ default: m.DashboardFaq })));
 const Admin = lazy(() => import("@/pages/admin/Admin").then((m) => ({ default: m.Admin })));
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ export default function App() {
               <Route path="/dashboard/progress" component={DashboardProgress} />
               <Route path="/dashboard/leaderboard" component={DashboardLeaderboard} />
               <Route path="/dashboard/settings" component={DashboardSettings} />
+              <Route path="/dashboard/faq" component={DashboardFaq} />
               <Route path="/admin" component={Admin} />
               <Route component={NotFound} />
             </Switch>

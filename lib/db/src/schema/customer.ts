@@ -15,6 +15,13 @@ export const customerProfilesTable = pgTable(
     interests: jsonb("interests").$type<string[]>().notNull().default([]),
     usageFrequency: text("usage_frequency"),
     onboardingCompleted: boolean("onboarding_completed").notNull().default(false),
+    // Analytics — self-reported pixel IDs the customer wants attached to their
+    // own storefront/campaign pages once those pages render this (see PLATFORM.md).
+    facebookPixelId: text("facebook_pixel_id"),
+    otherPixelPlatform: text("other_pixel_platform"),
+    otherPixelId: text("other_pixel_id"),
+    // Affiliate attribution — set once at signup from a ?ref= link, never changed after.
+    referredByUserId: text("referred_by_user_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -30,6 +37,10 @@ export const contributionsTable = pgTable(
     type: text("type").notNull().default("contribution"),
     amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
     currency: text("currency").notNull().default("GHS"),
+    // Platform takes a fixed 5% of every sale/payment. Both are stored (not
+    // just derived) so the fee rate can change later without rewriting history.
+    platformFeeAmount: numeric("platform_fee_amount", { precision: 12, scale: 2 }).notNull().default("0"),
+    netAmount: numeric("net_amount", { precision: 12, scale: 2 }).notNull().default("0"),
     status: text("status").notNull().default("pending"),
     description: text("description").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -164,3 +175,56 @@ export const agentTasksTable = pgTable(
 );
 
 export type AgentTask = typeof agentTasksTable.$inferSelect;
+
+/* ============ Payments ============ */
+
+/** Platform takes this cut of every sale/payment. Single source of truth — used by the
+ * webhook handler that records contributions, and shown in the FAQ/UI copy. */
+export const PLATFORM_FEE_RATE = 0.05;
+
+export const paymentMethodTypeEnum = pgEnum("payment_method_type", ["card", "mobile_money", "bank_transfer"]);
+
+/**
+ * Self-reported payout destinations — NOT a live payment processor
+ * integration. Only ever stores display-safe references (last 4 digits,
+ * provider/bank name), never full card or account numbers. Wiring a real
+ * processor (Stripe, Paystack, Flutterwave, etc.) later replaces the source
+ * of `last4`/`provider` with values that processor returns, but the schema
+ * shape stays the same.
+ */
+export const paymentMethodsTable = pgTable(
+  "payment_methods",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    type: paymentMethodTypeEnum("type").notNull(),
+    label: text("label").notNull(),
+    provider: text("provider"),
+    last4: text("last4"),
+    isDefault: boolean("is_default").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("payment_methods_user_id_idx").on(table.userId)],
+);
+
+export type PaymentMethod = typeof paymentMethodsTable.$inferSelect;
+
+/* ============ Support ============ */
+
+export const supportTicketStatusEnum = pgEnum("support_ticket_status", ["open", "in_progress", "closed"]);
+
+export const supportTicketsTable = pgTable(
+  "support_tickets",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    subject: text("subject").notNull(),
+    message: text("message").notNull(),
+    status: supportTicketStatusEnum("status").notNull().default("open"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("support_tickets_user_id_idx").on(table.userId)],
+);
+
+export type SupportTicket = typeof supportTicketsTable.$inferSelect;

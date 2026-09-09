@@ -17,6 +17,8 @@ import { loyaltyRouter } from "./routes/loyalty.js";
 import { leaderboardRouter } from "./routes/leaderboard.js";
 import { adminRouter } from "./routes/admin.js";
 import { agentsRouter } from "./routes/agents.js";
+import { paymentMethodsRouter } from "./routes/paymentMethods.js";
+import { supportRouter } from "./routes/support.js";
 
 export function createApp() {
   const app = express();
@@ -87,6 +89,8 @@ export function createApp() {
   app.use("/api/activity", clerkMiddleware(), activityRouter);
   app.use("/api/subscriptions", clerkMiddleware(), subscriptionsRouter);
   app.use("/api/loyalty", clerkMiddleware(), loyaltyRouter);
+  app.use("/api/payment-methods", clerkMiddleware(), paymentMethodsRouter);
+  app.use("/api/support", clerkMiddleware(), supportRouter);
 
   // Public — opted-in customers only, no auth required to view rankings.
   app.use("/api/leaderboard", leaderboardRouter);

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { CustomerRole } from "@cintexa/db/schema";
 import { ROLE_INTEREST_OPTIONS, ROLE_META, ROLE_ORDER, USAGE_FREQUENCY_OPTIONS } from "@/lib/roles";
 import { useUpdateProfile } from "@/hooks/useApi";
+import { ApiError } from "@/lib/api";
 import { useMotion } from "@/components/motion/MotionProvider";
 
 const STEP_LABELS = ["Role", "Interests", "Frequency"];
@@ -156,7 +157,7 @@ export function OnboardingFlow() {
                 </div>
                 {updateProfile.isError && (
                   <p className="mt-3 text-center text-sm" style={{ color: "hsl(var(--danger))" }}>
-                    Couldn't save — try again.
+                    {updateProfile.error instanceof ApiError ? updateProfile.error.message : "Couldn't save — try again."}
                   </p>
                 )}
               </motion.div>

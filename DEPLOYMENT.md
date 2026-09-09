@@ -1,5 +1,28 @@
 # Deploying CINTEXA (fix Cloudflare 404)
 
+## If you're seeing "Couldn't save — try again" (or any dashboard/onboarding action silently failing)
+
+**This means the API server isn't reachable from your live site — almost certainly because it hasn't
+been deployed anywhere yet, or `VITE_API_BASE_URL` isn't set in Cloudflare Pages.**
+
+Cloudflare Pages only serves the static frontend (`artifacts/cintexa/dist`). It does **not** run
+`artifacts/api-server` — that's a separate Node/Express process that needs its own host (see "Backend"
+below). Until it's deployed somewhere and `VITE_API_BASE_URL` points at it, every feature that talks to
+the API — sign-up onboarding, the dashboard, contributions, the admin panel — will fail. Concretely, with
+`VITE_API_BASE_URL` unset, the frontend defaults to calling `/api/...` on the Pages domain itself. Since
+nothing is listening there, Cloudflare's own SPA fallback rule (`_redirects`) catches the request and
+returns `index.html` with an HTTP 200 — which the frontend then fails to parse as JSON, surfacing as a
+generic save error with no useful detail (this was recently improved to at least name the real cause).
+
+**To fix:**
+1. Deploy `artifacts/api-server` somewhere (Fly.io, Render, Railway, a VPS — see "Backend" below;
+   `docker-compose.yml` covers local dev, not production hosting).
+2. In Cloudflare Pages → Settings → Environment variables, set `VITE_API_BASE_URL` to that server's public
+   URL + `/api` (e.g. `https://api.yourdomain.com/api`).
+3. Redeploy the frontend (env var changes need a fresh build to take effect).
+4. Also make sure the API server's `CORS_ORIGINS` env var includes your actual Pages domain — otherwise
+   the browser will block the requests even once the URL is correct.
+
 ## Why you see HTTP 404 on cintexa.com
 
 This is a **monorepo**. The Vite app lives in `artifacts/cintexa/`, not the repo root.

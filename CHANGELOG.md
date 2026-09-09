@@ -120,3 +120,38 @@ All performance figures on marketing/ads demos are clearly labeled sample data �
   11 columns), onboarding fields confirmed to read/write correctly
 - Re-verified: 52 tests passing (39 backend + 13 frontend) from a clean install, typecheck clean, both
   build:pages and api-server builds clean, OpenAPI spec updated and re-validated (13 paths, 7 schemas)
+
+## Round 7 — merged parallel work, made the fee/referral/leaderboard system real end-to-end
+- Merged 15 commits pushed directly by Kyle/another session while this work was in progress: Templates,
+  Affiliate, Analytics, Pixels, Email, Payback, Social (connect/post/schedule/boost/share/follow) dashboard
+  tabs, streak badges, and Clerk-branding cleanup — all kept as-is (more complete than this session's own
+  in-progress equivalents). Found and fixed 3 real bugs surfaced by the merge: a syntax error in
+  Progress.tsx (broken build), a wrong Clerk API call in Settings.tsx, and a reintroduced
+  `AnimatePresence mode="wait"` hang (the same bug fixed earlier this session)
+- Completed what the other session had scaffolded but explicitly marked as not-yet-persisted: username,
+  avatarId, and twoFactorEnabled now have real `customer_profiles` columns (15 -> 18, unique index on
+  username) instead of only ever living in browser localStorage. Verified live: set + duplicate-rejected
+  against real Postgres
+- **Platform fee reconciled to the confirmed scheme (7% default, 5% with promo code FREE2026)** — the
+  webhook was previously a flat, non-promo-aware 5%; `calculatePlatformFee` now takes an optional promo
+  code and the webhook accepts one in its payload. Verified live: a ₵100 payment with no code returns
+  exactly ₵7 fee, the same payment with `promoCode: "FREE2026"` returns exactly ₵5 fee
+- **Admin (FREE2026) referrer linking is now real and server-side**, not just a localStorage default:
+  `PATCH /api/customer/me` sets `referredByUserId` to FREE2026 on every brand-new profile unless a real
+  `?ref=` capture is supplied, and never touches it again on existing profiles. Extracted into a pure,
+  tested `resolveReferrer()` function
+- **Leaderboard rebuilt from three hardcoded demo arrays into three real Postgres queries** — most
+  referrer (self-join counting real referrals, admin always excluded), most creator (creators ranked by
+  loyalty balance), most user of the platform (ranked by activity event count). Verified end-to-end: seeded
+  a real two-person referral chain via direct DB inserts, confirmed the API returns exactly that referrer
+  ranked with a score of 2
+- **Fixed an urgent, unrelated production-breaking bug found during verification**: React 19.3.0 shipped
+  during this session and broke `@react-three/fiber`'s peer dependency range, making `npm install` fail
+  outright — this would have broken Cloudflare's build the moment it ran. Pinned `react`/`react-dom` to
+  `>=19.0.0 <19.3.0` (resolves to 19.2.8)
+- Flagged, not silently resolved: the other session's client-side fee/referral state (localStorage) and
+  this session's server-side state (real Postgres) are architecturally different sources of truth — this
+  round makes the server side fully correct and real, but the two layers still don't sync with each other
+- Re-verified: 68 tests passing (51 backend + 17 frontend, including a new real end-to-end referral-chain
+  leaderboard test) from a clean install, typecheck clean, both build:pages and api-server builds clean,
+  OpenAPI spec updated and re-validated (13 paths, 8 schemas)

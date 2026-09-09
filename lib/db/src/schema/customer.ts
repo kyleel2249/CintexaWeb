@@ -188,9 +188,14 @@ export type AgentTask = typeof agentTasksTable.$inferSelect;
 
 /* ============ Payments ============ */
 
-/** Platform takes this cut of every sale/payment. Single source of truth — used by the
+/** Platform takes this cut of every sale/payment by default. Single source of truth — used by the
  * webhook handler that records contributions, and shown in the FAQ/UI copy. */
-export const PLATFORM_FEE_RATE = 0.05;
+export const PLATFORM_FEE_RATE_DEFAULT = 0.07;
+/** With the FREE2026 promo code applied at checkout, the platform fee drops to 5%. */
+export const PLATFORM_FEE_RATE_PROMO = 0.05;
+export const PROMO_CODE = "FREE2026";
+/** Reserved username: every account is referred by this admin identity by default, and it's excluded from the leaderboard. */
+export const ADMIN_USERNAME = "FREE2026";
 
 export const paymentMethodTypeEnum = pgEnum("payment_method_type", ["card", "mobile_money", "bank_transfer"]);
 

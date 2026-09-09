@@ -11,7 +11,7 @@ export const webhooksRouter = Router();
  * is verified by `requireWebhookSignature` before this handler runs.
  */
 webhooksRouter.post("/contributions", requireWebhookSignature, async (req, res) => {
-  const { userId, reference, amount, currency, description } = req.body ?? {};
+  const { userId, reference, amount, currency, description, promoCode } = req.body ?? {};
 
   if (!userId || !reference || !amount || !description) {
     res.status(400).json({ error: "Missing required fields" });
@@ -24,10 +24,11 @@ webhooksRouter.post("/contributions", requireWebhookSignature, async (req, res) 
     return;
   }
 
-  // Platform retains 5% of every sale/payment — computed once here, at the
-  // point the payment is recorded, so it's never recalculated differently
-  // later even if the rate changes going forward.
-  const { platformFeeAmount, netAmount } = calculatePlatformFee(grossAmount);
+  // Platform retains 7% of every sale/payment by default, 5% with the
+  // FREE2026 promo code — computed once here, at the point the payment is
+  // recorded, so it's never recalculated differently later even if rates
+  // change going forward.
+  const { platformFeeAmount, netAmount, rate, promoApplied } = calculatePlatformFee(grossAmount, promoCode);
 
   await db
     .insert(contributionsTable)
@@ -51,5 +52,5 @@ webhooksRouter.post("/contributions", requireWebhookSignature, async (req, res) 
     description,
   });
 
-  res.json({ received: true, platformFeeAmount, netAmount });
+  res.json({ received: true, platformFeeAmount, netAmount, rate, promoApplied });
 });

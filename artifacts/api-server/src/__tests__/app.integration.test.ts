@@ -65,9 +65,38 @@ describeIfDb("API integration", () => {
     expect(res.status).toBe(400);
   });
 
-  it("GET /api/leaderboard is public and returns an array", async () => {
+  it("GET /api/leaderboard is public and returns all three ranking columns", async () => {
     const res = await request(app).get("/api/leaderboard");
     expect(res.status).toBe(200);
-    expect(Array.isArray(res.body.leaderboard)).toBe(true);
+    expect(Array.isArray(res.body.mostReferrer)).toBe(true);
+    expect(Array.isArray(res.body.mostCreator)).toBe(true);
+    expect(Array.isArray(res.body.mostUser)).toBe(true);
+  });
+
+  it("never lists the admin (FREE2026) in mostReferrer", async () => {
+    const res = await request(app).get("/api/leaderboard");
+    const names = res.body.mostReferrer.map((r: { name: string }) => r.name);
+    expect(names).not.toContain("FREE2026");
+  });
+
+  it("ranks a real referral chain correctly in mostReferrer", async () => {
+    const { db, customerProfilesTable } = await import("@cintexa/db");
+    const referrerUsername = `ref_${Date.now()}`;
+    const referrerUserId = `user_${Date.now()}_ref`;
+
+    await db.insert(customerProfilesTable).values({
+      userId: referrerUserId,
+      username: referrerUsername,
+      leaderboardVisible: true,
+    });
+    await db.insert(customerProfilesTable).values([
+      { userId: `${referrerUserId}_a`, referredByUserId: referrerUserId, leaderboardVisible: true },
+      { userId: `${referrerUserId}_b`, referredByUserId: referrerUserId, leaderboardVisible: true },
+    ]);
+
+    const res = await request(app).get("/api/leaderboard");
+    const entry = res.body.mostReferrer.find((r: { name: string }) => r.name === referrerUsername);
+    expect(entry).toBeDefined();
+    expect(entry.score).toBe(2);
   });
 });

@@ -2,7 +2,14 @@ import { Router } from "express";
 import { requireAuth, getAuth } from "@clerk/express";
 import { z } from "zod";
 import { eq, ne, and } from "drizzle-orm";
-import { db, customerProfilesTable, customerRoleEnum, ROLE_INTEREST_OPTIONS, USAGE_FREQUENCY_OPTIONS } from "@cintexa/db";
+import {
+  db,
+  customerProfilesTable,
+  customerRoleEnum,
+  ROLE_INTEREST_OPTIONS,
+  USAGE_FREQUENCY_OPTIONS,
+} from "@cintexa/db";
+import { resolveReferrer } from "../lib/referrer.js";
 
 export const customerRouter = Router();
 
@@ -24,6 +31,9 @@ export const updateProfileSchema = z
     avatarId: z.string().max(32).optional(),
     twoFactorEnabled: z.boolean().optional(),
     onboardingCompleted: z.boolean().optional(),
+    // A referral link (?ref=<username>) can set this explicitly; otherwise
+    // every new account defaults to the admin (see below).
+    referredByUserId: z.string().max(64).optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role && data.interests) {
@@ -69,8 +79,16 @@ customerRouter.patch("/me", requireAuth(), async (req, res) => {
     }
   }
 
+  const [existing] = await db
+    .select({ referredByUserId: customerProfilesTable.referredByUserId })
+    .from(customerProfilesTable)
+    .where(eq(customerProfilesTable.userId, userId!));
+
+  const referredByUserId = resolveReferrer(Boolean(existing), parsed.data.referredByUserId);
+
   const patch = {
     ...parsed.data,
+    ...(referredByUserId ? { referredByUserId } : {}),
     ...(parsed.data.role || parsed.data.onboardingCompleted ? { onboardingCompleted: true } : {}),
   };
 

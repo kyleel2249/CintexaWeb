@@ -187,9 +187,18 @@ export function useMyActivity() {
   return useAuthedQuery<{ activity: ActivityEvent[] }>(["activity"], "/activity");
 }
 
+export interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  score: number;
+}
+
 export function useLeaderboard() {
   return useQuery({
     queryKey: ["leaderboard"],
-    queryFn: () => apiFetch<{ leaderboard: { rank: number; name: string; score: number }[] }>("/leaderboard"),
+    queryFn: () =>
+      apiFetch<{ mostReferrer: LeaderboardEntry[]; mostCreator: LeaderboardEntry[]; mostUser: LeaderboardEntry[] }>(
+        "/leaderboard",
+      ),
   });
 }

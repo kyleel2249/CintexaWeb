@@ -215,28 +215,37 @@ paths:
     get:
       summary: Public leaderboard — opted-in customers only
       operationId: getLeaderboard
+      description: >
+        Three real, database-backed rankings — most referrer, most creator,
+        most user of the platform. Only leaderboardVisible=true customers
+        appear, and the admin account (username FREE2026) is always excluded
+        from mostReferrer.
       security: []
       responses:
         "200":
-          description: Top 20 by loyalty points, never exposes userId or contact info
+          description: Top 10 per column, never exposes userId or contact info
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  leaderboard:
+                  mostReferrer:
                     type: array
-                    items:
-                      type: object
-                      properties:
-                        rank: { type: integer }
-                        name: { type: string }
-                        score: { type: integer }
+                    items: { $ref: "#/components/schemas/LeaderboardRow" }
+                  mostCreator:
+                    type: array
+                    items: { $ref: "#/components/schemas/LeaderboardRow" }
+                  mostUser:
+                    type: array
+                    items: { $ref: "#/components/schemas/LeaderboardRow" }
 
   /api/webhooks/contributions:
     post:
       summary: Receive a contribution/payment event from an external provider
       operationId: receiveContributionWebhook
+      description: >
+        Platform fee is 7% by default, 5% when promoCode "FREE2026" is
+        supplied and matches exactly (case-insensitive).
       security: [{ webhookSignature: [] }]
       requestBody:
         required: true
@@ -251,9 +260,20 @@ paths:
                 amount: { type: string }
                 currency: { type: string, default: GHS }
                 description: { type: string }
+                promoCode: { type: string, description: 'Optional. "FREE2026" drops the platform fee from 7% to 5%.' }
       responses:
         "200":
-          description: Event recorded
+          description: Event recorded, with the computed fee breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received: { type: boolean }
+                  platformFeeAmount: { type: number }
+                  netAmount: { type: number }
+                  rate: { type: number, description: "0.07 or 0.05" }
+                  promoApplied: { type: boolean }
         "400":
           description: Missing required fields
         "401":
@@ -483,6 +503,12 @@ components:
         title: { type: string }
         description: { type: string }
         createdAt: { type: string, format: date-time }
+    LeaderboardRow:
+      type: object
+      properties:
+        rank: { type: integer }
+        name: { type: string }
+        score: { type: integer }
     PaginationMeta:
       type: object
       properties:

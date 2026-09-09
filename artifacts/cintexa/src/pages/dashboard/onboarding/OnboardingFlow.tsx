@@ -4,6 +4,7 @@ import type { CustomerRole } from "@cintexa/db/schema";
 import { ROLE_INTEREST_OPTIONS, ROLE_META, ROLE_ORDER, USAGE_FREQUENCY_OPTIONS } from "@/lib/roles";
 import { useUpdateProfile } from "@/hooks/useApi";
 import { useMotion } from "@/components/motion/MotionProvider";
+import { readPendingReferral, clearPendingReferral } from "@/lib/referral-capture";
 
 const STEP_LABELS = ["Role", "Interests", "Frequency"];
 
@@ -27,13 +28,16 @@ export function OnboardingFlow() {
 
   async function handleSubmit() {
     if (!role || !frequency) return;
+    const pendingReferral = readPendingReferral();
     try {
       await updateProfile.mutateAsync({
         role,
         interests,
         usageFrequency: frequency,
         onboardingCompleted: true,
+        ...(pendingReferral ? { referredByUserId: pendingReferral } : {}),
       });
+      clearPendingReferral();
     } catch {
       // useUpdateProfile already falls back to localStorage — surface only unexpected failures
     }

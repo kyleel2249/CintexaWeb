@@ -1,10 +1,11 @@
 import { Route, Switch } from "wouter";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { CookieConsent } from "@/components/CookieConsent";
 import { Home } from "@/pages/Home";
+import { captureReferralFromUrl } from "@/lib/referral-capture";
 
 const MarketingTech = lazy(() => import("@/pages/MarketingTech").then((m) => ({ default: m.MarketingTech })));
 const SalesTech = lazy(() => import("@/pages/SalesTech").then((m) => ({ default: m.SalesTech })));
@@ -42,6 +43,10 @@ function RouteFallback() {
 }
 
 export default function App() {
+  useEffect(() => {
+    captureReferralFromUrl();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <MotionProvider>

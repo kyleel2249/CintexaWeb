@@ -32,9 +32,15 @@ export function DashboardTemplates() {
 }
 
 export function DashboardAffiliate() {
-  const code = "CX-" + (typeof window !== "undefined" ? (localStorage.getItem("cintexa.aff") ?? "DEMO01") : "DEMO01");
+  const profile = useMyProfile();
+  const username = (profile.data?.profile as { username?: string } | null)?.username;
   const feePct = (currentPlatformFeeRate() * 100).toFixed(0);
   const keepPct = (100 - currentPlatformFeeRate() * 100).toFixed(0);
+  const [copied, setCopied] = useState(false);
+
+  const referralLink =
+    username && typeof window !== "undefined" ? `${window.location.origin}/get-started?ref=${username}` : null;
+
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Affiliate marketing</h2>
@@ -42,9 +48,30 @@ export function DashboardAffiliate() {
         Share your link and track referrals. Platform fee {feePct}% · you keep {keepPct}% of attributed sales.
       </p>
       <div className="cx-card mt-6 max-w-lg">
-        <p className="text-xs uppercase tracking-wider text-[hsl(var(--fg-muted))]">Your referral code</p>
-        <p className="mt-2 font-mono text-lg">{code}</p>
-        <p className="mt-4 text-sm text-[hsl(var(--fg-muted))]">Sample share of attributed volume shown as percentages in Payback.</p>
+        <p className="text-xs uppercase tracking-wider text-[hsl(var(--fg-muted))]">Your referral link</p>
+        {referralLink ? (
+          <>
+            <p className="mt-2 break-all font-mono text-sm">{referralLink}</p>
+            <button
+              type="button"
+              className="cx-btn cx-btn-secondary cx-btn-sm mt-3"
+              onClick={() => {
+                navigator.clipboard?.writeText(referralLink);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+            >
+              {copied ? "Copied!" : "Copy link"}
+            </button>
+            <p className="mt-4 text-sm text-[hsl(var(--fg-muted))]">
+              Anyone who signs up through this link is attributed to you as their referrer.
+            </p>
+          </>
+        ) : (
+          <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
+            Set a username in Settings to get your referral link.
+          </p>
+        )}
       </div>
     </DashboardShell>
   );

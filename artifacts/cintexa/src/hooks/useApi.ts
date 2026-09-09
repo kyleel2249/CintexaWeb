@@ -74,7 +74,14 @@ export function useMyProfile() {
 type ProfilePatch = Partial<
   Pick<
     CustomerProfile,
-    "displayName" | "businessName" | "country" | "leaderboardVisible" | "role" | "interests" | "usageFrequency"
+    | "displayName"
+    | "businessName"
+    | "country"
+    | "leaderboardVisible"
+    | "role"
+    | "interests"
+    | "usageFrequency"
+    | "referredByUserId"
   >
 > & {
   username?: string;

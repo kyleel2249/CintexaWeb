@@ -95,7 +95,30 @@ npx serve artifacts/cintexa/dist
 
 If this fails locally, Cloudflare will also 404.
 
-## API
+## Pinned React version — don't remove this without checking first
+
+`package.json` (root `overrides`, plus `artifacts/cintexa/package.json`'s own
+`react`/`react-dom` ranges) pins React to `>=19.0.0 <19.3.0`.
+
+This isn't a stylistic choice — **React 19.3.0 shipped and broke
+`@react-three/fiber`'s peer dependency range** (`@react-three/fiber@9.7.0`
+requires `react: ">=19 <19.3"`). Without this pin, `npm install` fails
+outright with an ERESOLVE error, which means the Cloudflare build fails too,
+regardless of anything else in this repo. This actually happened once during
+development.
+
+Before removing or loosening this pin, confirm a version of
+`@react-three/fiber` (or `@react-three/drei`) has actually shipped support
+for React 19.3+:
+
+```bash
+npm view @react-three/fiber@latest peerDependencies
+```
+
+If `react` there still excludes `19.3`, leave the pin in place. If a newer
+version supports it, update `@react-three/fiber`/`@react-three/drei` in
+`artifacts/cintexa/package.json` and the pin together, then re-verify
+`npm install` succeeds before removing the `overrides` entry.
 
 ## API
 

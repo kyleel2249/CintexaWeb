@@ -9,6 +9,10 @@
     "lib/*",
     "scripts"
   ],
+  "overrides": {
+    "react": ">=19.0.0 <19.3.0",
+    "react-dom": ">=19.0.0 <19.3.0"
+  },
   "scripts": {
     "dev:web": "npm run dev -w cintexa",
     "dev:api": "npm run build -w @cintexa/db && npm run dev -w api-server",

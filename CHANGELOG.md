@@ -155,3 +155,17 @@ All performance figures on marketing/ads demos are clearly labeled sample data �
 - Re-verified: 68 tests passing (51 backend + 17 frontend, including a new real end-to-end referral-chain
   leaderboard test) from a clean install, typecheck clean, both build:pages and api-server builds clean,
   OpenAPI spec updated and re-validated (13 paths, 8 schemas)
+
+## Round 8 — harden the React 19.3 fix
+- The earlier fix (pinning `react`/`react-dom` to `>=19.0.0 <19.3.0` in `artifacts/cintexa/package.json`)
+  only constrained that one workspace's own dependency resolution. Added a root-level `overrides` field so
+  the pin is enforced across the entire dependency tree regardless of what any single package declares —
+  stronger guarantee against the exact failure mode that broke `npm install` once already
+- No permanent upstream fix exists yet: confirmed `@react-three/fiber@9.7.0` (latest stable, no newer
+  non-canary release exists) still requires `react: ">=19 <19.3"`. The range pin remains the correct fix,
+  not a temporary workaround with a known expiry
+- Documented this clearly in `DEPLOYMENT.md` with the exact command to check before ever removing the pin,
+  so a future change doesn't silently reintroduce the same production-breaking failure
+- Fixed an unrelated duplicate `## API` heading in `DEPLOYMENT.md` found while editing nearby
+- Re-verified from a fully clean install (confirmed React still resolves to 19.2.8): 72 tests passing
+  (51 backend + 21 frontend), typecheck clean, both build:pages and api-server builds clean

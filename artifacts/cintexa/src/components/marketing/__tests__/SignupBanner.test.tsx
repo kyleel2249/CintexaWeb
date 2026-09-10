@@ -29,16 +29,19 @@ describe("SignupBanner", () => {
     expect(screen.getByRole("link", { name: /get started free/i })).toHaveAttribute("href", "/get-started");
   });
 
-  it("shows the default 7% fee / 93% keep rate when no promo is active", () => {
+  it("renders the headline", () => {
     renderBanner();
-    expect(screen.getByText(/keep 93% of every sale/i)).toBeInTheDocument();
+    expect(screen.getByText(/keep your sale — up and running in three easy steps/i)).toBeInTheDocument();
+  });
+
+  it("shows the default 7% fee rate when no promo is active", () => {
+    renderBanner();
     expect(screen.getByText(/platform fee is 7%/i)).toBeInTheDocument();
   });
 
-  it("shows the promo 5% fee / 95% keep rate once FREE2026 is applied", () => {
+  it("shows the promo 5% fee rate once FREE2026 is applied", () => {
     localStorage.setItem("cintexa.promo.code", "FREE2026");
     renderBanner();
-    expect(screen.getByText(/keep 95% of every sale/i)).toBeInTheDocument();
     expect(screen.getByText(/platform fee is 5%/i)).toBeInTheDocument();
   });
 });

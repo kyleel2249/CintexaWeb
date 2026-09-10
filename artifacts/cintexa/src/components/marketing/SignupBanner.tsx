@@ -30,7 +30,6 @@ const STEPS = [
 export function SignupBanner() {
   const { allowMotion } = useMotion();
   const feePct = (currentPlatformFeeRate() * 100).toFixed(0);
-  const keepPct = (100 - currentPlatformFeeRate() * 100).toFixed(0);
   const promoActive = hasActivePromo();
 
   return (
@@ -54,7 +53,7 @@ export function SignupBanner() {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.05 }}
           >
-            Keep {keepPct}% of every sale — up and running in three steps
+            Keep your sale — up and running in three easy steps
           </motion.h2>
           <motion.p
             className="mt-3 text-sm text-[hsl(var(--fg-muted))]"

@@ -1,7 +1,7 @@
 {
-  "name": "CINTEXA",
-  "short_name": "CINTEXA",
-  "description": "A growth platform for technology, commerce, motion, and intelligence.",
+  "name": "Cintexa | Connected Technology Systems for Modern Businesses",
+  "short_name": "Cintexa",
+  "description": "Cintexa builds intelligent software, cloud infrastructure, and business platforms that help companies automate operations, manage inventory. Run technology, commerce, and marketing from one connected core.",
   "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }],
   "theme_color": "#0B0F14",
   "background_color": "#0B0F14",

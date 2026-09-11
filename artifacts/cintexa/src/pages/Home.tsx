@@ -13,7 +13,7 @@ const PILLARS = [
   { title: "Marketing technology", copy: "Plan campaigns and track channel performance from one workspace.", href: "/solutions/marketing", accent: "sky" as const },
   { title: "Sales technology", copy: "Move visitors to loyal customers with a pipeline built for repeat growth.", href: "/solutions/sales", accent: "teal" as const },
   { title: "Ads Boost", copy: "Run programmatic campaigns with a live lifecycle view, start to revenue.", href: "/solutions/ads-boost", accent: "accent" as const },
-  { title: "E-commerce", copy: "A full commerce toolkit: catalog, checkout, and a 3D storefront demo.", href: "/solutions/ecommerce", accent: "violet" as const },
+  { title: "E-commerce", copy: "A full commerce toolkit: catalog, checkout, and a 3D storefront preview.", href: "/solutions/ecommerce", accent: "violet" as const },
 ];
 
 export function Home() {

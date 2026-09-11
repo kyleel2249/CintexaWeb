@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { DashboardShell } from "./DashboardShell";
-import { useMyProfile } from "@/hooks/useApi";
+import { useMyProfile, useMyActivity, useMyContributions, useMyLoyalty, useMyTickets, useCreateTicket, useMyPaymentMethods, useAddPaymentMethod } from "@/hooks/useApi";
 import { currentPlatformFeeRate } from "@/lib/platform-economics";
 import { faqForInterests } from "@/lib/interest-faq";
+import { ApiError } from "@/lib/api";
 
 const TEMPLATES = [
   { name: "Launch email sequence", tag: "Email" },
@@ -78,19 +79,27 @@ export function DashboardAffiliate() {
 }
 
 export function DashboardAnalytics() {
+  const activity = useMyActivity();
+  const contributions = useMyContributions();
+  const loyalty = useMyLoyalty();
+
+  const metrics = [
+    { l: "Activity events recorded", v: activity.data?.pagination.total ?? 0, loading: activity.isLoading },
+    { l: "Contributions recorded", v: contributions.data?.pagination.total ?? 0, loading: contributions.isLoading },
+    { l: "Loyalty points balance", v: loyalty.data?.balance ?? 0, loading: loyalty.isLoading },
+  ];
+
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Analytics</h2>
-      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Demo rates — connect live sources when your API is deployed.</p>
+      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Real figures from your account.</p>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        {[
-          { l: "Conversion rate (7d)", v: "4.3%" },
-          { l: "Engagement rate", v: "12%" },
-          { l: "Repeat purchase share", v: "28%" },
-        ].map((m) => (
+        {metrics.map((m) => (
           <div key={m.l} className="cx-card">
             <p className="text-xs text-[hsl(var(--fg-muted))]">{m.l}</p>
-            <p className="mt-2 cx-display text-2xl">{m.v}</p>
+            <p className="mt-2 cx-display text-2xl">
+              {m.loading ? <span className="inline-block h-6 w-12 animate-pulse rounded bg-[hsl(var(--bg-inset))]" /> : m.v}
+            </p>
           </div>
         ))}
       </div>
@@ -132,30 +141,98 @@ export function DashboardPixels() {
 }
 
 export function DashboardEmail() {
+  const tickets = useMyTickets();
+  const createTicket = useCreateTicket();
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Email support</h2>
-      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Contact the CINTEXA team or queue a support thread.</p>
-      <div className="cx-card mt-6 max-w-lg space-y-3">
-        <p className="text-sm">
-          Support:{" "}
+      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
+        Message the CINTEXA team directly — your ticket is saved to your account and tracked below.
+      </p>
+
+      <form
+        className="cx-card mt-6 max-w-lg space-y-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!subject.trim() || !message.trim()) return;
+          createTicket.mutate(
+            { subject, message },
+            {
+              onSuccess: () => {
+                setSubject("");
+                setMessage("");
+              },
+            },
+          );
+        }}
+      >
+        <label className="cx-field">
+          <span className="cx-label">Subject</span>
+          <input className="cx-input" value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={160} required />
+        </label>
+        <label className="cx-field">
+          <span className="cx-label">Message</span>
+          <textarea
+            className="cx-input min-h-24"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            maxLength={4000}
+            required
+          />
+        </label>
+        <button type="submit" className="cx-btn cx-btn-primary w-fit" disabled={createTicket.isPending}>
+          {createTicket.isPending ? "Sending…" : "Submit ticket"}
+        </button>
+        {createTicket.isError && (
+          <p className="text-sm" style={{ color: "hsl(var(--danger))" }}>
+            {createTicket.error instanceof ApiError ? createTicket.error.message : "Couldn't send — try again."}
+          </p>
+        )}
+        <p className="text-xs text-[hsl(var(--fg-muted))]">
+          Prefer email? Reach us directly at{" "}
           <a className="underline" href="mailto:support@cintexa.com">
             support@cintexa.com
           </a>
+          .
         </p>
-        <p className="text-sm text-[hsl(var(--fg-muted))]">Typical response within 1 business day (demo policy).</p>
-        <a className="cx-btn cx-btn-secondary w-fit" href="mailto:support@cintexa.com?subject=CINTEXA%20support">
-          Open email
-        </a>
+      </form>
+
+      <div className="mt-6 max-w-lg">
+        <p className="text-xs uppercase tracking-wider text-[hsl(var(--fg-muted))]">Your tickets</p>
+        {tickets.isLoading && <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Loading…</p>}
+        {tickets.data && tickets.data.tickets.length === 0 && (
+          <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">No tickets yet.</p>
+        )}
+        {tickets.data && tickets.data.tickets.length > 0 && (
+          <ul className="mt-2 space-y-2">
+            {tickets.data.tickets.map((t) => (
+              <li key={t.id} className="cx-card">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-medium">{t.subject}</p>
+                  <span className="cx-badge">{t.status}</span>
+                </div>
+                <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">{new Date(t.createdAt).toLocaleString()}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </DashboardShell>
   );
 }
 
 export function DashboardPayback() {
-  const [method, setMethod] = useState<"card" | "momo" | "bank">("momo");
   const feePct = (currentPlatformFeeRate() * 100).toFixed(0);
   const keepPct = (100 - currentPlatformFeeRate() * 100).toFixed(0);
+  const methods = useMyPaymentMethods();
+  const addMethod = useAddPaymentMethod();
+  const [type, setType] = useState<"card" | "mobile_money" | "bank_transfer">("mobile_money");
+  const [label, setLabel] = useState("");
+  const [last4, setLast4] = useState("");
+
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Payback</h2>
@@ -164,24 +241,6 @@ export function DashboardPayback() {
         sale.
       </p>
       <div className="cx-card mt-6 max-w-md space-y-4">
-        <div className="flex flex-wrap gap-2">
-          {(
-            [
-              ["card", "Card"],
-              ["momo", "Mobile Money"],
-              ["bank", "Bank transfer"],
-            ] as const
-          ).map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              className={`cx-btn cx-btn-sm ${method === id ? "cx-btn-primary" : "cx-btn-secondary"}`}
-              onClick={() => setMethod(id)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
         <dl className="space-y-1 text-sm">
           <div className="flex justify-between">
             <dt>Gross sale</dt>
@@ -196,10 +255,83 @@ export function DashboardPayback() {
             <dd>{keepPct}%</dd>
           </div>
         </dl>
-        <button type="button" className="cx-btn cx-btn-primary">
-          Request payout ({method === "momo" ? "Mobile Money" : method === "bank" ? "Bank" : "Card"})
-        </button>
-        <p className="text-xs text-[hsl(var(--fg-muted))]">Demo only — no live money movement.</p>
+      </div>
+
+      <div className="mt-6 max-w-md">
+        <p className="text-xs uppercase tracking-wider text-[hsl(var(--fg-muted))]">Your payout methods</p>
+        {methods.isLoading && <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Loading…</p>}
+        {methods.data && methods.data.paymentMethods.length === 0 && (
+          <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">None saved yet — add one below.</p>
+        )}
+        {methods.data && methods.data.paymentMethods.length > 0 && (
+          <ul className="mt-2 space-y-2">
+            {methods.data.paymentMethods.map((m) => (
+              <li key={m.id} className="cx-card flex items-center justify-between">
+                <span className="text-sm">{m.label}</span>
+                {m.isDefault && <span className="cx-badge">Default</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <form
+          className="cx-card mt-4 space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!label.trim()) return;
+            addMethod.mutate(
+              { type, label, last4: last4 || undefined, isDefault: methods.data?.paymentMethods.length === 0 },
+              { onSuccess: () => { setLabel(""); setLast4(""); } },
+            );
+          }}
+        >
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                ["card", "Card"],
+                ["mobile_money", "Mobile Money"],
+                ["bank_transfer", "Bank transfer"],
+              ] as const
+            ).map(([id, l]) => (
+              <button
+                key={id}
+                type="button"
+                className={`cx-btn cx-btn-sm ${type === id ? "cx-btn-primary" : "cx-btn-secondary"}`}
+                onClick={() => setType(id)}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+          <label className="cx-field">
+            <span className="cx-label">Label</span>
+            <input
+              className="cx-input"
+              placeholder={type === "card" ? "Visa" : type === "mobile_money" ? "MTN Mobile Money" : "GTBank"}
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              required
+            />
+          </label>
+          <label className="cx-field">
+            <span className="cx-label">Last 4 digits (optional)</span>
+            <input
+              className="cx-input"
+              value={last4}
+              onChange={(e) => setLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
+              placeholder="1234"
+              maxLength={4}
+            />
+          </label>
+          <button type="submit" className="cx-btn cx-btn-primary" disabled={addMethod.isPending}>
+            {addMethod.isPending ? "Saving…" : "Save payout method"}
+          </button>
+        </form>
+        <p className="mt-3 text-xs text-[hsl(var(--fg-muted))]">
+          Only display-safe details (last 4 digits, provider name) are ever stored — never full card or account
+          numbers. Payout requests aren't connected to a live processor yet; your method is saved and ready for
+          when they are.
+        </p>
       </div>
     </DashboardShell>
   );

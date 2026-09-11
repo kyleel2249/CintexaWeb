@@ -133,24 +133,3 @@ export function suggestedAccounts(selfUsername?: string) {
     blurb: "Active on CINTEXA — follow to see their public activity.",
   }));
 }
-
-/** Demo leaderboard rows — excludes admin FREE2026. */
-export function demoLeaderboard() {
-  return {
-    mostReferrer: [
-      { username: "growthlab", score: 128 },
-      { username: "signalshop", score: 96 },
-      { username: "adboostpro", score: 71 },
-    ],
-    mostCreator: [
-      { username: "creatorhub", score: 84 },
-      { username: "growthlab", score: 62 },
-      { username: "commercekit", score: 55 },
-    ],
-    mostUser: [
-      { username: "signalshop", score: 210 },
-      { username: "commercekit", score: 188 },
-      { username: "creatorhub", score: 142 },
-    ],
-  };
-}

@@ -66,7 +66,7 @@ function StoreScene() {
 export function StorefrontFallback() {
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[24px] border border-[hsl(var(--border))] bg-[hsl(var(--foreground))] p-6" data-testid="storefront-css-fallback">
-      <p className="font-mono text-[10px] uppercase tracking-[.18em] text-[hsl(var(--accent))]">Storefront · demo</p>
+      <p className="font-mono text-[10px] uppercase tracking-[.18em] text-[hsl(var(--accent))]">Storefront · preview</p>
       <div className="mt-6 grid grid-cols-3 gap-3">
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div key={i} className="aspect-square rounded-xl bg-[hsl(var(--background)/.12)] border border-[hsl(var(--background)/.1)]" />
@@ -88,7 +88,7 @@ export function Storefront3D({ className }: { className?: string }) {
           <StoreScene />
         </Suspense>
       </Canvas>
-      <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[.16em] text-[hsl(var(--muted-foreground))]">Interactive demo storefront · sample products only</p>
+      <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[.16em] text-[hsl(var(--muted-foreground))]">Interactive storefront preview · sample products only</p>
     </div>
   );
 }

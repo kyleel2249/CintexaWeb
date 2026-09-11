@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { DashboardShell } from "./DashboardShell";
 import { useMyProfile } from "@/hooks/useApi";
 import {
@@ -15,7 +15,6 @@ import {
   type NetworkId,
 } from "@/lib/social-hub";
 import { ensureAdminReferrer } from "@/lib/social-hub";
-import { ADMIN_USERNAME } from "@/lib/platform-economics";
 
 export function DashboardSocial() {
   const profile = useMyProfile();
@@ -26,7 +25,9 @@ export function DashboardSocial() {
   const [body, setBody] = useState("");
   const [schedule, setSchedule] = useState("");
   const [boost, setBoost] = useState(false);
-  const referrer = useMemo(() => ensureAdminReferrer(), []);
+  useEffect(() => {
+    ensureAdminReferrer();
+  }, []);
 
   function handleConnect(network: NetworkId) {
     const handle = window.prompt(`Handle / page name for ${network}?`, self ? `@${self}` : "");
@@ -54,10 +55,6 @@ export function DashboardSocial() {
 
   return (
     <DashboardShell>
-      <p className="text-xs text-[hsl(var(--fg-muted))]">
-        Referred by admin <strong>@{referrer}</strong> (every account is linked to @{ADMIN_USERNAME}).
-      </p>
-
       <h2 className="cx-display mt-4 text-xl">Connect social accounts</h2>
       <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
         Connect networks to schedule posts and boost ads from the dashboard. OAuth handshakes can be wired to each

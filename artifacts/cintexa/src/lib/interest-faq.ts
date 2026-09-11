@@ -10,7 +10,7 @@ const BY_INTEREST: Record<string, { q: string; a: string }[]> = {
     { q: "Which payout methods are supported?", a: "Cards, Mobile Money, and bank transfer are available under Payback." },
   ],
   "Affiliate links & referrals": [
-    { q: "Where is my affiliate link?", a: "Dashboard → Affiliate shows your referral code and tracked conversions (demo data until campaigns go live). Every account is linked to referrer FREE2026." },
+    { q: "Where is my affiliate link?", a: "Dashboard → Affiliate shows your real referral link — anyone who signs up through it is attributed to you." },
     { q: "How do commissions appear?", a: "Affiliate earnings show net of the active platform fee percentage on attributed sales." },
   ],
   "Ad campaigns": [

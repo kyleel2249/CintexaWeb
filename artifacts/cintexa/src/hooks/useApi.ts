@@ -15,6 +15,8 @@ import type {
   LoyaltyLedgerEntry,
   Subscription,
   SubscriptionPlan,
+  PaymentMethod,
+  SupportTicket,
 } from "@cintexa/db/schema";
 
 function useAuthedQuery<T>(key: string[], path: string) {
@@ -186,12 +188,19 @@ export function useMyLoyalty() {
   return useAuthedQuery<{ balance: number; entries: LoyaltyLedgerEntry[] }>(["loyalty", "me"], "/loyalty/me");
 }
 
+export interface PaginationMeta {
+  limit: number;
+  offset: number;
+  total: number;
+  hasMore: boolean;
+}
+
 export function useMyContributions() {
-  return useAuthedQuery<{ contributions: Contribution[] }>(["contributions"], "/contributions");
+  return useAuthedQuery<{ contributions: Contribution[]; pagination: PaginationMeta }>(["contributions"], "/contributions");
 }
 
 export function useMyActivity() {
-  return useAuthedQuery<{ activity: ActivityEvent[] }>(["activity"], "/activity");
+  return useAuthedQuery<{ activity: ActivityEvent[]; pagination: PaginationMeta }>(["activity"], "/activity");
 }
 
 export interface LeaderboardEntry {
@@ -207,5 +216,55 @@ export function useLeaderboard() {
       apiFetch<{ mostReferrer: LeaderboardEntry[]; mostCreator: LeaderboardEntry[]; mostUser: LeaderboardEntry[] }>(
         "/leaderboard",
       ),
+  });
+}
+
+export function useMyTickets() {
+  return useAuthedQuery<{ tickets: SupportTicket[] }>(["support", "tickets"], "/support/tickets");
+}
+
+export function useCreateTicket() {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: { subject: string; message: string }) => {
+      const token = await getToken();
+      return apiFetch<{ ticket: SupportTicket }>("/support/tickets", { method: "POST", body, token });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["support", "tickets"] }),
+  });
+}
+
+export function useMyPaymentMethods() {
+  return useAuthedQuery<{ paymentMethods: PaymentMethod[] }>(["payment-methods"], "/payment-methods");
+}
+
+export function useAddPaymentMethod() {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: {
+      type: PaymentMethod["type"];
+      label: string;
+      provider?: string;
+      last4?: string;
+      isDefault?: boolean;
+    }) => {
+      const token = await getToken();
+      return apiFetch<{ paymentMethod: PaymentMethod }>("/payment-methods", { method: "POST", body, token });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["payment-methods"] }),
+  });
+}
+
+export function useDeletePaymentMethod() {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const token = await getToken();
+      return apiFetch<{ deleted: boolean }>(`/payment-methods/${id}`, { method: "DELETE", token });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["payment-methods"] }),
   });
 }

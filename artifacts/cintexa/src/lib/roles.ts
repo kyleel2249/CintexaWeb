@@ -32,7 +32,7 @@ const INTEREST_RECOMMENDATIONS: Record<string, Recommendation> = {
   "Courses & education": { title: "Marketing technology", description: "Build a content calendar for launches.", href: "/solutions/marketing" },
   "Art & design": { title: "Ads Boost", description: "Get your work in front of more people.", href: "/solutions/ads-boost" },
   "Music & audio": { title: "Ads Boost", description: "Run a campaign lifecycle for a release.", href: "/solutions/ads-boost" },
-  "Physical products": { title: "E-commerce", description: "Catalog, checkout, and a 3D storefront demo.", href: "/solutions/ecommerce" },
+  "Physical products": { title: "E-commerce", description: "Catalog, checkout, and a 3D storefront preview.", href: "/solutions/ecommerce" },
   "Digital products": { title: "E-commerce", description: "Set up delivery and checkout for digital goods.", href: "/solutions/ecommerce" },
   Services: { title: "Sales technology", description: "Track leads from first visit to booked call.", href: "/solutions/sales" },
   Subscriptions: { title: "Pricing", description: "See how plans and entitlements are structured.", href: "/pricing" },

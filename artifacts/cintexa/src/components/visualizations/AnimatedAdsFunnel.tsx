@@ -54,7 +54,7 @@ export function AnimatedAdsFunnel({ className }: { className?: string }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[.2em] text-[hsl(var(--accent))]">
-            Ads Boost · demo model
+            Ads Boost · sample model
           </p>
           <h3 className="mt-2 font-display text-2xl font-bold tracking-[-.04em]">Ad → Revenue path</h3>
         </div>

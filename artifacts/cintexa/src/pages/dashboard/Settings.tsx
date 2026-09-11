@@ -3,6 +3,7 @@ import { useClerk, useUser } from "@clerk/clerk-react";
 import { DashboardShell } from "./DashboardShell";
 import { useDeleteMyData, useExportMyData, useMyProfile, useUpdateProfile } from "@/hooks/useApi";
 import { AVATAR_OPTIONS } from "@/lib/local-profile";
+import { clerkAppearance } from "@/lib/clerk-appearance";
 
 export function DashboardSettings() {
   const { user } = useUser();
@@ -149,7 +150,7 @@ export function DashboardSettings() {
             <button
               type="button"
               className="cx-btn cx-btn-secondary w-fit"
-              onClick={() => clerk.openUserProfile()}
+              onClick={() => clerk.openUserProfile({ appearance: clerkAppearance })}
             >
               Open security settings
             </button>

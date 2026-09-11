@@ -51,3 +51,15 @@ if (!window.matchMedia) {
     dispatchEvent: () => false,
   });
 }
+
+// jsdom has no requestAnimationFrame. GSAP's internal ticker (used by
+// GsapStagger/ScrollTrigger) schedules callbacks through it and can fire
+// after a test's DOM has already torn down, throwing "requestAnimationFrame
+// is not defined" as an unhandled error that fails the whole test run even
+// though the test itself passed. Stub it the same way jsdom's other missing
+// browser APIs are stubbed above.
+if (typeof window.requestAnimationFrame === "undefined") {
+  window.requestAnimationFrame = ((callback: FrameRequestCallback) =>
+    setTimeout(() => callback(Date.now()), 16)) as typeof window.requestAnimationFrame;
+  window.cancelAnimationFrame = ((handle: number) => clearTimeout(handle)) as typeof window.cancelAnimationFrame;
+}

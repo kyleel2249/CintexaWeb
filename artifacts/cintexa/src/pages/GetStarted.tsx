@@ -1,21 +1,18 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { SignIn, SignUp } from "@clerk/clerk-react";
+import { clerkAppearance } from "@/lib/clerk-appearance";
 
 const hasClerk =
   typeof import.meta.env.VITE_CLERK_PUBLISHABLE_KEY === "string" &&
   Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY.trim());
 
-const clerkAppearance = {
-  layout: {
-    unsafe_disableDevelopmentModeWarnings: true,
-  },
+const embeddedAppearance = {
+  ...clerkAppearance,
   elements: {
+    ...clerkAppearance.elements,
     rootBox: "w-full",
     card: "bg-[hsl(var(--bg-raised))] border border-[hsl(var(--border))] shadow-none",
-    footer: { display: "none" },
-    footerAction: { display: "none" },
-    badge: { display: "none" },
   },
 } as const;
 
@@ -61,14 +58,14 @@ export function GetStarted() {
                 routing="hash"
                 signInUrl="/get-started#sign-in"
                 fallbackRedirectUrl="/dashboard"
-                appearance={clerkAppearance}
+                appearance={embeddedAppearance}
               />
             ) : (
               <SignIn
                 routing="hash"
                 signUpUrl="/get-started#sign-up"
                 fallbackRedirectUrl="/dashboard"
-                appearance={clerkAppearance}
+                appearance={embeddedAppearance}
               />
             )
           ) : (

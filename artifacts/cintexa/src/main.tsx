@@ -1,10 +1,10 @@
 import { createRoot } from "react-dom/client";
 import { ClerkProvider } from "@clerk/clerk-react";
-import { dark } from "@clerk/themes";
 import type { ReactNode } from "react";
 
 import App from "./App";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { clerkAppearance } from "@/lib/clerk-appearance";
 
 import "./index.css";
 import "./styles/design-system.css";
@@ -26,25 +26,7 @@ function AuthRoot({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ClerkProvider
-      publishableKey={publishableKey}
-      appearance={{
-        baseTheme: dark,
-        layout: {
-          // Hides the "Development mode" strip on SignIn / SignUp while using pk_test_ keys
-          unsafe_disableDevelopmentModeWarnings: true,
-        },
-        elements: {
-          // Hide "Secured by Clerk" footer badge in the component chrome
-          footer: { display: "none" },
-          footerAction: { display: "none" },
-          badge: { display: "none" },
-          // Development mode banner (when still rendered by older builds)
-          internal: { display: "none" },
-        },
-      }}
-      afterSignOutUrl="/"
-    >
+    <ClerkProvider publishableKey={publishableKey} appearance={clerkAppearance} afterSignOutUrl="/">
       {children}
     </ClerkProvider>
   );

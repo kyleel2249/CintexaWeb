@@ -6,6 +6,17 @@ import type { InsightSpecialistConfig } from "./types";
  */
 export const INSIGHT_SPECIALISTS: InsightSpecialistConfig[] = [
   {
+    id: "overview",
+    displayName: "Overview Insight",
+    tab: "overview",
+    description: "High-level interpretation of overall account activity when you request account analysis.",
+    capabilities: ["account_summary", "cross_tab_signals", "priority_attention"],
+    requiredDataSources: ["activity_events", "contributions", "loyalty", "profile"],
+    allowedScopes: ["own_account"],
+    version: "1.0.0",
+    enabled: true,
+  },
+  {
     id: "social",
     displayName: "Social Insight",
     tab: "social",
@@ -80,8 +91,8 @@ export const INSIGHT_SPECIALISTS: InsightSpecialistConfig[] = [
     id: "payback",
     displayName: "Payback Insight",
     tab: "payback",
-    description: "Explain payback-related records using the platform's configured definition.",
-    capabilities: ["record_summary", "pending_vs_verified"],
+    description: "Analyze verified payback records and payout readiness based on platform rules.",
+    capabilities: ["status_summary", "fee_rules", "method_health"],
     requiredDataSources: ["payback_records"],
     allowedScopes: ["own_payback"],
     version: "1.0.0",

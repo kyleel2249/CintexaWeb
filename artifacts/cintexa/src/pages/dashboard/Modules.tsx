@@ -1,3 +1,4 @@
+import { InsightPanel } from "@/components/insights/InsightPanel";
 import { useMemo, useState } from "react";
 import { DashboardShell } from "./DashboardShell";
 import { useMyProfile, useMyActivity, useMyContributions, useMyLoyalty, useMyTickets, useCreateTicket, useMyPaymentMethods, useAddPaymentMethod } from "@/hooks/useApi";
@@ -28,6 +29,7 @@ export function DashboardTemplates() {
           </article>
         ))}
       </div>
+      <InsightPanel tab="templates" />
     </DashboardShell>
   );
 }
@@ -74,6 +76,7 @@ export function DashboardAffiliate() {
           </p>
         )}
       </div>
+      <InsightPanel tab="affiliate" />
     </DashboardShell>
   );
 }
@@ -103,6 +106,7 @@ export function DashboardAnalytics() {
           </div>
         ))}
       </div>
+      <InsightPanel tab="analytics" />
     </DashboardShell>
   );
 }
@@ -136,6 +140,7 @@ export function DashboardPixels() {
           Save pixel settings
         </button>
       </form>
+      <InsightPanel tab="pixels" />
     </DashboardShell>
   );
 }
@@ -220,6 +225,7 @@ export function DashboardEmail() {
           </ul>
         )}
       </div>
+      <InsightPanel tab="email" />
     </DashboardShell>
   );
 }
@@ -333,6 +339,7 @@ export function DashboardPayback() {
           when they are.
         </p>
       </div>
+      <InsightPanel tab="payback" />
     </DashboardShell>
   );
 }
@@ -355,6 +362,7 @@ export function DashboardFaq() {
           </details>
         ))}
       </div>
+      <InsightPanel tab="faq" />
     </DashboardShell>
   );
 }

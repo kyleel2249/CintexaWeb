@@ -15,6 +15,7 @@ import {
   type NetworkId,
 } from "@/lib/social-hub";
 import { ensureAdminReferrer } from "@/lib/social-hub";
+import { InsightPanel } from "@/components/insights/InsightPanel";
 
 export function DashboardSocial() {
   const profile = useMyProfile();
@@ -173,6 +174,8 @@ export function DashboardSocial() {
           );
         })}
       </div>
+
+      <InsightPanel tab="social" />
     </DashboardShell>
   );
 }

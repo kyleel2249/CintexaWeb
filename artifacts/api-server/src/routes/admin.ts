@@ -9,6 +9,9 @@ import {
   subscriptionsTable,
   loyaltyLedgerTable,
   activityEventsTable,
+  insightSpecialistFlagsTable,
+  insightFeedbackTable,
+  insightRunsTable,
 } from "@cintexa/db";
 
 export const adminRouter = Router();
@@ -43,8 +46,6 @@ adminRouter.get("/customers", async (req, res) => {
       .orderBy(desc(customerProfilesTable.updatedAt))
       .limit(page.limit)
       .offset(page.offset),
-    // userId is customer_profiles' primary key, so a plain row count here
-    // equals the group count of the joined query above.
     db.select({ count: sql<number>`count(*)::int` }).from(customerProfilesTable),
   ]);
 
@@ -77,4 +78,68 @@ adminRouter.post("/loyalty/adjust", async (req, res) => {
   });
 
   res.json({ entry });
+});
+
+const flagSchema = z.object({
+  specialistId: z.string().min(1).max(64),
+  enabled: z.boolean(),
+  notes: z.string().max(500).optional(),
+});
+
+/** List Insight specialist flags (admin). */
+adminRouter.get("/insights/flags", async (_req, res) => {
+  const rows = await db.select().from(insightSpecialistFlagsTable);
+  res.json({ flags: rows });
+});
+
+/** Upsert Insight specialist enable flag. */
+adminRouter.put("/insights/flags", async (req, res) => {
+  const parsed = flagSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+  const { specialistId, enabled, notes } = parsed.data;
+  const [row] = await db
+    .insert(insightSpecialistFlagsTable)
+    .values({
+      specialistId,
+      enabled,
+      notes: notes ?? null,
+      updatedAt: new Date(),
+      updatedBy: "admin",
+    })
+    .onConflictDoUpdate({
+      target: insightSpecialistFlagsTable.specialistId,
+      set: {
+        enabled,
+        notes: notes ?? null,
+        updatedAt: new Date(),
+        updatedBy: "admin",
+      },
+    })
+    .returning();
+  res.json({ flag: row });
+});
+
+/** Recent insight feedback for quality review. */
+adminRouter.get("/insights/feedback", async (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 50, 100);
+  const rows = await db
+    .select()
+    .from(insightFeedbackTable)
+    .orderBy(desc(insightFeedbackTable.createdAt))
+    .limit(limit);
+  res.json({ feedback: rows });
+});
+
+/** Recent insight runs (admin audit). */
+adminRouter.get("/insights/runs", async (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 50, 100);
+  const rows = await db
+    .select()
+    .from(insightRunsTable)
+    .orderBy(desc(insightRunsTable.createdAt))
+    .limit(limit);
+  res.json({ runs: rows });
 });

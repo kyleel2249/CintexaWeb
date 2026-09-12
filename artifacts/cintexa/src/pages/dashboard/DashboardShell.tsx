@@ -38,10 +38,10 @@ function SignedOutPrompt() {
 }
 
 export function DashboardShell({ children }: { children: ReactNode }) {
-  const { user } = useUser();
-  const profile = useMyProfile();
   const [, params] = useRoute("/dashboard/:tab?");
   const activeHref = params?.tab ? `/dashboard/${params.tab}` : "/dashboard";
+  const { user } = useUser();
+  const profile = useMyProfile();
 
   const [streakDays, setStreakDays] = useState(0);
   const [badgeId, setBadgeId] = useState<BadgeId>(null);

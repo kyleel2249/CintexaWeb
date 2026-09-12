@@ -1,12 +1,13 @@
 import { Route, Switch } from "wouter";
 import { lazy, Suspense, useEffect } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { CookieBanner } from "@/components/CookieBanner";
+import { ScrollProgress } from "@/components/ScrollProgress";
 import { MotionProvider } from "@/components/motion/MotionProvider";
-import { SiteLayout } from "@/components/layout/SiteLayout";
-import { CookieConsent } from "@/components/CookieConsent";
-import { Home } from "@/pages/Home";
-import { captureReferralFromUrl } from "@/lib/referral-capture";
 
+const Home = lazy(() => import("@/pages/Home").then((m) => ({ default: m.Home })));
+const Solutions = lazy(() => import("@/pages/Solutions").then((m) => ({ default: m.Solutions })));
 const MarketingTech = lazy(() => import("@/pages/MarketingTech").then((m) => ({ default: m.MarketingTech })));
 const SalesTech = lazy(() => import("@/pages/SalesTech").then((m) => ({ default: m.SalesTech })));
 const AdsBoost = lazy(() => import("@/pages/AdsBoost").then((m) => ({ default: m.AdsBoost })));
@@ -16,73 +17,59 @@ const Pricing = lazy(() => import("@/pages/Pricing").then((m) => ({ default: m.P
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
 const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DashboardOverview = lazy(() => import("@/pages/dashboard/Overview").then((m) => ({ default: m.DashboardOverview })));
-const DashboardContributions = lazy(() => import("@/pages/dashboard/Contributions").then((m) => ({ default: m.DashboardContributions })));
 const DashboardProgress = lazy(() => import("@/pages/dashboard/Progress").then((m) => ({ default: m.DashboardProgress })));
 const DashboardLeaderboard = lazy(() => import("@/pages/dashboard/Leaderboard").then((m) => ({ default: m.DashboardLeaderboard })));
 const DashboardSettings = lazy(() => import("@/pages/dashboard/Settings").then((m) => ({ default: m.DashboardSettings })));
-const DashboardTemplates = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardTemplates })));
-const DashboardAffiliate = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardAffiliate })));
 const DashboardAnalytics = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardAnalytics })));
-const DashboardPixels = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardPixels })));
 const DashboardEmail = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardEmail })));
-const DashboardPayback = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardPayback })));
 const DashboardFaq = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardFaq })));
-const DashboardSocial = lazy(() => import("@/pages/dashboard/Social").then((m) => ({ default: m.DashboardSocial })));
 const Admin = lazy(() => import("@/pages/admin/Admin").then((m) => ({ default: m.Admin })));
 
-const queryClient = new QueryClient();
-
-function RouteFallback() {
+function PageFallback() {
   return (
     <div className="cx-section">
       <div className="cx-container">
-        <div className="h-40 w-full animate-pulse rounded-2xl bg-[hsl(var(--bg-raised))]" />
+        <p className="text-sm text-[hsl(var(--fg-muted))]">Loading…</p>
       </div>
     </div>
   );
 }
 
-export default function App() {
+export function App() {
   useEffect(() => {
-    captureReferralFromUrl();
+    document.documentElement.classList.add("js");
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <MotionProvider>
-        <SiteLayout>
-          <Suspense fallback={<RouteFallback />}>
-            <Switch>
-              <Route path="/" component={Home} />
-              <Route path="/solutions/marketing" component={MarketingTech} />
-              <Route path="/solutions/sales" component={SalesTech} />
-              <Route path="/solutions/ads-boost" component={AdsBoost} />
-              <Route path="/solutions/ecommerce" component={Ecommerce} />
-              <Route path="/platform" component={Platform} />
-              <Route path="/pricing" component={Pricing} />
-              <Route path="/get-started" component={GetStarted} />
-              <Route path="/sign-in" component={GetStarted} />
-              <Route path="/sign-up" component={GetStarted} />
-              <Route path="/dashboard" component={DashboardOverview} />
-              <Route path="/dashboard/social" component={DashboardSocial} />
-              <Route path="/dashboard/templates" component={DashboardTemplates} />
-              <Route path="/dashboard/affiliate" component={DashboardAffiliate} />
-              <Route path="/dashboard/analytics" component={DashboardAnalytics} />
-              <Route path="/dashboard/pixels" component={DashboardPixels} />
-              <Route path="/dashboard/email" component={DashboardEmail} />
-              <Route path="/dashboard/payback" component={DashboardPayback} />
-              <Route path="/dashboard/faq" component={DashboardFaq} />
-              <Route path="/dashboard/contributions" component={DashboardContributions} />
-              <Route path="/dashboard/progress" component={DashboardProgress} />
-              <Route path="/dashboard/leaderboard" component={DashboardLeaderboard} />
-              <Route path="/dashboard/settings" component={DashboardSettings} />
-              <Route path="/admin" component={Admin} />
-              <Route component={NotFound} />
-            </Switch>
-          </Suspense>
-        </SiteLayout>
-        <CookieConsent />
-      </MotionProvider>
-    </QueryClientProvider>
+    <MotionProvider>
+      <ScrollProgress />
+      <SiteHeader />
+      <main>
+        <Suspense fallback={<PageFallback />}>
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/solutions" component={Solutions} />
+            <Route path="/marketing" component={MarketingTech} />
+            <Route path="/sales" component={SalesTech} />
+            <Route path="/ads-boost" component={AdsBoost} />
+            <Route path="/ecommerce" component={Ecommerce} />
+            <Route path="/platform" component={Platform} />
+            <Route path="/pricing" component={Pricing} />
+            <Route path="/get-started" component={GetStarted} />
+            <Route path="/dashboard" component={DashboardOverview} />
+            <Route path="/dashboard/analytics" component={DashboardAnalytics} />
+            <Route path="/dashboard/email" component={DashboardEmail} />
+            <Route path="/dashboard/faq" component={DashboardFaq} />
+            <Route path="/dashboard/progress" component={DashboardProgress} />
+            <Route path="/dashboard/leaderboard" component={DashboardLeaderboard} />
+            <Route path="/dashboard/settings" component={DashboardSettings} />
+            <Route path="/admin" component={Admin} />
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+      </main>
+      <SiteFooter />
+      <CookieBanner />
+    </MotionProvider>
   );
 }

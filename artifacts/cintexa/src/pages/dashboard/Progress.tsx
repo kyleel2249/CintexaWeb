@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { DashboardShell } from "./DashboardShell";
 import { useMyActivity, useMyLoyalty, useMySubscription } from "@/hooks/useApi";
 import { BADGE_TIERS, badgeMeta, checkInStreak, type BadgeId } from "@/lib/streak-badges";
+import { InsightPanel } from "@/components/insights/InsightPanel";
 
 export function DashboardProgress() {
   const activity = useMyActivity();
@@ -125,6 +126,8 @@ export function DashboardProgress() {
           </ol>
         </div>
       </div>
+
+      <InsightPanel tab="progress" />
     </DashboardShell>
   );
 }

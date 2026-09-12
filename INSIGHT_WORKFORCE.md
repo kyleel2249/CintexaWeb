@@ -1,11 +1,18 @@
 # CINTEXA Insight Workforce
 
-Customer-facing specialists are named **`[Tab] Insight`** (never "AI Employee" / "AI Agent").
+Customer-facing specialists are named **[Tab] Insight** only. Never "AI", "AI Agent", or "AI Employee".
 
-## Specialists (enabled)
+## Overview page
 
-| Tab | Specialist |
-|-----|------------|
+- Clean account command center with verified metrics only.
+- No "AI Insight Foundation" or equivalent placeholder.
+- Optional deep analysis: **View account analysis** → Overview Insight (on demand).
+
+## Specialists
+
+| Tab | Display name |
+|-----|----------------|
+| Overview | Overview Insight |
 | Social | Social Insight |
 | Templates | Template Insight |
 | Affiliate | Affiliate Insight |
@@ -19,37 +26,19 @@ Customer-facing specialists are named **`[Tab] Insight`** (never "AI Employee" /
 | Leaderboard | Leaderboard Insight |
 | Settings | Settings Insight |
 
-## Architecture (client foundation)
-
-- `src/lib/insights/types.ts` — structured `InsightResult` schema
-- `src/lib/insights/registry.ts` — extensible specialist registry
-- `src/lib/insights/engine.ts` — deterministic runners (evidence-first, zero fabrication)
-- `src/components/insights/InsightPanel.tsx` — shared UI on every dashboard tab
-
 ## Principles
 
-1. **Evidence first** — only authorized account data; missing sources are disclosed.
-2. **Deterministic metrics** — totals, percentages, ranks, fees computed in code.
-3. **No silent actions** — recommendations may require approval; Insights never move money or change security settings.
-4. **Account isolation** — each report is scoped to the signed-in account / local workspace data.
+1. Evidence-first — every finding links to sources.
+2. Zero fabrication — insufficient data is stated explicitly.
+3. Deterministic arithmetic for financials and totals.
+4. Minimum necessary data access per specialist.
+5. Structured reports: summary, metrics, findings, trends, opportunities, recommendations, evidence, limitations, confidence.
 
-## Data sources (current deployment)
+## Architecture
 
-| Source | Status |
-|--------|--------|
-| Social connections / posts | Workspace local (ready for OAuth) |
-| Contributions, activity, loyalty, subscription | API when available |
-| Daily streak / badges | Local streak store |
-| Pixels | Local config IDs |
-| Affiliate commissions, email campaigns, payback ledger, live analytics | **Not connected** — reported as insufficient/partial |
+- `src/lib/insights/types.ts` — report schema
+- `src/lib/insights/registry.ts` — specialist registry
+- `src/lib/insights/engine.ts` — deterministic runners
+- `src/components/insights/InsightPanel.tsx` — shared UI
 
-## UI
-
-Each tab includes **Generate Insight**, metrics, findings, recommendations, evidence, limitations, confidence, and on-device insight history.
-
-## Extending
-
-1. Add config to `INSIGHT_SPECIALISTS` in `registry.ts`.
-2. Implement a runner in `engine.ts`.
-3. Mount `<InsightPanel tab="…" />` on the tab page.
-4. Prefer server-side orchestration when the API + DB insight tables are deployed.
+Generate reports via **Generate Insight** on each dashboard tab. History is stored locally per browser.

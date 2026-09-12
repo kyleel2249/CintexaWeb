@@ -41,8 +41,13 @@ export function DashboardOverview() {
   const recommendations = role ? getRecommendations(profile?.interests ?? []) : [];
 
   const contribList = contributions.data?.contributions ?? [];
-  const completed = contribList.filter((c) => (c as { status?: string }).status === "completed" || !(c as { status?: string }).status);
-  const totalContributed = completed.reduce((sum, c) => sum + (Number((c as { amount?: number }).amount) || 0), 0);
+  const completed = contribList.filter(
+    (c) => (c as { status?: string }).status === "completed" || !(c as { status?: string }).status,
+  );
+  const totalContributed = completed.reduce((sum, c) => {
+    const raw = (c as { amount?: string | number }).amount;
+    return sum + (Number(raw) || 0);
+  }, 0);
   const contribCount = contributions.data?.pagination.total ?? completed.length;
   const activityCount = activity.data?.pagination.total ?? activity.data?.activity?.length ?? 0;
   const recentActivity = (activity.data?.activity ?? []).slice(0, 5);
@@ -103,11 +108,7 @@ export function DashboardOverview() {
           loading={subscription.isLoading}
           href="/dashboard/settings"
         />
-        <StatCard
-          label="Subscription status"
-          value={status}
-          loading={subscription.isLoading}
-        />
+        <StatCard label="Subscription status" value={status} loading={subscription.isLoading} />
         <StatCard
           label="Contributions recorded"
           value={loading ? "…" : String(contribCount)}
@@ -132,18 +133,19 @@ export function DashboardOverview() {
                 : "0"}
           </p>
           <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
-            Sum of completed contribution amounts available on this account. Failed or cancelled records are excluded when status is provided.
+            Sum of completed contribution amounts available on this account. Failed or cancelled records are excluded
+            when status is provided.
           </p>
           {contribList.length === 0 && !contributions.isLoading && (
-            <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">
-              No contributions recorded on this account yet.
-            </p>
+            <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">No contributions recorded on this account yet.</p>
           )}
         </div>
 
         <div className="cx-card">
           <p className="cx-eyebrow">Daily streak</p>
-          <p className="cx-display mt-2 text-2xl">{streak.consecutiveDays} day{streak.consecutiveDays === 1 ? "" : "s"}</p>
+          <p className="cx-display mt-2 text-2xl">
+            {streak.consecutiveDays} day{streak.consecutiveDays === 1 ? "" : "s"}
+          </p>
           <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
             {badge ? (
               <>
@@ -170,16 +172,22 @@ export function DashboardOverview() {
             <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">No activity events recorded yet.</p>
           )}
           <ul className="mt-3 space-y-2">
-            {recentActivity.map((a, i) => (
-              <li key={(a as { id?: string }).id ?? i} className="flex items-start justify-between gap-2 border-b border-[hsl(var(--border))] pb-2 text-sm last:border-0">
-                <span>{(a as { title?: string }).title ?? (a as { eventType?: string }).eventType ?? "Event"}</span>
-                <span className="shrink-0 text-xs text-[hsl(var(--fg-muted))]">
-                  {(a as { createdAt?: string }).createdAt
-                    ? new Date((a as { createdAt: string }).createdAt).toLocaleDateString()
-                    : ""}
-                </span>
-              </li>
-            ))}
+            {recentActivity.map((a, i) => {
+              const createdAt = (a as { createdAt?: string | Date }).createdAt;
+              return (
+                <li
+                  key={(a as { id?: string }).id ?? i}
+                  className="flex items-start justify-between gap-2 border-b border-[hsl(var(--border))] pb-2 text-sm last:border-0"
+                >
+                  <span>
+                    {(a as { title?: string }).title ?? (a as { eventType?: string }).eventType ?? "Event"}
+                  </span>
+                  <span className="shrink-0 text-xs text-[hsl(var(--fg-muted))]">
+                    {createdAt ? new Date(createdAt).toLocaleDateString() : ""}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </div>
 

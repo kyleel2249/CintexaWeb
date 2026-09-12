@@ -112,7 +112,7 @@ export function DashboardOverview() {
           label="Contributions recorded"
           value={loading ? "…" : String(contribCount)}
           loading={contributions.isLoading}
-          href="/dashboard/contributions"
+          href="/dashboard/progress"
         />
       </div>
 
@@ -120,8 +120,8 @@ export function DashboardOverview() {
         <div className="cx-card lg:col-span-2">
           <div className="flex items-center justify-between gap-2">
             <p className="cx-eyebrow">Contribution summary</p>
-            <Link href="/dashboard/contributions" className="text-xs text-[hsl(var(--accent))]">
-              View all
+            <Link href="/dashboard/progress" className="text-xs text-[hsl(var(--accent))]">
+              View progress
             </Link>
           </div>
           <p className="cx-display mt-2 text-2xl">
@@ -136,10 +136,7 @@ export function DashboardOverview() {
           </p>
           {contribList.length === 0 && !contributions.isLoading && (
             <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">
-              No contributions yet.{" "}
-              <Link href="/dashboard/contributions" className="text-[hsl(var(--accent))] underline">
-                Record a contribution
-              </Link>
+              No contributions recorded on this account yet.
             </p>
           )}
         </div>
@@ -190,11 +187,11 @@ export function DashboardOverview() {
           <p className="cx-eyebrow">Quick links</p>
           <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {[
-              { href: "/dashboard/contributions", label: "Contributions" },
               { href: "/dashboard/progress", label: "Progress" },
               { href: "/dashboard/leaderboard", label: "Leaderboard" },
-              { href: "/dashboard/social", label: "Social" },
               { href: "/dashboard/analytics", label: "Analytics" },
+              { href: "/dashboard/email", label: "Email" },
+              { href: "/dashboard/faq", label: "FAQ" },
               { href: "/dashboard/settings", label: "Settings" },
             ].map((l) => (
               <li key={l.href}>

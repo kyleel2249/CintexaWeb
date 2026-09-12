@@ -10,18 +10,11 @@ import { ADMIN_USERNAME } from "@/lib/platform-economics";
 
 const TABS = [
   { label: "Overview", href: "/dashboard" },
-  { label: "Social", href: "/dashboard/social" },
-  { label: "Templates", href: "/dashboard/templates" },
-  { label: "Affiliate", href: "/dashboard/affiliate" },
   { label: "Analytics", href: "/dashboard/analytics" },
-  { label: "Pixels", href: "/dashboard/pixels" },
   { label: "Email", href: "/dashboard/email" },
-  { label: "Payback", href: "/dashboard/payback" },
   { label: "FAQ", href: "/dashboard/faq" },
-  { label: "Contributions", href: "/dashboard/contributions" },
   { label: "Progress", href: "/dashboard/progress" },
   { label: "Leaderboard", href: "/dashboard/leaderboard" },
-  { label: "FAQ", href: "/dashboard/faq" },
   { label: "Settings", href: "/dashboard/settings" },
 ];
 
@@ -32,7 +25,7 @@ function SignedOutPrompt() {
         <p className="cx-eyebrow">Customer portal</p>
         <h1 className="cx-display mt-3 text-3xl">Sign in to see your dashboard.</h1>
         <p className="mt-3 max-w-sm text-[hsl(var(--fg-muted))]">
-          Social scheduling, boosts, templates, affiliate tools, and personalized FAQ live here after sign-in.
+          Your account metrics, progress, leaderboard, and tools live here after sign-in.
         </p>
         <SignInButton mode="modal">
           <button type="button" className="cx-btn cx-btn-primary mt-6">
@@ -45,12 +38,11 @@ function SignedOutPrompt() {
 }
 
 export function DashboardShell({ children }: { children: ReactNode }) {
-  const [, params] = useRoute("/dashboard/:tab?");
-  const activeHref = params?.tab ? `/dashboard/${params.tab}` : "/dashboard";
   const { user } = useUser();
   const profile = useMyProfile();
-  const avatar = AVATAR_OPTIONS.find((a) => a.id === (profile.data?.profile as { avatarId?: string } | null)?.avatarId);
-  const username = (profile.data?.profile as { username?: string } | null)?.username;
+  const [, params] = useRoute("/dashboard/:tab?");
+  const activeHref = params?.tab ? `/dashboard/${params.tab}` : "/dashboard";
+
   const [streakDays, setStreakDays] = useState(0);
   const [badgeId, setBadgeId] = useState<BadgeId>(null);
 
@@ -62,6 +54,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   }, []);
 
   const badge = badgeMeta(badgeId);
+  const username = (profile.data?.profile as { username?: string } | null)?.username;
+  const avatarId = (profile.data?.profile as { avatarId?: string } | null)?.avatarId;
+  const avatar = AVATAR_OPTIONS.find((a) => a.id === avatarId);
 
   return (
     <>
@@ -70,8 +65,10 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       </SignedOut>
       <SignedIn>
         {profile.isLoading ? (
-          <div className="cx-section flex justify-center !pt-16">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[hsl(var(--accent))] border-t-transparent" />
+          <div className="cx-section">
+            <div className="cx-container">
+              <p className="text-sm text-[hsl(var(--fg-muted))]">Loading your portal…</p>
+            </div>
           </div>
         ) : profile.data?.profile?.onboardingCompleted ? (
           <div className="cx-section !pt-10">

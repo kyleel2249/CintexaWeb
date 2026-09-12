@@ -1,5 +1,6 @@
 import { DashboardShell } from "./DashboardShell";
 import { useMyContributions } from "@/hooks/useApi";
+import { InsightPanel } from "@/components/insights/InsightPanel";
 
 export function DashboardContributions() {
   const { data, isLoading, isError } = useMyContributions();
@@ -45,7 +46,9 @@ export function DashboardContributions() {
                     <tr key={c.id} className="border-b border-[hsl(var(--border))] last:border-0">
                       <td className="px-5 py-3 font-mono text-xs text-[hsl(var(--fg-muted))]">{c.reference}</td>
                       <td className="px-5 py-3">{c.description}</td>
-                      <td className="px-5 py-3">{c.currency} {c.amount}</td>
+                      <td className="px-5 py-3">
+                        {c.currency} {c.amount}
+                      </td>
                       <td className="px-5 py-3">
                         <span className={`cx-badge ${c.status === "paid" ? "cx-badge-accent" : ""}`}>{c.status}</span>
                       </td>
@@ -55,6 +58,8 @@ export function DashboardContributions() {
           </table>
         </div>
       )}
+
+      <InsightPanel tab="contributions" />
     </DashboardShell>
   );
 }

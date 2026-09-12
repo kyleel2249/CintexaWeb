@@ -2,6 +2,7 @@ import { AdminGate } from "./AdminGate";
 import { CustomerList } from "./CustomerList";
 import { LoyaltyAdjuster } from "./LoyaltyAdjuster";
 import { AgentRunner } from "./AgentRunner";
+import { SpecialistFlags } from "./SpecialistFlags";
 
 export function Admin() {
   return (
@@ -21,7 +22,8 @@ export function Admin() {
               <LoyaltyAdjuster adminKey={adminKey} />
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 grid gap-4 lg:grid-cols-2">
+              <SpecialistFlags adminKey={adminKey} />
               <AgentRunner adminKey={adminKey} />
             </div>
           </div>

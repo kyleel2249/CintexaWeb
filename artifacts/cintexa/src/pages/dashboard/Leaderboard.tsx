@@ -3,6 +3,7 @@ import { DashboardShell } from "./DashboardShell";
 import { useLeaderboard, useMyProfile } from "@/hooks/useApi";
 import { ADMIN_USERNAME } from "@/lib/platform-economics";
 import { readFollowing, toggleFollow } from "@/lib/social-hub";
+import { InsightPanel } from "@/components/insights/InsightPanel";
 
 const COLUMNS = [
   { key: "mostReferrer" as const, title: "Most referrer" },
@@ -86,6 +87,8 @@ export function DashboardLeaderboard() {
           })}
         </div>
       )}
+
+      <InsightPanel tab="leaderboard" />
     </DashboardShell>
   );
 }

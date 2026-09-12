@@ -4,6 +4,7 @@ import { DashboardShell } from "./DashboardShell";
 import { useDeleteMyData, useExportMyData, useMyProfile, useUpdateProfile } from "@/hooks/useApi";
 import { AVATAR_OPTIONS } from "@/lib/local-profile";
 import { clerkAppearance } from "@/lib/clerk-appearance";
+import { InsightPanel } from "@/components/insights/InsightPanel";
 
 export function DashboardSettings() {
   const { user } = useUser();
@@ -157,7 +158,7 @@ export function DashboardSettings() {
           </section>
 
           <section className="cx-card space-y-3">
-            <h2 className="cx-display text-lg">Privacy · export &amp; delete</h2>
+            <h2 className="cx-display text-lg">Privacy · export & delete</h2>
             <p className="text-sm text-[hsl(var(--fg-muted))]">
               Download a copy of your stored profile data, or permanently delete local data and request server deletion.
             </p>
@@ -223,6 +224,8 @@ export function DashboardSettings() {
           </div>
         </div>
       )}
+
+      <InsightPanel tab="settings" />
     </DashboardShell>
   );
 }

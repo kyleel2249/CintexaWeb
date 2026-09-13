@@ -1,19 +1,50 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { EcosystemHero } from "@/components/hero/EcosystemHero";
+import { BrandRevealHero } from "@/components/hero/BrandRevealHero";
 import { GlowField } from "@/components/decorative/GlowField";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { PointerParallax } from "@/components/motion/PointerParallax";
 import { SignupBanner } from "@/components/marketing/SignupBanner";
 import { useMotion } from "@/components/motion/MotionProvider";
 
-const WORDS = ["TECHNOLOGY", "COMMERCE", "MOTION", "INTELLIGENCE", "GROWTH", "PRECISION", "TRUST", "SPEED", "INNOVATION"];
+const WORDS = [
+  "TECHNOLOGY",
+  "COMMERCE",
+  "MOTION",
+  "INTELLIGENCE",
+  "GROWTH",
+  "PRECISION",
+  "TRUST",
+  "SPEED",
+  "INNOVATION",
+];
 
 const PILLARS = [
-  { title: "Marketing technology", copy: "Plan campaigns and track channel performance from one workspace.", href: "/solutions/marketing", accent: "sky" as const },
-  { title: "Sales technology", copy: "Move visitors to loyal customers with a pipeline built for repeat growth.", href: "/solutions/sales", accent: "teal" as const },
-  { title: "Ads Boost", copy: "Run programmatic campaigns with a live lifecycle view, start to revenue.", href: "/solutions/ads-boost", accent: "accent" as const },
-  { title: "E-commerce", copy: "A full commerce toolkit: catalog, checkout, and a 3D storefront preview.", href: "/solutions/ecommerce", accent: "violet" as const },
+  {
+    title: "Marketing technology",
+    copy: "Plan campaigns and track channel performance from one workspace.",
+    href: "/solutions/marketing",
+    accent: "sky" as const,
+  },
+  {
+    title: "Sales technology",
+    copy: "Move visitors to loyal customers with a pipeline built for repeat growth.",
+    href: "/solutions/sales",
+    accent: "teal" as const,
+  },
+  {
+    title: "Ads Boost",
+    copy: "Run programmatic campaigns with a live lifecycle view, start to revenue.",
+    href: "/solutions/ads-boost",
+    accent: "accent" as const,
+  },
+  {
+    title: "E-commerce",
+    copy: "A full commerce toolkit: catalog, checkout, and a 3D storefront preview.",
+    href: "/solutions/ecommerce",
+    accent: "violet" as const,
+  },
 ];
 
 export function Home() {
@@ -29,25 +60,25 @@ export function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p className="cx-eyebrow">A growth platform for teams building their next stage of scale</p>
+            <p className="cx-eyebrow">People + information technology + growth</p>
             <h1 className="cx-display mt-4 text-4xl sm:text-5xl lg:text-6xl">
-              Run technology, commerce, and marketing from one connected core.
+              Technology that helps your business understand, improve, and grow.
             </h1>
             <p className="mt-5 max-w-md text-base text-[hsl(var(--fg-muted))]">
-              CINTEXA gives growing teams a single platform for lead generation, customer accounts,
-              and the tooling that turns first-time visitors into a loyal customer base.
+              CINTEXA helps businesses assess where they are, use Information Technology to solve
+              problems, improve operations, reach customers, and create measurable growth.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/get-started" className="cx-btn cx-btn-primary cx-btn-lg">
-                Get started
+                Start Growing
               </Link>
               <Link href="/platform" className="cx-btn cx-btn-secondary cx-btn-lg">
-                See the platform
+                Explore Solutions
               </Link>
             </div>
           </motion.div>
-          <PointerParallax strength={14}>
-            <EcosystemHero />
+          <PointerParallax strength={10}>
+            <BrandRevealHero />
           </PointerParallax>
         </div>
       </section>
@@ -64,6 +95,22 @@ export function Home() {
 
       <SignupBanner />
 
+      <section className="cx-section border-t border-[hsl(var(--border))]">
+        <div className="cx-container grid items-center gap-10 md:grid-cols-2">
+          <div>
+            <p className="cx-eyebrow">Connected systems</p>
+            <h2 className="cx-display mt-2 text-2xl sm:text-3xl">One ecosystem. Every growth surface.</h2>
+            <p className="mt-3 max-w-md text-sm text-[hsl(var(--fg-muted))]">
+              Marketing, sales, advertising, and commerce linked so people can act on real
+              information—not disconnected tools.
+            </p>
+          </div>
+          <PointerParallax strength={12}>
+            <EcosystemHero />
+          </PointerParallax>
+        </div>
+      </section>
+
       <section className="cx-section">
         <div className="cx-container">
           <h2 className="cx-display text-2xl sm:text-3xl">Four surfaces, one platform</h2>
@@ -77,7 +124,10 @@ export function Home() {
                   >
                     <h3 className="cx-display text-lg">{p.title}</h3>
                     <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">{p.copy}</p>
-                    <span className="mt-4 inline-block text-sm font-medium" style={{ color: `hsl(var(--${p.accent}))` }}>
+                    <span
+                      className="mt-4 inline-block text-sm font-medium"
+                      style={{ color: `hsl(var(--${p.accent}))` }}
+                    >
                       Explore
                     </span>
                   </div>

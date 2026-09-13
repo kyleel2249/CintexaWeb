@@ -4,8 +4,9 @@ import { BrandMark } from "@/components/brand/logo";
 
 /**
  * Cinematic 5-beat brand story using real business / IT photography.
- * Each beat holds for 5 seconds before advancing (loops when motion allowed).
+ * Each keyframe holds for 5 seconds before advancing (loops when motion is allowed).
  * Story: challenge → assessment → solutions → growth → CINTEXA hold.
+ * No visible timestamps in the UI.
  */
 const BEATS = [
   {
@@ -54,7 +55,7 @@ const BEATS = [
   },
 ] as const;
 
-/** Hold each keyframe for 5 seconds before moving to the next. */
+/** Hold each keyframe for 5 seconds before moving to the next image. */
 const BEAT_MS = 5000;
 
 export function BrandRevealSequence() {

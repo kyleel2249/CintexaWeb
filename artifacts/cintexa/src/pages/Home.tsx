@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { EcosystemHero } from "@/components/hero/EcosystemHero";
 import { BrandRevealHero } from "@/components/hero/BrandRevealHero";
+import { BrandStorySection } from "@/components/marketing/BrandStorySection";
 import { GlowField } from "@/components/decorative/GlowField";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { PointerParallax } from "@/components/motion/PointerParallax";
@@ -92,6 +93,8 @@ export function Home() {
           ))}
         </div>
       </section>
+
+      <BrandStorySection />
 
       <SignupBanner />
 

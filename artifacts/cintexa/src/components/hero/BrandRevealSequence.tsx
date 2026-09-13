@@ -4,14 +4,13 @@ import { BrandMark } from "@/components/brand/logo";
 
 /**
  * Cinematic 5-beat brand story using real business / IT photography.
- * Plays once on mount (loops gently when motion allowed).
- * Beats mirror the GOD-MODE brand reveal: challenge → assessment →
- * solutions → growth → CINTEXA hold.
+ * Each beat holds for 5 seconds before advancing (loops when motion allowed).
+ * Story: challenge → assessment → solutions → growth → CINTEXA hold.
  */
 const BEATS = [
   {
     id: "challenge",
-    label: "0.0–0.7s · Challenge",
+    label: "Challenge",
     title: "Every business has a challenge",
     copy: "Leaders need clearer insight into performance, customers, and systems.",
     image:
@@ -20,7 +19,7 @@ const BEATS = [
   },
   {
     id: "assessment",
-    label: "0.7–1.6s · Assessment",
+    label: "Assessment",
     title: "CINTEXA helps you see where you are",
     copy: "Business assessment across sales, marketing, operations, technology, and growth opportunities.",
     image:
@@ -29,7 +28,7 @@ const BEATS = [
   },
   {
     id: "solutions",
-    label: "1.6–2.7s · Technology",
+    label: "Technology",
     title: "People use technology to solve real problems",
     copy: "Software, websites, automation, analytics, and customer growth systems—built for how teams work.",
     image:
@@ -38,7 +37,7 @@ const BEATS = [
   },
   {
     id: "growth",
-    label: "2.7–3.5s · Growth",
+    label: "Growth",
     title: "Systems improve. Confidence grows.",
     copy: "Assessment → technology → better decisions → measurable growth.",
     image:
@@ -47,7 +46,7 @@ const BEATS = [
   },
   {
     id: "logo",
-    label: "4.1–5.0s · CINTEXA",
+    label: "CINTEXA",
     title: "CINTEXA",
     copy: "Technology that helps businesses understand, improve, and grow.",
     image: null as string | null,
@@ -55,7 +54,8 @@ const BEATS = [
   },
 ] as const;
 
-const BEAT_MS = 1000;
+/** Hold each keyframe for 5 seconds before moving to the next. */
+const BEAT_MS = 5000;
 
 export function BrandRevealSequence() {
   const { allowMotion } = useMotion();

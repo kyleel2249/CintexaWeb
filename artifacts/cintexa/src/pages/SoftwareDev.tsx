@@ -32,7 +32,7 @@ export function SoftwareDev() {
     <SolutionPageShell
       eyebrow="Solutions · Software development"
       title="Custom software and apps for your business specifications"
-      intro="We design and build custom software and applications that suite your business needs—from internal operations tools to customer-facing systems—aligned to your requirements, timelines, and growth plans."
+      intro="We design and build custom software and applications that suit your business needs—from internal operations tools to customer-facing systems—aligned to your requirements, timelines, and growth plans."
     >
       <div className="grid gap-4 sm:grid-cols-2">
         {CAPABILITIES.map((c) => (

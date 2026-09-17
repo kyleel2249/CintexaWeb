@@ -9,6 +9,8 @@ const COLUMNS = [
       { label: "Sales technology", href: "/solutions/sales" },
       { label: "Ads Boost", href: "/solutions/ads-boost" },
       { label: "E-commerce", href: "/solutions/ecommerce" },
+      { label: "Website development", href: "/solutions/website-development" },
+      { label: "Software development", href: "/solutions/software-development" },
     ],
   },
   {
@@ -16,6 +18,7 @@ const COLUMNS = [
     links: [
       { label: "Overview", href: "/platform" },
       { label: "Pricing", href: "/pricing" },
+      { label: "Contact", href: "/contact" },
       { label: "Dashboard", href: "/dashboard" },
     ],
   },
@@ -31,7 +34,16 @@ export function SiteFooter() {
             <span className="cx-eyebrow">TECHNOLOGY · COMMERCE · MOTION · INTELLIGENCE</span>
           </div>
           <p className="text-sm text-[hsl(var(--fg-muted))]">
-            A growth platform for teams building their next stage of scale.
+            Custom websites, software, and growth technology for modern businesses.
+          </p>
+          <p className="text-sm text-[hsl(var(--fg-muted))]">
+            <a href="mailto:info@cintexa.com" className="hover:text-[hsl(var(--fg))]">
+              info@cintexa.com
+            </a>
+            <br />
+            <a href="tel:+233242483082" className="hover:text-[hsl(var(--fg))]">
+              +233 24 248 3082
+            </a>
           </p>
         </div>
         <div className="flex gap-12">
@@ -39,7 +51,11 @@ export function SiteFooter() {
             <div key={col.title} className="flex flex-col gap-2">
               <p className="cx-eyebrow">{col.title}</p>
               {col.links.map((l) => (
-                <Link key={l.href} href={l.href} className="text-sm text-[hsl(var(--fg-muted))] hover:text-[hsl(var(--fg))]">
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="text-sm text-[hsl(var(--fg-muted))] hover:text-[hsl(var(--fg))]"
+                >
                   {l.label}
                 </Link>
               ))}

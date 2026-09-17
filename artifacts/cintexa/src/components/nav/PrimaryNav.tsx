@@ -16,12 +16,23 @@ const SOLUTIONS: NavGroup = {
     { label: "Sales technology", href: "/solutions/sales", blurb: "Visitor-to-loyal customer pipeline" },
     { label: "Ads Boost", href: "/solutions/ads-boost", blurb: "Programmatic campaign lifecycle" },
     { label: "E-commerce", href: "/solutions/ecommerce", blurb: "Storefront, catalog, and checkout" },
+    {
+      label: "Website development",
+      href: "/solutions/website-development",
+      blurb: "Custom websites and web apps for your business",
+    },
+    {
+      label: "Software development",
+      href: "/solutions/software-development",
+      blurb: "Custom software and apps to your specifications",
+    },
   ],
 };
 
 const NAV_LINKS = [
   { label: "Platform", href: "/platform" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function PrimaryNav() {
@@ -51,8 +62,23 @@ export function PrimaryNav() {
               onClick={() => setSolutionsOpen((v) => !v)}
             >
               {SOLUTIONS.label}
-              <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden style={{ transform: solutionsOpen ? "rotate(180deg)" : undefined, transition: "transform 160ms ease" }}>
-                <path d="M1.5 3.5L5 7L8.5 3.5" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                aria-hidden
+                style={{
+                  transform: solutionsOpen ? "rotate(180deg)" : undefined,
+                  transition: "transform 160ms ease",
+                }}
+              >
+                <path
+                  d="M1.5 3.5L5 7L8.5 3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  fill="none"
+                  strokeLinecap="round"
+                />
               </svg>
             </button>
             <AnimatePresence>
@@ -62,7 +88,7 @@ export function PrimaryNav() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={allowMotion ? { opacity: 0, y: 8 } : undefined}
                   transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-                  className="cx-dropdown-panel absolute left-0 top-[calc(100%+10px)] w-72 p-2"
+                  className="cx-dropdown-panel absolute left-0 top-[calc(100%+10px)] w-80 p-2"
                   role="menu"
                 >
                   {SOLUTIONS.items.map((item) => (
@@ -86,10 +112,16 @@ export function PrimaryNav() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link href="/dashboard" className={`cx-btn cx-btn-secondary cx-btn-sm ${onDashboard ? "border-[hsl(var(--accent)/.6)]" : ""}`}>
+          <Link
+            href="/dashboard"
+            className={`cx-btn cx-btn-secondary cx-btn-sm ${onDashboard ? "border-[hsl(var(--accent)/.6)]" : ""}`}
+          >
             Dashboard
           </Link>
-          <Link href="/get-started" className={`cx-btn cx-btn-primary cx-btn-sm ${onGetStarted ? "ring-2 ring-[hsl(var(--accent)/.4)]" : ""}`}>
+          <Link
+            href="/get-started"
+            className={`cx-btn cx-btn-primary cx-btn-sm ${onGetStarted ? "ring-2 ring-[hsl(var(--accent)/.4)]" : ""}`}
+          >
             Get started
           </Link>
         </div>
@@ -115,19 +147,33 @@ export function PrimaryNav() {
           >
             <div className="cx-container flex flex-col gap-1 py-4">
               {SOLUTIONS.items.map((item) => (
-                <Link key={item.href} href={item.href} className="cx-nav-link" onClick={() => setMobileOpen(false)}>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="cx-nav-link"
+                  onClick={() => setMobileOpen(false)}
+                >
                   {item.label}
                 </Link>
               ))}
               {NAV_LINKS.map((link) => (
-                <Link key={link.href} href={link.href} className="cx-nav-link" onClick={() => setMobileOpen(false)}>
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="cx-nav-link"
+                  onClick={() => setMobileOpen(false)}
+                >
                   {link.label}
                 </Link>
               ))}
-              <Link href="/dashboard" className="cx-btn cx-btn-secondary mt-2 w-full" onClick={() => setMobileOpen(false)}>
+              <Link href="/dashboard" className="cx-nav-link" onClick={() => setMobileOpen(false)}>
                 Dashboard
               </Link>
-              <Link href="/get-started" className="cx-btn cx-btn-primary w-full" onClick={() => setMobileOpen(false)}>
+              <Link
+                href="/get-started"
+                className="cx-btn cx-btn-primary cx-btn-sm mt-2"
+                onClick={() => setMobileOpen(false)}
+              >
                 Get started
               </Link>
             </div>

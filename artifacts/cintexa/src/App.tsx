@@ -11,6 +11,9 @@ const MarketingTech = lazy(() => import("@/pages/MarketingTech").then((m) => ({ 
 const SalesTech = lazy(() => import("@/pages/SalesTech").then((m) => ({ default: m.SalesTech })));
 const AdsBoost = lazy(() => import("@/pages/AdsBoost").then((m) => ({ default: m.AdsBoost })));
 const Ecommerce = lazy(() => import("@/pages/Ecommerce").then((m) => ({ default: m.Ecommerce })));
+const WebsiteDev = lazy(() => import("@/pages/WebsiteDev").then((m) => ({ default: m.WebsiteDev })));
+const SoftwareDev = lazy(() => import("@/pages/SoftwareDev").then((m) => ({ default: m.SoftwareDev })));
+const Contact = lazy(() => import("@/pages/Contact").then((m) => ({ default: m.Contact })));
 const Platform = lazy(() => import("@/pages/Platform").then((m) => ({ default: m.Platform })));
 const Pricing = lazy(() => import("@/pages/Pricing").then((m) => ({ default: m.Pricing })));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
@@ -52,6 +55,9 @@ export default function App() {
               <Route path="/solutions/sales" component={SalesTech} />
               <Route path="/solutions/ads-boost" component={AdsBoost} />
               <Route path="/solutions/ecommerce" component={Ecommerce} />
+              <Route path="/solutions/website-development" component={WebsiteDev} />
+              <Route path="/solutions/software-development" component={SoftwareDev} />
+              <Route path="/contact" component={Contact} />
               <Route path="/platform" component={Platform} />
               <Route path="/pricing" component={Pricing} />
               <Route path="/get-started" component={GetStarted} />

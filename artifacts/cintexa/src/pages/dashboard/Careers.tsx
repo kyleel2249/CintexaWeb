@@ -4,6 +4,15 @@ import { DashboardShell } from "./DashboardShell";
 /** Sample listings for the portal. Replace with live data from the API when available. */
 const JOBS = [
   {
+    id: "j0",
+    title: "Cleaner",
+    type: "Full-time",
+    location: "Ghana",
+    summary: "Available and dedicated cleaner for CINTEXA workspaces. Call or WhatsApp +233 59 516 8610.",
+    status: "Open",
+  },
+
+  {
     id: "j1",
     title: "Frontend Engineer (React)",
     type: "Full-time",

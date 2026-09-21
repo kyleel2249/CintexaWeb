@@ -1,6 +1,5 @@
 /**
- * Client for CINTEXA email notification endpoints.
- * Prefers same-origin Pages Function; falls back to VITE_API_URL when set.
+ * Client for CINTEXA email / signup notification endpoints.
  */
 
 export type CareerAlertPayload = {
@@ -14,9 +13,21 @@ export type CareerAlertPayload = {
   source?: string;
 };
 
-export type CareerAlertResponse = {
+export type SignupPayload = {
+  fullName: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  role?: string;
+  message?: string;
+  source?: string;
+  clerkUserId?: string;
+};
+
+export type NotifyResponse = {
   ok: boolean;
   id?: string;
+  stored?: boolean;
   confirmation?: { ok: boolean; id?: string; dryRun?: boolean; error?: string };
   adminNotify?: { ok: boolean; id?: string; dryRun?: boolean; error?: string };
   error?: string;
@@ -24,22 +35,28 @@ export type CareerAlertResponse = {
 
 function apiBase(): string {
   const fromEnv = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "");
-  // Same-origin Pages Function when deployed on Cloudflare
   if (typeof window !== "undefined" && !fromEnv) return "";
   return fromEnv || "";
 }
 
-export async function submitCareerAlert(payload: CareerAlertPayload): Promise<CareerAlertResponse> {
-  const url = `${apiBase()}/api/notifications/career-alert`;
+async function postJson(path: string, payload: unknown): Promise<NotifyResponse> {
+  const url = `${apiBase()}${path}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  const data = (await res.json().catch(() => ({}))) as Partial<CareerAlertResponse>;
+  const data = (await res.json().catch(() => ({}))) as Partial<NotifyResponse>;
   if (!res.ok) {
-    return { ok: false, error: data.error || `Request failed (${res.status})` };
+    return { ok: false, error: (data.error as string) || `Request failed (${res.status})` };
   }
-  // Spread first so ok:true is authoritative (avoids TS2783)
   return { ...data, ok: true };
+}
+
+export async function submitCareerAlert(payload: CareerAlertPayload): Promise<NotifyResponse> {
+  return postJson("/api/notifications/career-alert", payload);
+}
+
+export async function submitGetStartedSignup(payload: SignupPayload): Promise<NotifyResponse> {
+  return postJson("/api/notifications/signup", payload);
 }

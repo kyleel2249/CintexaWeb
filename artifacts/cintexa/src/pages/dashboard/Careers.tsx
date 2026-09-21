@@ -8,7 +8,7 @@ const JOBS = [
     title: "Cleaner",
     type: "Full-time",
     location: "Ghana",
-    summary: "Available and dedicated cleaner for CINTEXA workspaces. Call or WhatsApp +233 59 516 8610.",
+    summary: "Available and dedicated cleaner for professional workspaces. Call or WhatsApp +233 59 516 8610.",
     status: "Open",
   },
 

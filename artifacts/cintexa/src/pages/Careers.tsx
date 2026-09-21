@@ -1,6 +1,13 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "wouter";
 import { submitCareerAlert } from "@/lib/email-notifications";
+
+const WHATSAPP_NUMBER = "233595168610";
+const PHONE_DISPLAY = "+233 59 516 8610";
+const PHONE_TEL = "+233595168610";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Hello CINTEXA, I am interested in the Cleaner job vacancy. Please share application details.",
+)}`;
 
 const INTERESTS = [
   "Full-time roles",
@@ -11,6 +18,7 @@ const INTERESTS = [
   "Technology & engineering",
   "Sales & marketing",
   "Design & product",
+  "Facilities & cleaning",
 ] as const;
 
 type FormState = {
@@ -36,6 +44,20 @@ const empty: FormState = {
 export function Careers() {
   const [form, setForm] = useState<FormState>(empty);
   const [status, setStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
+
+  useEffect(() => {
+    document.title =
+      "Cleaner Job Vacancy in Ghana | Careers & Scholarships — CINTEXA";
+    const desc =
+      "CINTEXA is hiring a Cleaner in Ghana. Apply for the cleaner job vacancy — available and dedicated candidates. Call or WhatsApp +233 59 516 8610. Sign up for job and scholarship alerts.";
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "description");
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", desc);
+  }, []);
 
   function toggleInterest(label: string) {
     setForm((f) => ({
@@ -70,18 +92,15 @@ export function Careers() {
         key,
         JSON.stringify([{ ...entry, submittedAt: new Date().toISOString() }, ...prev].slice(0, 50)),
       );
-
       const result = await submitCareerAlert(entry);
       if (!result.ok) {
-        // Graceful fallback: open mailto so the team still receives the lead
-        const subject = encodeURIComponent(`Career & Scholarship alert signup — ${entry.fullName}`);
+        const subject = encodeURIComponent(`Career alert signup — ${entry.fullName}`);
         const body = encodeURIComponent(
           [
             `Name: ${entry.fullName}`,
             `Email: ${entry.email}`,
             `Phone: ${entry.phone || "—"}`,
             `Location: ${entry.location || "—"}`,
-            `Education: ${entry.education || "—"}`,
             `Interests: ${entry.interests.join(", ") || "—"}`,
             "",
             entry.message || "",
@@ -99,38 +118,112 @@ export function Careers() {
   return (
     <div className="cx-section">
       <div className="cx-container">
-        <p className="cx-eyebrow">Careers · Scholarships</p>
-        <h1 className="cx-display mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Build your future with CINTEXA
+        <p className="cx-eyebrow">Careers · Jobs · Scholarships</p>
+        <h1 className="cx-display mt-3 max-w-3xl text-3xl sm:text-4xl">
+          Cleaner Job Vacancy in Ghana — CINTEXA Is Hiring
         </h1>
-        <p className="mt-4 max-w-xl text-[hsl(var(--fg-muted))]">
-          Sign up for job and scholarship alerts. When new roles or funding opportunities open, we
-          email you so you can apply early.
+        <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
+          Join the CINTEXA facilities team. We are recruiting a reliable{" "}
+          <strong className="text-[hsl(var(--fg))]">Cleaner</strong> who takes pride in a
+          professional, hygienic workspace. Available and dedicated applicants are invited to apply
+          today.
         </p>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-2">
-          <div className="space-y-4">
-            <div className="cx-card border-t-2 border-t-[hsl(var(--accent))]">
+        {/* Featured vacancy */}
+        <article
+          className="mt-10 overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))]"
+          itemScope
+          itemType="https://schema.org/JobPosting"
+        >
+          <meta itemProp="title" content="Cleaner" />
+          <meta itemProp="employmentType" content="FULL_TIME" />
+          <meta itemProp="hiringOrganization" content="CINTEXA" />
+          <div className="grid gap-0 lg:grid-cols-2">
+            <div className="relative min-h-[280px] bg-[hsl(var(--bg))]">
+              <img
+                src="/careers/cleaner-job-vacancy.jpeg"
+                alt="CINTEXA job vacancy: Cleaner role — professional cleaning staff in modern office"
+                className="absolute inset-0 h-full w-full object-cover"
+                itemProp="image"
+              />
+            </div>
+            <div className="flex flex-col justify-center p-6 sm:p-8">
               <p className="cx-eyebrow" style={{ color: "hsl(var(--accent))" }}>
-                Jobs
+                Open role · We&apos;re hiring
               </p>
-              <h2 className="cx-display mt-2 text-xl">Careers at and through CINTEXA</h2>
+              <h2 className="cx-display mt-2 text-2xl sm:text-3xl" itemProp="title">
+                Cleaner
+              </h2>
+              <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
+                Title / Role: <strong className="text-[hsl(var(--fg))]">Cleaner</strong>
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-[hsl(var(--fg-muted))]" itemProp="description">
+                Keep CINTEXA workspaces clean, safe, and welcoming. Daily cleaning of offices,
+                meeting areas, restrooms, and common spaces; restocking supplies; and reporting
+                maintenance needs. Ideal for someone who is{" "}
+                <strong className="text-[hsl(var(--fg))]">available and dedicated</strong>,
+                punctual, and proud of high standards.
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-[hsl(var(--fg-muted))]">
+                <li>
+                  <span style={{ color: "hsl(var(--accent))" }}>→</span> Role:{" "}
+                  <strong className="text-[hsl(var(--fg))]">Cleaner</strong>
+                </li>
+                <li>
+                  <span style={{ color: "hsl(var(--accent))" }}>→</span> Requirements: Available and
+                  dedicated
+                </li>
+                <li>
+                  <span style={{ color: "hsl(var(--accent))" }}>→</span> Location: Ghana (confirm at
+                  interview)
+                </li>
+              </ul>
+
+              <div className="mt-6 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg))] p-4">
+                <p className="text-sm font-medium text-[hsl(var(--fg))]">
+                  Interested? Call or WhatsApp now
+                </p>
+                <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">
+                  Speak with the hiring team for application steps, location, and start date.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a
+                    href={`tel:${PHONE_TEL}`}
+                    className="cx-btn cx-btn-secondary cx-btn-sm"
+                  >
+                    Call {PHONE_DISPLAY}
+                  </a>
+                  <a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="cx-btn cx-btn-primary cx-btn-sm"
+                  >
+                    WhatsApp {PHONE_DISPLAY}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div className="mt-12 grid gap-8 lg:grid-cols-2">
+          <div className="space-y-4">
+            <div className="cx-card">
+              <p className="cx-eyebrow">Why this role matters</p>
+              <h2 className="cx-display mt-2 text-xl">A clean workplace supports every team</h2>
               <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-                Technology, product, sales, marketing, and operations roles—plus partner openings we
-                share with our network. Create an account and complete your profile so recruiters
-                can find you.
+                At CINTEXA, facilities and technology work together. As a Cleaner you help create the
+                environment where our staff and visitors can focus on building technology, commerce,
+                and growth for our clients.
               </p>
-              <Link href="/get-started" className="cx-btn cx-btn-primary cx-btn-sm mt-4">
-                Sign up for jobs
-              </Link>
             </div>
             <div className="cx-card">
-              <p className="cx-eyebrow">Scholarships</p>
-              <h2 className="cx-display mt-2 text-xl">Education & skills support</h2>
+              <p className="cx-eyebrow">Scholarships & more jobs</p>
+              <h2 className="cx-display mt-2 text-xl">Stay informed</h2>
               <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-                Scholarship and learning pathways for students and early-career professionals
-                focused on technology, business, and digital skills. Register interest to hear
-                about new programmes.
+                Sign up for alerts on new roles and scholarship programmes. For the Cleaner vacancy,
+                calling or WhatsApping is the fastest way to apply.
               </p>
               <Link href="/dashboard/careers" className="cx-btn cx-btn-secondary cx-btn-sm mt-4">
                 View listings in dashboard
@@ -142,8 +235,8 @@ export function Careers() {
             <p className="cx-eyebrow">Job & scholarship alerts</p>
             <h2 className="cx-display mt-2 text-xl">Get emailed about new opportunities</h2>
             <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-              Fill in your details. We use this only to notify you about relevant jobs and
-              scholarships.
+              Leave your details for future openings. For the current Cleaner role, prefer call or
+              WhatsApp.
             </p>
 
             <form className="mt-6 space-y-4" onSubmit={onSubmit} noValidate>
@@ -187,15 +280,6 @@ export function Careers() {
                   placeholder="City, country"
                 />
               </label>
-              <label className="block">
-                <span className="text-xs font-medium text-[hsl(var(--fg-muted))]">Education / level</span>
-                <input
-                  className="cx-input mt-1 w-full"
-                  value={form.education}
-                  onChange={(e) => setForm({ ...form, education: e.target.value })}
-                  placeholder="e.g. Undergraduate, Graduate, Self-taught"
-                />
-              </label>
               <fieldset>
                 <legend className="text-xs font-medium text-[hsl(var(--fg-muted))]">Interests</legend>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -228,16 +312,14 @@ export function Careers() {
                   rows={3}
                 />
               </label>
-
               {status === "error" && (
                 <p className="text-sm text-red-400">Please enter your name and a valid email.</p>
               )}
               {status === "done" && (
                 <p className="text-sm" style={{ color: "hsl(var(--accent))" }}>
-                  You’re on the list. Check your email client if a message to info@cintexa.com opened.
+                  You&apos;re on the list. For the Cleaner role, call or WhatsApp {PHONE_DISPLAY}.
                 </p>
               )}
-
               <button
                 type="submit"
                 className="cx-btn cx-btn-primary w-full sm:w-auto"
@@ -250,13 +332,17 @@ export function Careers() {
         </div>
 
         <p className="mt-10 text-xs text-[hsl(var(--fg-muted))]">
-          Questions?{" "}
-          <a href="mailto:info@cintexa.com" className="underline hover:text-[hsl(var(--fg))]">
-            info@cintexa.com
+          Cleaner job vacancy · Call{" "}
+          <a href={`tel:${PHONE_TEL}`} className="underline hover:text-[hsl(var(--fg))]">
+            {PHONE_DISPLAY}
           </a>{" "}
           ·{" "}
-          <a href="https://wa.me/233242483082" className="underline hover:text-[hsl(var(--fg))]">
-            WhatsApp +233 24 248 3082
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-[hsl(var(--fg))]">
+            WhatsApp the same number
+          </a>{" "}
+          · General enquiries{" "}
+          <a href="mailto:info@cintexa.com" className="underline hover:text-[hsl(var(--fg))]">
+            info@cintexa.com
           </a>
         </p>
       </div>

@@ -18,6 +18,7 @@ const COLUMNS = [
     links: [
       { label: "Overview", href: "/platform" },
       { label: "Pricing", href: "/pricing" },
+      { label: "Careers & scholarships", href: "/careers" },
       { label: "Contact", href: "/contact" },
       { label: "Dashboard", href: "/dashboard" },
     ],

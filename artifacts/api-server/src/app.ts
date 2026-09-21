@@ -16,6 +16,7 @@ import { insightsRouter } from "./routes/insights.js";
 import { leaderboardRouter } from "./routes/leaderboard.js";
 import { adminRouter } from "./routes/admin.js";
 import { agentsRouter } from "./routes/agents.js";
+import { notificationsRouter } from "./routes/notifications.js";
 
 export function createApp() {
   const app = express();
@@ -65,6 +66,9 @@ export function createApp() {
   app.use("/api/insights", clerkMiddleware(), insightsRouter);
 
   app.use("/api/leaderboard", leaderboardRouter);
+
+  // Public + lightly rate-limited notification endpoints (career alerts, etc.)
+  app.use("/api/notifications", notificationsRouter);
 
   app.use("/api/admin", adminRouter);
   app.use("/api/admin/agents", agentsRouter);

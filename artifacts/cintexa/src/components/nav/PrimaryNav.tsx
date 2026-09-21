@@ -32,6 +32,7 @@ const SOLUTIONS: NavGroup = {
 const NAV_LINKS = [
   { label: "Platform", href: "/platform" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Careers", href: "/careers" },
   { label: "Contact", href: "/contact" },
 ];
 

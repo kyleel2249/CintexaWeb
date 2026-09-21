@@ -14,6 +14,7 @@ const Ecommerce = lazy(() => import("@/pages/Ecommerce").then((m) => ({ default:
 const WebsiteDev = lazy(() => import("@/pages/WebsiteDev").then((m) => ({ default: m.WebsiteDev })));
 const SoftwareDev = lazy(() => import("@/pages/SoftwareDev").then((m) => ({ default: m.SoftwareDev })));
 const Contact = lazy(() => import("@/pages/Contact").then((m) => ({ default: m.Contact })));
+const Careers = lazy(() => import("@/pages/Careers").then((m) => ({ default: m.Careers })));
 const Platform = lazy(() => import("@/pages/Platform").then((m) => ({ default: m.Platform })));
 const Pricing = lazy(() => import("@/pages/Pricing").then((m) => ({ default: m.Pricing })));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
@@ -25,6 +26,7 @@ const DashboardSettings = lazy(() => import("@/pages/dashboard/Settings").then((
 const DashboardAnalytics = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardAnalytics })));
 const DashboardEmail = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardEmail })));
 const DashboardFaq = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardFaq })));
+const DashboardCareers = lazy(() => import("@/pages/dashboard/Careers").then((m) => ({ default: m.DashboardCareers })));
 const Admin = lazy(() => import("@/pages/admin/Admin").then((m) => ({ default: m.Admin })));
 
 const queryClient = new QueryClient();
@@ -58,6 +60,7 @@ export default function App() {
               <Route path="/solutions/website-development" component={WebsiteDev} />
               <Route path="/solutions/software-development" component={SoftwareDev} />
               <Route path="/contact" component={Contact} />
+              <Route path="/careers" component={Careers} />
               <Route path="/platform" component={Platform} />
               <Route path="/pricing" component={Pricing} />
               <Route path="/get-started" component={GetStarted} />
@@ -69,6 +72,7 @@ export default function App() {
               <Route path="/dashboard/faq" component={DashboardFaq} />
               <Route path="/dashboard/progress" component={DashboardProgress} />
               <Route path="/dashboard/leaderboard" component={DashboardLeaderboard} />
+              <Route path="/dashboard/careers" component={DashboardCareers} />
               <Route path="/dashboard/settings" component={DashboardSettings} />
               <Route path="/admin" component={Admin} />
               <Route component={NotFound} />

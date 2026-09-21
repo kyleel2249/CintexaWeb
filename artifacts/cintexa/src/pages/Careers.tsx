@@ -6,7 +6,7 @@ const WHATSAPP_NUMBER = "233595168610";
 const PHONE_DISPLAY = "+233 59 516 8610";
 const PHONE_TEL = "+233595168610";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Hello CINTEXA, I am interested in the Cleaner job vacancy. Please share application details.",
+  "Hello, I am interested in the Cleaner job vacancy. Please share application details.",
 )}`;
 
 const INTERESTS = [
@@ -47,9 +47,9 @@ export function Careers() {
 
   useEffect(() => {
     document.title =
-      "Cleaner Job Vacancy in Ghana | Careers & Scholarships — CINTEXA";
+      "Cleaner Job Vacancy in Ghana | Apply Now — Careers & Job Alerts";
     const desc =
-      "CINTEXA is hiring a Cleaner in Ghana. Apply for the cleaner job vacancy — available and dedicated candidates. Call or WhatsApp +233 59 516 8610. Sign up for job and scholarship alerts.";
+      "Cleaner job vacancy in Ghana. Apply now — available and dedicated candidates welcome. Call or WhatsApp +233 59 516 8610. Sign up for job and scholarship alerts.";
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) {
       meta = document.createElement("meta");
@@ -120,13 +120,13 @@ export function Careers() {
       <div className="cx-container">
         <p className="cx-eyebrow">Careers · Jobs · Scholarships</p>
         <h1 className="cx-display mt-3 max-w-3xl text-3xl sm:text-4xl">
-          Cleaner Job Vacancy in Ghana — CINTEXA Is Hiring
+          Cleaner Job Vacancy in Ghana — Apply Now
         </h1>
         <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
-          Join the CINTEXA facilities team. We are recruiting a reliable{" "}
-          <strong className="text-[hsl(var(--fg))]">Cleaner</strong> who takes pride in a
-          professional, hygienic workspace. Available and dedicated applicants are invited to apply
-          today.
+          A reliable{" "}
+          <strong className="text-[hsl(var(--fg))]">Cleaner</strong> is needed for a professional
+          office environment. If you take pride in a hygienic workspace and you are available and
+          dedicated, you are invited to apply today.
         </p>
 
         {/* Featured vacancy */}
@@ -137,19 +137,19 @@ export function Careers() {
         >
           <meta itemProp="title" content="Cleaner" />
           <meta itemProp="employmentType" content="FULL_TIME" />
-          <meta itemProp="hiringOrganization" content="CINTEXA" />
+          <meta itemProp="hiringOrganization" content="Hiring partner" />
           <div className="grid gap-0 lg:grid-cols-2">
             <div className="relative min-h-[280px] bg-[hsl(var(--bg))]">
               <img
                 src="/careers/cleaner-job-vacancy.jpeg"
-                alt="CINTEXA job vacancy: Cleaner role — professional cleaning staff in modern office"
+                alt="Cleaner job vacancy — professional cleaning staff in modern office"
                 className="absolute inset-0 h-full w-full object-cover"
                 itemProp="image"
               />
             </div>
             <div className="flex flex-col justify-center p-6 sm:p-8">
               <p className="cx-eyebrow" style={{ color: "hsl(var(--accent))" }}>
-                Open role · We&apos;re hiring
+                Open role · Apply now
               </p>
               <h2 className="cx-display mt-2 text-2xl sm:text-3xl" itemProp="title">
                 Cleaner
@@ -158,9 +158,9 @@ export function Careers() {
                 Title / Role: <strong className="text-[hsl(var(--fg))]">Cleaner</strong>
               </p>
               <p className="mt-4 text-sm leading-relaxed text-[hsl(var(--fg-muted))]" itemProp="description">
-                Keep CINTEXA workspaces clean, safe, and welcoming. Daily cleaning of offices,
-                meeting areas, restrooms, and common spaces; restocking supplies; and reporting
-                maintenance needs. Ideal for someone who is{" "}
+                Keep workspaces clean, safe, and welcoming. Daily cleaning of offices, meeting
+                areas, restrooms, and common spaces; restocking supplies; and reporting maintenance
+                needs. Ideal for someone who is{" "}
                 <strong className="text-[hsl(var(--fg))]">available and dedicated</strong>,
                 punctual, and proud of high standards.
               </p>
@@ -184,7 +184,7 @@ export function Careers() {
                   Interested? Call or WhatsApp now
                 </p>
                 <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">
-                  Speak with the hiring team for application steps, location, and start date.
+                  Call or message for application steps, location, and start date.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a
@@ -213,9 +213,8 @@ export function Careers() {
               <p className="cx-eyebrow">Why this role matters</p>
               <h2 className="cx-display mt-2 text-xl">A clean workplace supports every team</h2>
               <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-                At CINTEXA, facilities and technology work together. As a Cleaner you help create the
-                environment where our staff and visitors can focus on building technology, commerce,
-                and growth for our clients.
+                Clean, well-kept offices help staff and visitors stay focused and comfortable. As a
+                Cleaner you play a direct part in that standard every day.
               </p>
             </div>
             <div className="cx-card">

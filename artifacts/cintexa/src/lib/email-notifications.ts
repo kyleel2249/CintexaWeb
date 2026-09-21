@@ -40,8 +40,6 @@ export async function submitCareerAlert(payload: CareerAlertPayload): Promise<Ca
   if (!res.ok) {
     return { ok: false, error: data.error || `Request failed (${res.status})` };
   }
-  return {
-    ...data,
-    ok: true,
-  };
+  // Spread first so ok:true is authoritative (avoids TS2783)
+  return { ...data, ok: true };
 }

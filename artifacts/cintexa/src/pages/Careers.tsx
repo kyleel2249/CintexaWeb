@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "wouter";
+import { submitCareerAlert } from "@/lib/email-notifications";
 
 const INTERESTS = [
   "Full-time roles",
@@ -45,38 +46,49 @@ export function Careers() {
     }));
   }
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!form.fullName.trim() || !form.email.trim()) {
       setStatus("error");
       return;
     }
     setStatus("saving");
+    const entry = {
+      fullName: form.fullName.trim(),
+      email: form.email.trim().toLowerCase(),
+      phone: form.phone,
+      location: form.location,
+      education: form.education,
+      interests: form.interests,
+      message: form.message,
+      source: "careers_page",
+    };
     try {
       const key = "cintexa_career_alerts";
       const prev = JSON.parse(localStorage.getItem(key) || "[]") as unknown[];
-      const entry = {
-        ...form,
-        fullName: form.fullName.trim(),
-        email: form.email.trim().toLowerCase(),
-        submittedAt: new Date().toISOString(),
-      };
-      localStorage.setItem(key, JSON.stringify([entry, ...prev].slice(0, 50)));
-      // Open mailto so the team receives the signup at info@cintexa.com
-      const subject = encodeURIComponent(`Career & Scholarship alert signup — ${entry.fullName}`);
-      const body = encodeURIComponent(
-        [
-          `Name: ${entry.fullName}`,
-          `Email: ${entry.email}`,
-          `Phone: ${entry.phone || "—"}`,
-          `Location: ${entry.location || "—"}`,
-          `Education: ${entry.education || "—"}`,
-          `Interests: ${entry.interests.join(", ") || "—"}`,
-          "",
-          entry.message || "",
-        ].join("\n"),
+      localStorage.setItem(
+        key,
+        JSON.stringify([{ ...entry, submittedAt: new Date().toISOString() }, ...prev].slice(0, 50)),
       );
-      window.open(`mailto:info@cintexa.com?subject=${subject}&body=${body}`, "_blank");
+
+      const result = await submitCareerAlert(entry);
+      if (!result.ok) {
+        // Graceful fallback: open mailto so the team still receives the lead
+        const subject = encodeURIComponent(`Career & Scholarship alert signup — ${entry.fullName}`);
+        const body = encodeURIComponent(
+          [
+            `Name: ${entry.fullName}`,
+            `Email: ${entry.email}`,
+            `Phone: ${entry.phone || "—"}`,
+            `Location: ${entry.location || "—"}`,
+            `Education: ${entry.education || "—"}`,
+            `Interests: ${entry.interests.join(", ") || "—"}`,
+            "",
+            entry.message || "",
+          ].join("\n"),
+        );
+        window.open(`mailto:info@cintexa.com?subject=${subject}&body=${body}`, "_blank");
+      }
       setStatus("done");
       setForm(empty);
     } catch {

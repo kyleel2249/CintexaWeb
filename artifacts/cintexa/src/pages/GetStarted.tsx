@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Link } from "wouter";
 import { SignIn, SignUp } from "@clerk/clerk-react";
 import { clerkAppearance } from "@/lib/clerk-appearance";
+import { submitGetStartedSignup } from "@/lib/email-notifications";
 
 const hasClerk =
   typeof import.meta.env.VITE_CLERK_PUBLISHABLE_KEY === "string" &&
@@ -17,11 +18,64 @@ const embeddedAppearance = {
 } as const;
 
 /**
- * Get Started — sign-in / sign-up entry (not pricing).
- * Clerk branding / development notices are suppressed via appearance props.
+ * Get Started — capture lead details (KV + info@cintexa.com) then Clerk auth.
  */
 export function GetStarted() {
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-up");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+  const [role, setRole] = useState("");
+  const [notifyStatus, setNotifyStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
+  const [notifyMsg, setNotifyMsg] = useState("");
+
+  async function onLeadSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!fullName.trim() || !email.trim()) {
+      setNotifyStatus("error");
+      setNotifyMsg("Name and email are required.");
+      return;
+    }
+    setNotifyStatus("saving");
+    try {
+      const result = await submitGetStartedSignup({
+        fullName: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+        company: company.trim(),
+        role: role.trim(),
+        source: "get_started",
+      });
+      if (!result.ok) {
+        // Still open mailto so info@ always has a path to receive the lead
+        const subject = encodeURIComponent(`Get Started signup — ${fullName.trim()}`);
+        const body = encodeURIComponent(
+          [
+            `Name: ${fullName.trim()}`,
+            `Email: ${email.trim()}`,
+            `Phone: ${phone || "—"}`,
+            `Company: ${company || "—"}`,
+            `Role: ${role || "—"}`,
+          ].join("\n"),
+        );
+        window.open(`mailto:info@cintexa.com?subject=${subject}&body=${body}`, "_blank");
+        setNotifyStatus("done");
+        setNotifyMsg("Details saved. If email delivery is offline, your mail client may open as backup.");
+        return;
+      }
+      const dry = result.adminNotify?.dryRun;
+      setNotifyStatus("done");
+      setNotifyMsg(
+        dry
+          ? "Details saved on CINTEXA. Admin email is in dry-run mode until RESEND_API_KEY is configured."
+          : "Details sent to CINTEXA. Check your inbox for a confirmation email.",
+      );
+    } catch {
+      setNotifyStatus("error");
+      setNotifyMsg("Something went wrong. Email info@cintexa.com directly.");
+    }
+  }
 
   return (
     <section className="cx-section">
@@ -33,6 +87,79 @@ export function GetStarted() {
         <p className="mt-3 text-center text-sm text-[hsl(var(--fg-muted))]">
           Access your dashboard, contributions, progress, and platform tools.
         </p>
+
+        {mode === "sign-up" && (
+          <form className="cx-card mt-8 space-y-3 p-5" onSubmit={onLeadSubmit}>
+            <p className="cx-eyebrow">Your details</p>
+            <p className="text-xs text-[hsl(var(--fg-muted))]">
+              We store this securely and notify <strong>info@cintexa.com</strong> so our team can support you.
+            </p>
+            <label className="block">
+              <span className="text-xs text-[hsl(var(--fg-muted))]">Full name *</span>
+              <input
+                className="cx-input mt-1 w-full"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                autoComplete="name"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs text-[hsl(var(--fg-muted))]">Email *</span>
+              <input
+                type="email"
+                className="cx-input mt-1 w-full"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs text-[hsl(var(--fg-muted))]">Phone / WhatsApp</span>
+              <input
+                type="tel"
+                className="cx-input mt-1 w-full"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                autoComplete="tel"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs text-[hsl(var(--fg-muted))]">Company / organisation</span>
+              <input
+                className="cx-input mt-1 w-full"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                autoComplete="organization"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs text-[hsl(var(--fg-muted))]">Role</span>
+              <input
+                className="cx-input mt-1 w-full"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                placeholder="e.g. Founder, Marketing lead"
+              />
+            </label>
+            {notifyStatus === "error" && (
+              <p className="text-sm text-red-400">{notifyMsg}</p>
+            )}
+            {notifyStatus === "done" && (
+              <p className="text-sm" style={{ color: "hsl(var(--accent))" }}>
+                {notifyMsg}
+              </p>
+            )}
+            <button
+              type="submit"
+              className="cx-btn cx-btn-secondary w-full"
+              disabled={notifyStatus === "saving"}
+            >
+              {notifyStatus === "saving" ? "Sending…" : "Send details to CINTEXA"}
+            </button>
+          </form>
+        )}
 
         <div className="mt-8 flex justify-center gap-2">
           <button
@@ -51,7 +178,7 @@ export function GetStarted() {
           </button>
         </div>
 
-        <div className="mt-8 flex justify-center [&.cl-internal-b3fm6y]:hidden">
+        <div className="mt-8 flex justify-center">
           {hasClerk ? (
             mode === "sign-up" ? (
               <SignUp
@@ -71,12 +198,12 @@ export function GetStarted() {
           ) : (
             <div className="cx-card w-full max-w-md p-6 text-center">
               <p className="text-sm text-[hsl(var(--fg-muted))]">
-                Authentication is not configured for this deployment yet. Set{" "}
-                <code className="text-[hsl(var(--accent))]">VITE_CLERK_PUBLISHABLE_KEY</code> in
-                Cloudflare Pages and redeploy to enable sign-in and sign-up.
+                {notifyStatus === "done"
+                  ? "Your details were submitted. Account login will be available once authentication is fully configured."
+                  : "Submit your details above. Full sign-in unlocks when Clerk is configured on this deployment."}
               </p>
-              <Link href="/pricing" className="cx-btn cx-btn-secondary mt-6 inline-flex">
-                View pricing
+              <Link href="/contact" className="cx-btn cx-btn-secondary mt-6 inline-flex">
+                Contact us
               </Link>
             </div>
           )}

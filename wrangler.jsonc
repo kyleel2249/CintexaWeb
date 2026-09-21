@@ -1,0 +1,17 @@
+{
+  // Cloudflare Pages + KV
+  // Build output must remain artifacts/cintexa/dist (see also wrangler.toml)
+  "name": "cintexa-growth-platform",
+  "pages_build_output_dir": "artifacts/cintexa/dist",
+  "compatibility_date": "2026-01-01",
+
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "1d9e41a13fd642ec8fb6f2e7ec3a11ce",
+
+      // Optional: preview_id used when running `wrangler dev` for local dev
+      "preview_id": "<ID_OF_PREVIEW_KV_NAMESPACE_FOR_LOCAL_DEVELOPMENT>"
+    }
+  ]
+}

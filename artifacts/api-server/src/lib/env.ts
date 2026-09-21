@@ -12,6 +12,12 @@ const envSchema = z.object({
     .string()
     .default("http://localhost:5173")
     .transform((v) => v.split(",").map((s) => s.trim()).filter(Boolean)),
+  /** Resend API key — optional; without it emails run in dry-run mode */
+  RESEND_API_KEY: z.string().optional(),
+  /** e.g. "CINTEXA <alerts@cintexa.com>" — must be a verified domain in Resend */
+  EMAIL_FROM: z.string().optional(),
+  /** Where admin copies of career alerts and system notices go */
+  NOTIFY_ADMIN_EMAIL: z.string().email().optional().or(z.literal("")).transform((v) => v || undefined),
 });
 
 /** Validated environment — throws with a clear message at boot if anything required is missing. */

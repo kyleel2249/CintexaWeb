@@ -36,9 +36,12 @@ export async function submitCareerAlert(payload: CareerAlertPayload): Promise<Ca
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  const data = (await res.json().catch(() => ({}))) as CareerAlertResponse;
+  const data = (await res.json().catch(() => ({}))) as Partial<CareerAlertResponse>;
   if (!res.ok) {
     return { ok: false, error: data.error || `Request failed (${res.status})` };
   }
-  return { ok: true, ...data };
+  return {
+    ...data,
+    ok: true,
+  };
 }

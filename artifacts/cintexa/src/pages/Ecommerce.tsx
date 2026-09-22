@@ -5,7 +5,7 @@ export function Ecommerce() {
   return (
     <SolutionPageShell
       eyebrow="Solutions · E-commerce"
-      title="Catalog, checkout, and a storefront that shows itself off."
+      title="Ecommerce Platform & Digital Store Technology"
       intro="A full commerce toolkit with a 3D storefront preview — sample products only, wired to your real catalog on launch."
     >
       <Storefront3D className="max-w-lg" />

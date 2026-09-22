@@ -10,7 +10,7 @@ export function Contact() {
     <div className="cx-section">
       <div className="cx-container max-w-2xl">
         <p className="cx-eyebrow">Contact</p>
-        <h1 className="cx-display mt-3 text-3xl sm:text-4xl">Talk to CINTEXA</h1>
+        <h1 className="cx-display mt-3 text-3xl sm:text-4xl">Contact CINTEXA</h1>
         <p className="mt-4 text-[hsl(var(--fg-muted))]">
           Whether you need a custom website, software, growth technology, or a full platform conversation—reach us
           directly.

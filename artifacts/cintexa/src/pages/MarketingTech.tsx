@@ -11,7 +11,7 @@ export function MarketingTech() {
   return (
     <SolutionPageShell
       eyebrow="Solutions · Marketing technology"
-      title="Plan, launch, and track every campaign channel."
+      title="Marketing Technology & Automation That Attracts Customers"
       intro="A shared calendar and content pipeline for the whole marketing stack, so channels stop working in isolation."
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,6 +1,7 @@
 # CINTEXA — https://cintexa.com
 # https://cintexa.com/robots.txt
 
+# Default: public site open to all crawlers
 User-agent: *
 Allow: /
 Allow: /careers
@@ -12,20 +13,20 @@ Allow: /contact
 Allow: /get-started
 Allow: /sitemap.xml
 
-# Private app surfaces — no indexing value
+# Private app surfaces
 Disallow: /dashboard
 Disallow: /dashboard/
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
-Disallow: /sign-in
-Disallow: /sign-up
 
-# Common bot traps / noise
+# Query noise
 Disallow: /*?*utm_
 Disallow: /*?*ref=
 
-# Major search engines (explicit allow for clarity)
+# ---------------------------------------------------------------------------
+# Search engines
+# ---------------------------------------------------------------------------
 User-agent: Googlebot
 Allow: /
 Disallow: /dashboard
@@ -42,12 +43,17 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
 
-# AI / answer-engine crawlers — allow public marketing & careers content
+# ---------------------------------------------------------------------------
+# AI crawlers — explicitly allowed to index public pages (including careers)
+# ---------------------------------------------------------------------------
 User-agent: GPTBot
 Allow: /
 Allow: /careers
+Allow: /careers/
 Disallow: /dashboard
+Disallow: /dashboard/
 Disallow: /admin
+Disallow: /admin/
 Disallow: /api/
 
 User-agent: ChatGPT-User
@@ -56,7 +62,19 @@ Disallow: /dashboard
 Disallow: /admin
 Disallow: /api/
 
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
 User-agent: Google-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: GoogleOther
 Allow: /
 Disallow: /dashboard
 Disallow: /admin
@@ -74,11 +92,65 @@ Disallow: /dashboard
 Disallow: /admin
 Disallow: /api/
 
+User-agent: Claude-Web
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
 User-agent: PerplexityBot
 Allow: /
 Disallow: /dashboard
 Disallow: /admin
 Disallow: /api/
 
-# Absolute sitemap URL (required)
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: Bytespider
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: CCBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: Diffbot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: FacebookBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+# Absolute sitemap
 Sitemap: https://cintexa.com/sitemap.xml

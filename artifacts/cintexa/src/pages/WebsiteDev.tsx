@@ -30,7 +30,7 @@ export function WebsiteDev() {
   return (
     <SolutionPageShell
       eyebrow="Solutions · Website development"
-      title="Custom websites built for how your business works"
+      title="Custom Website Development & High-Performance Web Apps"
       intro="We create custom websites and web applications tailored to your business needs and specifications—from first impression to conversion, operations, and growth."
     >
       <div className="grid gap-4 sm:grid-cols-2">

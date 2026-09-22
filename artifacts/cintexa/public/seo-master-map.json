@@ -1,0 +1,97 @@
+{
+  "site": "https://cintexa.com",
+  "pages": [
+    {
+      "path": "/",
+      "primary": [
+        "CINTEXA",
+        "connected technology systems"
+      ],
+      "metaTitle": "CINTEXA | Connected Technology Systems for Sales, Marketing & Growth"
+    },
+    {
+      "path": "/platform",
+      "primary": [
+        "SaaS business platform"
+      ],
+      "metaTitle": "SaaS Business Platform & Customer Dashboard | CINTEXA"
+    },
+    {
+      "path": "/solutions/sales",
+      "primary": [
+        "sales technology"
+      ],
+      "metaTitle": "Sales Technology & Lead Generation Platform | CINTEXA"
+    },
+    {
+      "path": "/solutions/marketing",
+      "primary": [
+        "marketing technology"
+      ],
+      "metaTitle": "Marketing Technology & Campaign Automation | CINTEXA"
+    },
+    {
+      "path": "/solutions/ecommerce",
+      "primary": [
+        "ecommerce platform"
+      ],
+      "metaTitle": "Ecommerce Platform & Online Store Technology | CINTEXA"
+    },
+    {
+      "path": "/solutions/ads-boost",
+      "primary": [
+        "ads boost"
+      ],
+      "metaTitle": "Digital Advertising Platform & Ads Boost | CINTEXA"
+    },
+    {
+      "path": "/solutions/website-development",
+      "primary": [
+        "website development company"
+      ],
+      "metaTitle": "Website Development Company & Custom Websites | CINTEXA"
+    },
+    {
+      "path": "/solutions/software-development",
+      "primary": [
+        "custom software development"
+      ],
+      "metaTitle": "Custom Software Development & Business Software | CINTEXA"
+    },
+    {
+      "path": "/pricing",
+      "primary": [
+        "platform fee"
+      ],
+      "metaTitle": "Pricing & Platform Fee | Get Started with CINTEXA"
+    },
+    {
+      "path": "/get-started",
+      "primary": [
+        "get started CINTEXA"
+      ],
+      "metaTitle": "Get Started | Create Account on CINTEXA"
+    },
+    {
+      "path": "/contact",
+      "primary": [
+        "contact CINTEXA"
+      ],
+      "metaTitle": "Contact CINTEXA | info@cintexa.com"
+    },
+    {
+      "path": "/careers",
+      "primary": [
+        "careers Ghana"
+      ],
+      "metaTitle": "Careers & Jobs in Ghana | Job Alerts & Scholarships \u2014 CINTEXA"
+    },
+    {
+      "path": "/careers/cleaner",
+      "primary": [
+        "cleaner job vacancy Ghana"
+      ],
+      "metaTitle": "Cleaner Job Vacancy in Ghana \u2014 Apply Now | Careers"
+    }
+  ]
+}

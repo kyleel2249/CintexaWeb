@@ -1,5 +1,14 @@
 {
   "version": 1,
   "include": ["/api/*"],
-  "exclude": ["/assets/*", "/careers", "/careers/*", "/favicon.svg", "/robots.txt", "/sitemap.xml", "/site.webmanifest"]
+  "exclude": [
+    "/assets/*",
+    "/careers",
+    "/careers/*",
+    "/favicon.svg",
+    "/robots.txt",
+    "/ads.txt",
+    "/sitemap.xml",
+    "/site.webmanifest"
+  ]
 }

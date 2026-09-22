@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { PrimaryNav } from "@/components/nav/PrimaryNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { AdSenseFooterBanner } from "@/components/ads/AdSenseSlot";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +16,8 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <ScrollProgress />
       <PrimaryNav />
       <main id="main-content">{children}</main>
+      {/* Mobile-safe display unit: full-width responsive, reserved height, no fixed px width */}
+      <AdSenseFooterBanner />
       <SiteFooter />
     </div>
   );

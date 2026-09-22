@@ -10,7 +10,9 @@ export type JobPosting = {
   role: string;
   employmentType: "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERN";
   location: string;
+  addressCountry: string;
   requirements: string[];
+  responsibilities: string[];
   summary: string;
   description: string;
   image: string;
@@ -19,6 +21,7 @@ export type JobPosting = {
   applyWhatsApp: string;
   datePosted: string;
   validThrough?: string;
+  occupationalCategory?: string;
   status: "open" | "closed";
 };
 
@@ -30,7 +33,14 @@ export const JOBS: JobPosting[] = [
     role: "Cleaner",
     employmentType: "FULL_TIME",
     location: "Ghana",
+    addressCountry: "GH",
     requirements: ["Available and dedicated", "Punctual", "High cleaning standards"],
+    responsibilities: [
+      "Daily cleaning of offices, meeting areas, restrooms, and common spaces",
+      "Restock cleaning and hygiene supplies",
+      "Report maintenance needs promptly",
+      "Maintain a safe, welcoming workspace",
+    ],
     summary:
       "Cleaner job vacancy in Ghana. Apply now — available and dedicated candidates welcome. Call or WhatsApp +233 59 516 8610.",
     description:
@@ -40,6 +50,8 @@ export const JOBS: JobPosting[] = [
     applyPhoneDisplay: "+233 59 516 8610",
     applyWhatsApp: "233595168610",
     datePosted: "2026-09-21",
+    validThrough: "2026-12-31",
+    occupationalCategory: "37-2011.00",
     status: "open",
   },
 ];
@@ -59,29 +71,167 @@ export function jobWhatsAppUrl(job: JobPosting): string {
   return `https://wa.me/${job.applyWhatsApp}?text=${text}`;
 }
 
+/** Google JobPosting-compatible JSON-LD (+ optional graph helpers). */
 export function jobPostingJsonLd(job: JobPosting, canonicalUrl: string): Record<string, unknown> {
-  return {
-    "@context": "https://schema.org",
+  const absoluteImage = job.image.startsWith("http")
+    ? job.image
+    : `https://cintexa.com${job.image}`;
+
+  const posting: Record<string, unknown> = {
     "@type": "JobPosting",
+    "@id": `${canonicalUrl}#jobposting`,
     title: job.role,
-    description: `${job.summary} ${job.description}`,
+    name: job.title,
+    description: [job.summary, job.description, `Requirements: ${job.requirements.join("; ")}`]
+      .filter(Boolean)
+      .join("\n\n"),
+    identifier: {
+      "@type": "PropertyValue",
+      name: "CINTEXA Careers",
+      value: job.id,
+    },
     datePosted: job.datePosted,
-    validThrough: job.validThrough,
     employmentType: job.employmentType,
     hiringOrganization: {
       "@type": "Organization",
       name: "Hiring partner",
+      // Board is published on cintexa.com without naming the employer brand
     },
     jobLocation: {
       "@type": "Place",
       address: {
         "@type": "PostalAddress",
-        addressCountry: "GH",
+        addressCountry: job.addressCountry,
         addressRegion: job.location,
       },
     },
+    applicantLocationRequirements: {
+      "@type": "Country",
+      name: job.location,
+    },
+    jobLocationType: undefined,
     url: canonicalUrl,
-    image: `https://cintexa.com${job.image}`,
+    image: [absoluteImage],
     directApply: true,
+    responsibilities: job.responsibilities.join(". "),
+    qualifications: job.requirements.join(". "),
+    occupationalCategory: job.occupationalCategory,
+    industry: "Facilities services",
+  };
+
+  if (job.validThrough) {
+    posting.validThrough = job.validThrough;
+  }
+
+  // Remove undefined keys
+  Object.keys(posting).forEach((k) => {
+    if (posting[k] === undefined) delete posting[k];
+  });
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      posting,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://cintexa.com/",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Careers",
+            item: "https://cintexa.com/careers",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: job.role,
+            item: canonicalUrl,
+          },
+        ],
+      },
+      {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+        url: canonicalUrl,
+        name: job.title,
+        description: job.summary,
+        isPartOf: { "@id": "https://cintexa.com/#website" },
+        about: { "@id": `${canonicalUrl}#jobposting` },
+        inLanguage: "en",
+      },
+    ],
+  };
+}
+
+export function careersListJsonLd(jobs: JobPosting[]): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": "https://cintexa.com/careers#webpage",
+        url: "https://cintexa.com/careers",
+        name: "Careers & Job Vacancies in Ghana | Apply Now",
+        description:
+          "Browse open job vacancies including Cleaner roles in Ghana. Apply by call or WhatsApp.",
+        isPartOf: { "@id": "https://cintexa.com/#website" },
+        inLanguage: "en",
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://cintexa.com/careers#joblist",
+        name: "Open job vacancies",
+        numberOfItems: jobs.length,
+        itemListElement: jobs.map((j, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: `https://cintexa.com/careers/${j.slug}`,
+          name: j.title,
+          item: {
+            "@type": "JobPosting",
+            title: j.role,
+            description: j.summary,
+            datePosted: j.datePosted,
+            employmentType: j.employmentType,
+            url: `https://cintexa.com/careers/${j.slug}`,
+            hiringOrganization: {
+              "@type": "Organization",
+              name: "Hiring partner",
+            },
+            jobLocation: {
+              "@type": "Place",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: j.addressCountry,
+                addressRegion: j.location,
+              },
+            },
+          },
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://cintexa.com/",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Careers",
+            item: "https://cintexa.com/careers",
+          },
+        ],
+      },
+    ],
   };
 }

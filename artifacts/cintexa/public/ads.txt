@@ -1,0 +1,3 @@
+# CINTEXA ads.txt — https://cintexa.com/ads.txt
+# Google AdSense / Ad Manager authorized sellers
+google.com, pub-2604547500089196, DIRECT, f08c47fec0942fa0

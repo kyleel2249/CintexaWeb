@@ -152,10 +152,16 @@ export function Careers() {
                 Open role · Apply now
               </p>
               <h2 className="cx-display mt-2 text-2xl sm:text-3xl" itemProp="title">
-                Cleaner
+                <Link href="/careers/cleaner" className="hover:underline">
+                  Cleaner
+                </Link>
               </h2>
               <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
                 Title / Role: <strong className="text-[hsl(var(--fg))]">Cleaner</strong>
+                {" · "}
+                <Link href="/careers/cleaner" className="underline" style={{ color: "hsl(var(--accent))" }}>
+                  Full details
+                </Link>
               </p>
               <p className="mt-4 text-sm leading-relaxed text-[hsl(var(--fg-muted))]" itemProp="description">
                 Keep workspaces clean, safe, and welcoming. Daily cleaning of offices, meeting

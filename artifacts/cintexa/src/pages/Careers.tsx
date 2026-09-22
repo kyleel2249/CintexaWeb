@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "wouter";
 import { submitCareerAlert } from "@/lib/email-notifications";
+import { AdSenseInContent } from "@/components/ads/AdSenseSlot";
 
 const WHATSAPP_NUMBER = "233595168610";
 const PHONE_DISPLAY = "+233 59 516 8610";
@@ -218,6 +219,8 @@ export function Careers() {
             </div>
           </div>
         </article>
+
+        <AdSenseInContent />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           <div className="space-y-4">

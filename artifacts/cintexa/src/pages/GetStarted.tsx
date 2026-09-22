@@ -82,7 +82,7 @@ export function GetStarted() {
       <div className="cx-container mx-auto max-w-lg">
         <p className="cx-eyebrow text-center">Get started</p>
         <h1 className="cx-display mt-3 text-center text-3xl sm:text-4xl">
-          {mode === "sign-up" ? "Create your account" : "Sign in to CINTEXA"}
+          {mode === "sign-up" ? "Get Started with CINTEXA — Create Your Account" : "Sign in to CINTEXA"}
         </h1>
         <p className="mt-3 text-center text-sm text-[hsl(var(--fg-muted))]">
           Access your dashboard, contributions, progress, and platform tools.

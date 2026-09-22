@@ -1,4 +1,84 @@
+# CINTEXA — https://cintexa.com
+# https://cintexa.com/robots.txt
+
 User-agent: *
 Allow: /
+Allow: /careers
+Allow: /careers/
+Allow: /solutions/
+Allow: /platform
+Allow: /pricing
+Allow: /contact
+Allow: /get-started
+Allow: /sitemap.xml
 
-Sitemap: /sitemap.xml
+# Private app surfaces — no indexing value
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /sign-in
+Disallow: /sign-up
+
+# Common bot traps / noise
+Disallow: /*?*utm_
+Disallow: /*?*ref=
+
+# Major search engines (explicit allow for clarity)
+User-agent: Googlebot
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+
+# AI / answer-engine crawlers — allow public marketing & careers content
+User-agent: GPTBot
+Allow: /
+Allow: /careers
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+# Absolute sitemap URL (required)
+Sitemap: https://cintexa.com/sitemap.xml

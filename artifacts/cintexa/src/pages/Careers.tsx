@@ -47,7 +47,7 @@ export function Careers() {
 
   useEffect(() => {
     document.title =
-      "Cleaner Job Vacancy in Ghana | Apply Now — Careers & Job Alerts";
+      "Careers & Jobs in Ghana | Job Alerts & Scholarships — CINTEXA";
     const desc =
       "Cleaner job vacancy in Ghana. Apply now — available and dedicated candidates welcome. Call or WhatsApp +233 59 516 8610. Sign up for job and scholarship alerts.";
     let meta = document.querySelector('meta[name="description"]');
@@ -120,7 +120,7 @@ export function Careers() {
       <div className="cx-container">
         <p className="cx-eyebrow">Careers · Jobs · Scholarships</p>
         <h1 className="cx-display mt-3 max-w-3xl text-3xl sm:text-4xl">
-          Cleaner Job Vacancy in Ghana — Apply Now
+          Careers & Job Vacancies in Ghana — Apply Now
         </h1>
         <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
           A reliable{" "}

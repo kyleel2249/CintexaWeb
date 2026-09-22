@@ -112,7 +112,7 @@ export function Pricing() {
     <div className="cx-section">
       <div className="cx-container">
         <p className="cx-eyebrow">Pricing</p>
-        <h1 className="cx-display mt-3 text-3xl sm:text-4xl">Clear percentages on every sale.</h1>
+        <h1 className="cx-display mt-3 text-3xl sm:text-4xl">Simple Platform Pricing to Start Growing</h1>
         <p className="mt-4 max-w-2xl text-sm text-[hsl(var(--fg-muted))]">
           Platform fee is <strong>{DEFAULT_PCT}%</strong> on sales by default. Apply <strong>{PROMO_CODE}</strong> for{" "}
           <strong>{PROMO_PCT}%</strong>. Starter has a <strong>0%</strong> subscription charge.

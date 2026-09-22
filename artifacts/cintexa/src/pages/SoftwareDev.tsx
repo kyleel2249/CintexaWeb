@@ -31,7 +31,7 @@ export function SoftwareDev() {
   return (
     <SolutionPageShell
       eyebrow="Solutions · Software development"
-      title="Custom software and apps for your business specifications"
+      title="Custom Software Development for Growing Companies"
       intro="We design and build custom software and applications that suit your business needs—from internal operations tools to customer-facing systems—aligned to your requirements, timelines, and growth plans."
     >
       <div className="grid gap-4 sm:grid-cols-2">

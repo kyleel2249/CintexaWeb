@@ -269,7 +269,7 @@ export const SEO_MASTER_MAP: SeoPageEntry[] = [
     h1: "Careers & Job Vacancies in Ghana — Apply Now",
     metaTitle: "Careers & Jobs in Ghana | Job Alerts & Scholarships — CINTEXA",
     metaDescription:
-      "Careers Ghana: open job vacancies including cleaner jobs, scholarships and job alerts. Apply by call or WhatsApp. Sign up for job alerts.",
+      "Careers Ghana: open job vacancies including cleaners jobs for homes, offices and churches, scholarships and job alerts. Apply by call or WhatsApp. Sign up for job alerts.",
     imageAlt: [
       "careers Ghana job vacancies",
       "jobs and scholarships Ghana",
@@ -279,17 +279,17 @@ export const SEO_MASTER_MAP: SeoPageEntry[] = [
   },
   {
     path: "/careers/cleaner",
-    primary: ["cleaner job vacancy Ghana"],
-    secondary: ["cleaner jobs in Ghana", "full time cleaner job", "job vacancy Ghana apply now"],
-    longTail: ["WhatsApp job application Ghana", "available and dedicated cleaner Ghana"],
-    h1: "Cleaner Job Vacancy in Ghana — Apply Now",
-    metaTitle: "Cleaner Job Vacancy in Ghana — Apply Now | Careers",
+    primary: ["cleaners job vacancy Ghana", "cleaner jobs in Ghana"],
+    secondary: ["full time cleaners job", "job vacancy Ghana apply now", "cleaners for homes offices churches"],
+    longTail: ["WhatsApp job application Ghana", "available and dedicated cleaners Ghana"],
+    h1: "Cleaners Job Vacancy in Ghana — Apply Now",
+    metaTitle: "Cleaners Job Vacancy in Ghana — Apply Now | Careers",
     metaDescription:
-      "Cleaner job vacancy in Ghana. Full-time role for available and dedicated candidates. Call or WhatsApp +233 59 516 8610 to apply now.",
+      "Cleaners job vacancy in Ghana for homes, offices, churches and more. Full-time roles for available and dedicated candidates. Call or WhatsApp +233 59 516 8610.",
     imageAlt: [
-      "cleaner job vacancy Ghana",
-      "professional cleaner in modern office",
-      "full time cleaner job apply now",
+      "cleaners job vacancy Ghana",
+      "cleaning homes offices and churches",
+      "full time cleaners job apply now",
     ],
     ogImage: "https://cintexa.com/careers/cleaner-job-vacancy.jpeg",
     schemaType: "JobPosting",

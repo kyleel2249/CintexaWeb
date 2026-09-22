@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { CookieConsent } from "@/components/CookieConsent";
 import { Home } from "@/pages/Home";
 import { captureReferralFromUrl } from "@/lib/referral-capture";
+import { SeoManager } from "@/components/SeoManager";
 
 const MarketingTech = lazy(() => import("@/pages/MarketingTech").then((m) => ({ default: m.MarketingTech })));
 const SalesTech = lazy(() => import("@/pages/SalesTech").then((m) => ({ default: m.SalesTech })));
@@ -50,6 +51,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <MotionProvider>
+        <SeoManager />
         <SiteLayout>
           <Suspense fallback={<RouteFallback />}>
             <Switch>

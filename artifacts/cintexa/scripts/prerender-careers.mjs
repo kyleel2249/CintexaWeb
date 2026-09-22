@@ -21,24 +21,25 @@ const JOBS = [
   {
     id: "cleaner-ghana",
     slug: "cleaner",
-    title: "Cleaner Job Vacancy in Ghana — Apply Now",
-    role: "Cleaner",
+    title: "Cleaners Job Vacancy in Ghana — Apply Now",
+    role: "Cleaners",
     employmentType: "FULL_TIME",
     location: "Ghana",
     requirements: ["Available and dedicated", "Punctual", "High cleaning standards"],
     responsibilities: [
-      "Daily cleaning of offices, meeting areas, restrooms, and common spaces",
+      "Clean and maintain homes, offices, churches, schools, and other assigned premises",
+      "Daily cleaning of rooms, halls, restrooms, kitchens, and common areas",
       "Restock cleaning and hygiene supplies",
-      "Report maintenance needs promptly",
-      "Maintain a safe, welcoming workspace",
+      "Report maintenance or safety needs promptly",
+      "Leave every space clean, safe, and welcoming",
     ],
     addressCountry: "GH",
     validThrough: "2026-12-31",
     occupationalCategory: "37-2011.00",
     summary:
-      "Cleaner job vacancy in Ghana. Apply now — available and dedicated candidates welcome. Call or WhatsApp +233 59 516 8610.",
+      "Cleaners job vacancy in Ghana. Apply now — available and dedicated candidates welcome for homes, offices, churches and more. Call or WhatsApp +233 59 516 8610.",
     description:
-      "Keep workspaces clean, safe, and welcoming. Daily cleaning of offices, meeting areas, restrooms, and common spaces; restocking supplies; and reporting maintenance needs. Ideal for someone who is available and dedicated, punctual, and proud of high standards.",
+      "We are recruiting Cleaners to keep homes, offices, churches, schools and other premises clean, safe and welcoming. Duties include routine cleaning of rooms, halls, restrooms, kitchens and shared areas; restocking supplies; and reporting maintenance needs. Ideal for people who are available and dedicated, punctual, and proud of high standards across residential and community settings—not only professional offices.",
     image: "/careers/cleaner-job-vacancy.jpeg",
     applyPhone: "+233595168610",
     applyPhoneDisplay: "+233 59 516 8610",
@@ -209,7 +210,7 @@ function run() {
   let listHtml = injectHead(shell, {
     title: "Careers & Job Vacancies in Ghana | Apply Now",
     description:
-      "Browse open job vacancies including Cleaner roles in Ghana. Apply by call or WhatsApp. Job and scholarship alerts available.",
+      "Browse open job vacancies including Cleaners roles in Ghana for homes, offices, churches and more. Apply by call or WhatsApp. Job and scholarship alerts available.",
     canonical: "https://cintexa.com/careers",
     image: "https://cintexa.com/careers/cleaner-job-vacancy.jpeg",
     ldJson: {
@@ -221,7 +222,7 @@ function run() {
           url: "https://cintexa.com/careers",
           name: "Careers & Job Vacancies in Ghana | Apply Now",
           description:
-            "Browse open job vacancies including Cleaner roles in Ghana. Apply by call or WhatsApp.",
+            "Browse open job vacancies including Cleaners roles in Ghana for homes, offices, churches and more. Apply by call or WhatsApp.",
           inLanguage: "en",
         },
         {

@@ -6,7 +6,7 @@ export function SalesTech() {
   return (
     <SolutionPageShell
       eyebrow="Solutions · Sales technology"
-      title="A pipeline built for the whole customer lifetime, not just the first sale."
+      title="Sales Technology for Lead Capture, Pipeline & Conversion"
       intro="Track every account from first visit to repeat purchase, with the loyalty and contribution data your CRM was missing."
     >
       <div className="cx-card">

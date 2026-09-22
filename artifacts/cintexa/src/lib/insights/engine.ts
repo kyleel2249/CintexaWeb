@@ -6,7 +6,7 @@ import type { InsightContext, InsightResult, InsightSpecialistConfig } from "./t
 import { getSpecialistByTab } from "./registry";
 import { readConnections, readPosts, readFollowing } from "@/lib/social-hub";
 import { readStreak, badgeMeta } from "@/lib/streak-badges";
-import { currentPlatformFeeRate, ADMIN_USERNAME } from "@/lib/platform-economics";
+import { currentPlatformFeeRate } from "@/lib/platform-economics";
 import { faqForInterests } from "@/lib/interest-faq";
 
 const iso = () => new Date().toISOString();

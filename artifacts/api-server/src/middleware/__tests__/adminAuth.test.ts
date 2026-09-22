@@ -47,4 +47,12 @@ describe("requireAdminKey", () => {
     expect(next).not.toHaveBeenCalled();
     expect(res.statusCode).toBe(401);
   });
+
+  it("returns 401 (not a 500) when the key is a different length than the real one", () => {
+    const req = { header: (_: string) => "short" } as never;
+    const res = mockRes();
+    expect(() => requireAdminKey(req, res as never, next)).not.toThrow();
+    expect(next).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(401);
+  });
 });

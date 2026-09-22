@@ -21,6 +21,15 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: true,
+    // vendor-three (three/@react-three/fiber/@react-three/drei) is ~1.2MB minified.
+    // It's already isolated here on purpose so it never lands in the initial/index
+    // chunk: BusinessEcosystem3D and BrandReveal3D are React.lazy()-loaded and only
+    // pull this chunk in on WebGL-capable, motion-enabled devices (see
+    // components/hero/EcosystemHero.tsx and BrandRevealHero.tsx, which fall back to
+    // CSS/photo sequences otherwise). Raising the warning limit here just silences
+    // Rollup's default 500kB notice for that known, intentionally-large, lazy chunk
+    // rather than papering over a real problem.
+    chunkSizeWarningLimit: 1300,
     rollupOptions: {
       output: {
         manualChunks: {

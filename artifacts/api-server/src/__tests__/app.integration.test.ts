@@ -4,7 +4,7 @@
  * Skips gracefully if DATABASE_URL isn't set, so `npm test` still passes in
  * environments without a database configured.
  */
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 const describeIfDb = hasDb ? describe : describe.skip;

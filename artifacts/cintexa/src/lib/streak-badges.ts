@@ -69,9 +69,10 @@ export function checkInStreak(): StreakState {
         const prevTier = BADGE_TIERS[currentIdx - 1];
         consecutiveDays = Math.max(0, prevTier.minDays);
       }
-      // If they check in after a miss, today still counts as a new day-1 toward climbing again
+      // If they check in after a miss, today still counts as a new day-1 toward climbing again;
+      // otherwise consecutiveDays already holds the previous-tier floor computed above, so it
+      // simply stays put — no assignment needed.
       if (consecutiveDays === 0) consecutiveDays = 1;
-      else consecutiveDays = consecutiveDays; // stay at previous tier floor; today doesn't auto-advance past miss penalty same day
     }
   }
 

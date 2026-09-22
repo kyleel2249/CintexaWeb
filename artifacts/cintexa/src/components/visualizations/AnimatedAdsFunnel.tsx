@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useMotion } from "@/components/motion/MotionProvider";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +11,10 @@ const STAGES = [
   { id: "sales", label: "Sales", width: 32, color: "hsl(25 90% 55%)" },
   { id: "revenue", label: "Revenue", width: 22, color: "hsl(6 72% 53%)" },
 ] as const;
+
+// Vertical distance between stage rows (36px bar + 10px gap), used to place the
+// traveling agent dots at the same row each stage's bar sits on.
+const ROW_HEIGHT = 46;
 
 /** Demo-only advertising funnel — labeled sample motion, not live performance data. */
 export function AnimatedAdsFunnel({ className }: { className?: string }) {
@@ -62,7 +67,7 @@ export function AnimatedAdsFunnel({ className }: { className?: string }) {
           Sample data only
         </span>
       </div>
-      <div className="mt-8 space-y-2.5">
+      <div className="relative mt-8 space-y-2.5">
         {STAGES.map((s, i) => (
           <div key={s.id} className="relative flex items-center gap-3">
             <span className={cn("w-24 shrink-0 text-right font-mono text-[9px] uppercase tracking-[.12em] sm:w-28 sm:text-[10px]", active === i ? "text-[hsl(var(--accent))]" : "text-[hsl(var(--background)/.4)]")}>{s.label}</span>
@@ -72,6 +77,24 @@ export function AnimatedAdsFunnel({ className }: { className?: string }) {
             {i < STAGES.length - 1 && <span className="absolute -bottom-1.5 left-[5.5rem] text-[hsl(var(--accent)/.6)] sm:left-[7rem]">↓</span>}
           </div>
         ))}
+        {/* Sample "conversion" particles: spawned, advanced, and retired by the
+            three intervals above, traveling down through each stage row. */}
+        <AnimatePresence>
+          {agents.map((a) => {
+            const stageColor = STAGES[a.stage]?.color ?? STAGES[0].color;
+            return (
+              <motion.span
+                key={a.id}
+                className="pointer-events-none absolute left-24 top-0 h-2.5 w-2.5 rounded-full sm:left-28"
+                style={{ background: stageColor, boxShadow: `0 0 10px ${stageColor}` }}
+                initial={{ opacity: 0, top: 12 }}
+                animate={{ opacity: 1, top: a.stage * ROW_HEIGHT + 12 }}
+                exit={{ opacity: 0, scale: 0.4 }}
+                transition={{ duration: 0.85, ease: "easeInOut" }}
+              />
+            );
+          })}
+        </AnimatePresence>
       </div>
       <p className="mt-6 text-center font-mono text-[9px] uppercase tracking-[.16em] text-[hsl(var(--background)/.4)]">
         Illustrative flow — not live advertising metrics

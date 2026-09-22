@@ -6,7 +6,7 @@ const WHATSAPP_NUMBER = "233595168610";
 const PHONE_DISPLAY = "+233 59 516 8610";
 const PHONE_TEL = "+233595168610";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Hello, I am interested in the Cleaner job vacancy. Please share application details.",
+  "Hello, I am interested in the Cleaners job vacancy. Please share application details.",
 )}`;
 
 const INTERESTS = [
@@ -49,7 +49,7 @@ export function Careers() {
     document.title =
       "Careers & Jobs in Ghana | Job Alerts & Scholarships — CINTEXA";
     const desc =
-      "Cleaner job vacancy in Ghana. Apply now — available and dedicated candidates welcome. Call or WhatsApp +233 59 516 8610. Sign up for job and scholarship alerts.";
+      "Cleaners job vacancy in Ghana. Apply now for homes, offices, churches and more — available and dedicated candidates welcome. Call or WhatsApp +233 59 516 8610. Sign up for job and scholarship alerts.";
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) {
       meta = document.createElement("meta");
@@ -123,9 +123,10 @@ export function Careers() {
           Careers & Job Vacancies in Ghana — Apply Now
         </h1>
         <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
-          A reliable{" "}
-          <strong className="text-[hsl(var(--fg))]">Cleaner</strong> is needed for a professional
-          office environment. If you take pride in a hygienic workspace and you are available and
+          Reliable{" "}
+          <strong className="text-[hsl(var(--fg))]">Cleaners</strong> are needed for{" "}
+          <strong className="text-[hsl(var(--fg))]">homes, offices, churches</strong>, schools and
+          other premises. If you take pride in clean, hygienic spaces and you are available and
           dedicated, you are invited to apply today.
         </p>
 
@@ -135,14 +136,14 @@ export function Careers() {
           itemScope
           itemType="https://schema.org/JobPosting"
         >
-          <meta itemProp="title" content="Cleaner" />
+          <meta itemProp="title" content="Cleaners" />
           <meta itemProp="employmentType" content="FULL_TIME" />
           <meta itemProp="hiringOrganization" content="Hiring partner" />
           <div className="grid gap-0 lg:grid-cols-2">
             <div className="relative min-h-[280px] bg-[hsl(var(--bg))]">
               <img
                 src="/careers/cleaner-job-vacancy.jpeg"
-                alt="Cleaner job vacancy — professional cleaning staff in modern office"
+                alt="Cleaners job vacancy Ghana — cleaning homes, offices, churches and community spaces"
                 className="absolute inset-0 h-full w-full object-cover"
                 itemProp="image"
               />
@@ -153,27 +154,32 @@ export function Careers() {
               </p>
               <h2 className="cx-display mt-2 text-2xl sm:text-3xl" itemProp="title">
                 <Link href="/careers/cleaner" className="hover:underline">
-                  Cleaner
+                  Cleaners
                 </Link>
               </h2>
               <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
-                Title / Role: <strong className="text-[hsl(var(--fg))]">Cleaner</strong>
+                Title / Role: <strong className="text-[hsl(var(--fg))]">Cleaners</strong>
                 {" · "}
                 <Link href="/careers/cleaner" className="underline" style={{ color: "hsl(var(--accent))" }}>
                   Full details
                 </Link>
               </p>
               <p className="mt-4 text-sm leading-relaxed text-[hsl(var(--fg-muted))]" itemProp="description">
-                Keep workspaces clean, safe, and welcoming. Daily cleaning of offices, meeting
-                areas, restrooms, and common spaces; restocking supplies; and reporting maintenance
-                needs. Ideal for someone who is{" "}
+                Keep homes, offices, churches, schools and other premises clean, safe and
+                welcoming. Routine cleaning of rooms, halls, restrooms, kitchens and shared areas;
+                restocking supplies; and reporting maintenance needs. Ideal for people who are{" "}
                 <strong className="text-[hsl(var(--fg))]">available and dedicated</strong>,
-                punctual, and proud of high standards.
+                punctual, and proud of high standards in residential, workplace and community
+                settings.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-[hsl(var(--fg-muted))]">
                 <li>
                   <span style={{ color: "hsl(var(--accent))" }}>→</span> Role:{" "}
-                  <strong className="text-[hsl(var(--fg))]">Cleaner</strong>
+                  <strong className="text-[hsl(var(--fg))]">Cleaners</strong>
+                </li>
+                <li>
+                  <span style={{ color: "hsl(var(--accent))" }}>→</span> Scope: Homes, offices,
+                  churches, schools &amp; more
                 </li>
                 <li>
                   <span style={{ color: "hsl(var(--accent))" }}>→</span> Requirements: Available and
@@ -216,18 +222,19 @@ export function Careers() {
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           <div className="space-y-4">
             <div className="cx-card">
-              <p className="cx-eyebrow">Why this role matters</p>
-              <h2 className="cx-display mt-2 text-xl">A clean workplace supports every team</h2>
+              <p className="cx-eyebrow">Why these roles matter</p>
+              <h2 className="cx-display mt-2 text-xl">Clean spaces support homes and communities</h2>
               <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-                Clean, well-kept offices help staff and visitors stay focused and comfortable. As a
-                Cleaner you play a direct part in that standard every day.
+                Clean, well-kept homes, offices, churches and public spaces help families, staff and
+                visitors stay comfortable and focused. As Cleaners you set that standard every day,
+                wherever the assignment is.
               </p>
             </div>
             <div className="cx-card">
               <p className="cx-eyebrow">Scholarships & more jobs</p>
               <h2 className="cx-display mt-2 text-xl">Stay informed</h2>
               <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-                Sign up for alerts on new roles and scholarship programmes. For the Cleaner vacancy,
+                Sign up for alerts on new roles and scholarship programmes. For the Cleaners vacancy,
                 calling or WhatsApping is the fastest way to apply.
               </p>
               <Link href="/dashboard/careers" className="cx-btn cx-btn-secondary cx-btn-sm mt-4">
@@ -240,7 +247,7 @@ export function Careers() {
             <p className="cx-eyebrow">Job & scholarship alerts</p>
             <h2 className="cx-display mt-2 text-xl">Get emailed about new opportunities</h2>
             <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-              Leave your details for future openings. For the current Cleaner role, prefer call or
+              Leave your details for future openings. For the current Cleaners roles, prefer call or
               WhatsApp.
             </p>
 
@@ -322,7 +329,7 @@ export function Careers() {
               )}
               {status === "done" && (
                 <p className="text-sm" style={{ color: "hsl(var(--accent))" }}>
-                  You&apos;re on the list. For the Cleaner role, call or WhatsApp {PHONE_DISPLAY}.
+                  You&apos;re on the list. For Cleaners roles, call or WhatsApp {PHONE_DISPLAY}.
                 </p>
               )}
               <button
@@ -337,7 +344,7 @@ export function Careers() {
         </div>
 
         <p className="mt-10 text-xs text-[hsl(var(--fg-muted))]">
-          Cleaner job vacancy · Call{" "}
+          Cleaners job vacancy · Call{" "}
           <a href={`tel:${PHONE_TEL}`} className="underline hover:text-[hsl(var(--fg))]">
             {PHONE_DISPLAY}
           </a>{" "}

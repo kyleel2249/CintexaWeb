@@ -26,6 +26,15 @@ const JOBS = [
     employmentType: "FULL_TIME",
     location: "Ghana",
     requirements: ["Available and dedicated", "Punctual", "High cleaning standards"],
+    responsibilities: [
+      "Daily cleaning of offices, meeting areas, restrooms, and common spaces",
+      "Restock cleaning and hygiene supplies",
+      "Report maintenance needs promptly",
+      "Maintain a safe, welcoming workspace",
+    ],
+    addressCountry: "GH",
+    validThrough: "2026-12-31",
+    occupationalCategory: "37-2011.00",
     summary:
       "Cleaner job vacancy in Ghana. Apply now — available and dedicated candidates welcome. Call or WhatsApp +233 59 516 8610.",
     description:
@@ -48,21 +57,59 @@ function escapeHtml(s) {
 }
 
 function jsonLd(job) {
-  return {
-    "@context": "https://schema.org",
+  const canonicalUrl = `https://cintexa.com/careers/${job.slug}`;
+  const absoluteImage = `https://cintexa.com${job.image}`;
+  const posting = {
     "@type": "JobPosting",
+    "@id": `${canonicalUrl}#jobposting`,
     title: job.role,
-    description: `${job.summary} ${job.description}`,
+    name: job.title,
+    description: [job.summary, job.description, `Requirements: ${job.requirements.join("; ")}`].join("\n\n"),
+    identifier: { "@type": "PropertyValue", name: "CINTEXA Careers", value: job.id },
     datePosted: job.datePosted,
+    validThrough: job.validThrough || undefined,
     employmentType: job.employmentType,
     hiringOrganization: { "@type": "Organization", name: "Hiring partner" },
     jobLocation: {
       "@type": "Place",
-      address: { "@type": "PostalAddress", addressCountry: "GH", addressRegion: job.location },
+      address: {
+        "@type": "PostalAddress",
+        addressCountry: job.addressCountry || "GH",
+        addressRegion: job.location,
+      },
     },
-    url: `https://cintexa.com/careers/${job.slug}`,
-    image: `https://cintexa.com${job.image}`,
+    applicantLocationRequirements: { "@type": "Country", name: job.location },
+    url: canonicalUrl,
+    image: [absoluteImage],
     directApply: true,
+    responsibilities: (job.responsibilities || []).join(". "),
+    qualifications: job.requirements.join(". "),
+    occupationalCategory: job.occupationalCategory || "37-2011.00",
+    industry: "Facilities services",
+  };
+  Object.keys(posting).forEach((k) => posting[k] === undefined && delete posting[k]);
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      posting,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://cintexa.com/" },
+          { "@type": "ListItem", position: 2, name: "Careers", item: "https://cintexa.com/careers" },
+          { "@type": "ListItem", position: 3, name: job.role, item: canonicalUrl },
+        ],
+      },
+      {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+        url: canonicalUrl,
+        name: job.title,
+        description: job.summary,
+        about: { "@id": `${canonicalUrl}#jobposting` },
+        inLanguage: "en",
+      },
+    ],
   };
 }
 
@@ -167,13 +214,52 @@ function run() {
     image: "https://cintexa.com/careers/cleaner-job-vacancy.jpeg",
     ldJson: {
       "@context": "https://schema.org",
-      "@type": "ItemList",
-      itemListElement: open.map((j, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        url: `https://cintexa.com/careers/${j.slug}`,
-        name: j.title,
-      })),
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          "@id": "https://cintexa.com/careers#webpage",
+          url: "https://cintexa.com/careers",
+          name: "Careers & Job Vacancies in Ghana | Apply Now",
+          description:
+            "Browse open job vacancies including Cleaner roles in Ghana. Apply by call or WhatsApp.",
+          inLanguage: "en",
+        },
+        {
+          "@type": "ItemList",
+          name: "Open job vacancies",
+          numberOfItems: open.length,
+          itemListElement: open.map((j, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            url: `https://cintexa.com/careers/${j.slug}`,
+            name: j.title,
+            item: {
+              "@type": "JobPosting",
+              title: j.role,
+              description: j.summary,
+              datePosted: j.datePosted,
+              employmentType: j.employmentType,
+              url: `https://cintexa.com/careers/${j.slug}`,
+              hiringOrganization: { "@type": "Organization", name: "Hiring partner" },
+              jobLocation: {
+                "@type": "Place",
+                address: {
+                  "@type": "PostalAddress",
+                  addressCountry: j.addressCountry || "GH",
+                  addressRegion: j.location,
+                },
+              },
+            },
+          })),
+        },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://cintexa.com/" },
+            { "@type": "ListItem", position: 2, name: "Careers", item: "https://cintexa.com/careers" },
+          ],
+        },
+      ],
     },
   });
   listHtml = listHtml.replace(

@@ -5,10 +5,10 @@ import { DashboardShell } from "./DashboardShell";
 const JOBS = [
   {
     id: "j0",
-    title: "Cleaner",
+    title: "Cleaners",
     type: "Full-time",
     location: "Ghana",
-    summary: "Available and dedicated cleaner for professional workspaces. Call or WhatsApp +233 59 516 8610.",
+    summary: "Available and dedicated Cleaners for homes, offices, churches and more. Call or WhatsApp +233 59 516 8610.",
     status: "Open",
   },
 

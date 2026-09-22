@@ -15,6 +15,7 @@ const WebsiteDev = lazy(() => import("@/pages/WebsiteDev").then((m) => ({ defaul
 const SoftwareDev = lazy(() => import("@/pages/SoftwareDev").then((m) => ({ default: m.SoftwareDev })));
 const Contact = lazy(() => import("@/pages/Contact").then((m) => ({ default: m.Contact })));
 const Careers = lazy(() => import("@/pages/Careers").then((m) => ({ default: m.Careers })));
+const JobDetail = lazy(() => import("@/pages/JobDetail").then((m) => ({ default: m.JobDetail })));
 const Platform = lazy(() => import("@/pages/Platform").then((m) => ({ default: m.Platform })));
 const Pricing = lazy(() => import("@/pages/Pricing").then((m) => ({ default: m.Pricing })));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
@@ -60,6 +61,7 @@ export default function App() {
               <Route path="/solutions/website-development" component={WebsiteDev} />
               <Route path="/solutions/software-development" component={SoftwareDev} />
               <Route path="/contact" component={Contact} />
+              <Route path="/careers/:id" component={JobDetail} />
               <Route path="/careers" component={Careers} />
               <Route path="/platform" component={Platform} />
               <Route path="/pricing" component={Pricing} />

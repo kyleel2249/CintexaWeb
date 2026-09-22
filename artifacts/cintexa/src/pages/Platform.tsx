@@ -17,7 +17,7 @@ export function Platform() {
       <div className="cx-container">
         <p className="cx-eyebrow">Platform</p>
         <h1 className="cx-display mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Built to extend, not to be rebuilt.
+          SaaS Business Platform &amp; Connected Core for Growth
         </h1>
         <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
           CINTEXA is a connected technology platform for sales, marketing, commerce, advertising, and growth — with an

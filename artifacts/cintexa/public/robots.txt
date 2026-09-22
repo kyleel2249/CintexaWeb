@@ -1,6 +1,20 @@
 # CINTEXA — https://cintexa.com
 # https://cintexa.com/robots.txt
 
+# ---------------------------------------------------------------------------
+# Google AdSense crawler — must reach every page that may show ads.
+# Do not block Mediapartners-Google or ads may not be approved / serve.
+# https://support.google.com/adsense/answer/10532
+# ---------------------------------------------------------------------------
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
+Allow: /
+
 # Default: public site open to all crawlers
 User-agent: *
 Allow: /
@@ -12,15 +26,17 @@ Allow: /pricing
 Allow: /contact
 Allow: /get-started
 Allow: /sitemap.xml
+Allow: /ads.txt
+Allow: /robots.txt
 
-# Private app surfaces
+# Private app surfaces (not for general indexing)
 Disallow: /dashboard
 Disallow: /dashboard/
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
 
-# Query noise
+# Query noise (does NOT apply to Mediapartners-Google / AdsBot above)
 Disallow: /*?*utm_
 Disallow: /*?*ref=
 
@@ -44,7 +60,7 @@ Disallow: /admin/
 Disallow: /api/
 
 # ---------------------------------------------------------------------------
-# AI crawlers — explicitly allowed to index public pages (including careers)
+# AI crawlers — public pages allowed
 # ---------------------------------------------------------------------------
 User-agent: GPTBot
 Allow: /

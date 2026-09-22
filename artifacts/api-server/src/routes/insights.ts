@@ -16,6 +16,14 @@ import {
   subscriptionsTable,
 } from "@cintexa/db";
 
+
+/** Express may type route params as string | string[]; Drizzle eq() needs a single string. */
+function getSingleRouteParam(value: string | string[] | undefined): string | null {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value) && value.length > 0) return value[0] ?? null;
+  return null;
+}
+
 export const insightsRouter = Router();
 
 const SPECIALIST_IDS = [
@@ -233,8 +241,24 @@ insightsRouter.get("/signals", requireAuth(), async (req, res) => {
 
 insightsRouter.post("/signals/:id/consume", requireAuth(), async (req, res) => {
   const { userId } = getAuth(req);
-  if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
-  await db.update(insightSignalsTable).set({ consumed: true }).where(and(eq(insightSignalsTable.id, req.params.id), eq(insightSignalsTable.userId, userId)));
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  const signalId = getSingleRouteParam(req.params.id);
+  if (!signalId) {
+    res.status(400).json({ error: "Invalid signal ID" });
+    return;
+  }
+  await db
+    .update(insightSignalsTable)
+    .set({ consumed: true })
+    .where(
+      and(
+        eq(insightSignalsTable.id, signalId),
+        eq(insightSignalsTable.userId, userId),
+      ),
+    );
   res.json({ ok: true });
 });
 
@@ -247,8 +271,24 @@ insightsRouter.get("/notifications", requireAuth(), async (req, res) => {
 
 insightsRouter.post("/notifications/:id/read", requireAuth(), async (req, res) => {
   const { userId } = getAuth(req);
-  if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
-  await db.update(insightNotificationsTable).set({ read: true }).where(and(eq(insightNotificationsTable.id, req.params.id), eq(insightNotificationsTable.userId, userId)));
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  const notificationId = getSingleRouteParam(req.params.id);
+  if (!notificationId) {
+    res.status(400).json({ error: "Invalid notification ID" });
+    return;
+  }
+  await db
+    .update(insightNotificationsTable)
+    .set({ read: true })
+    .where(
+      and(
+        eq(insightNotificationsTable.id, notificationId),
+        eq(insightNotificationsTable.userId, userId),
+      ),
+    );
   res.json({ ok: true });
 });
 

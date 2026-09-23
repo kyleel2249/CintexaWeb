@@ -13,6 +13,12 @@ const TEMPLATES = [
   { name: "Social pixel checklist", tag: "Ads" },
 ];
 
+// Stable empty-array reference for the "no interests yet" fallback below — using a
+// fresh `[]` literal there would get a new identity every render, defeating the
+// useMemo in DashboardFaq (it would recompute faqForInterests on every render
+// instead of only when interests actually change).
+const EMPTY_INTERESTS: string[] = [];
+
 export function DashboardTemplates() {
   return (
     <DashboardShell>
@@ -335,7 +341,7 @@ export function DashboardPayback() {
         </form>
         <p className="mt-3 text-xs text-[hsl(var(--fg-muted))]">
           Only display-safe details (last 4 digits, provider name) are ever stored — never full card or account
-          numbers. Payout requests aren't connected to a live processor yet; your method is saved and ready for
+          numbers. Payout requests aren&apos;t connected to a live processor yet; your method is saved and ready for
           when they are.
         </p>
       </div>
@@ -346,7 +352,7 @@ export function DashboardPayback() {
 
 export function DashboardFaq() {
   const profile = useMyProfile();
-  const interests = (profile.data?.profile?.interests as string[] | undefined) ?? [];
+  const interests = (profile.data?.profile?.interests as string[] | undefined) ?? EMPTY_INTERESTS;
   const items = useMemo(() => faqForInterests(interests), [interests]);
   return (
     <DashboardShell>

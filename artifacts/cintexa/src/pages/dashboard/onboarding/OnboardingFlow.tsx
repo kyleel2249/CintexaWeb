@@ -74,7 +74,7 @@ export function OnboardingFlow() {
                 exit={allowMotion ? { opacity: 0, x: -16 } : undefined}
                 transition={{ duration: 0.25 }}
               >
-                <p className="cx-eyebrow text-center">Let's tailor your dashboard</p>
+                <p className="cx-eyebrow text-center">Let&apos;s tailor your dashboard</p>
                 <h1 className="cx-display mt-2 text-center text-2xl">What best describes you?</h1>
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
                   {ROLE_ORDER.map((r) => (

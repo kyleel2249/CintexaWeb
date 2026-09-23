@@ -23,7 +23,7 @@ export function CustomerList({ adminKey }: { adminKey: string }) {
         <p className="cx-eyebrow">Customers</p>
       </div>
       {isLoading && <p className="px-5 py-4 text-sm text-[hsl(var(--fg-muted))]">Loading…</p>}
-      {isError && <p className="px-5 py-4 text-sm" style={{ color: "hsl(var(--danger))" }}>Couldn't load customers.</p>}
+      {isError && <p className="px-5 py-4 text-sm" style={{ color: "hsl(var(--danger))" }}>Couldn&apos;t load customers.</p>}
       {data && data.customers.length === 0 && (
         <p className="px-5 py-4 text-sm text-[hsl(var(--fg-muted))]">No customers yet.</p>
       )}

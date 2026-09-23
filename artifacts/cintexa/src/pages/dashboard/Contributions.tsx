@@ -11,7 +11,7 @@ export function DashboardContributions() {
       {isError && (
         <div className="cx-card mb-4" style={{ borderColor: "hsl(var(--danger) / .5)" }}>
           <p className="text-sm" style={{ color: "hsl(var(--danger))" }}>
-            Couldn't load contributions right now. Try refreshing.
+            Couldn&apos;t load contributions right now. Try refreshing.
           </p>
         </div>
       )}

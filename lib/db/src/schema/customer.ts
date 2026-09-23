@@ -47,8 +47,9 @@ export const contributionsTable = pgTable(
     type: text("type").notNull().default("contribution"),
     amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
     currency: text("currency").notNull().default("GHS"),
-    // Platform takes a fixed 5% of every sale/payment. Both are stored (not
-    // just derived) so the fee rate can change later without rewriting history.
+    // Platform takes a cut of every sale/payment — 7% by default, 5% with the
+    // FREE2026 promo (see PLATFORM_FEE_RATE_DEFAULT/PROMO below). Both amounts
+    // are stored (not just derived) so the fee rate can change later without rewriting history.
     platformFeeAmount: numeric("platform_fee_amount", { precision: 12, scale: 2 }).notNull().default("0"),
     netAmount: numeric("net_amount", { precision: 12, scale: 2 }).notNull().default("0"),
     status: text("status").notNull().default("pending"),

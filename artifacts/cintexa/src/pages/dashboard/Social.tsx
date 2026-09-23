@@ -39,7 +39,7 @@ export function DashboardSocial() {
   function handlePost(e: React.FormEvent) {
     e.preventDefault();
     if (!body.trim()) return;
-    const post = createPost({
+    createPost({
       body: body.trim(),
       scheduledFor: schedule || undefined,
       boost,
@@ -48,8 +48,6 @@ export function DashboardSocial() {
     setBody("");
     setSchedule("");
     setBoost(false);
-    const urls = shareUrls(post.shareUrl, post.body.slice(0, 120));
-    void urls;
   }
 
   const suggestions = suggestedAccounts(self);

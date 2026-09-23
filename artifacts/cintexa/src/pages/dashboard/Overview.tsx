@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { DashboardShell } from "./DashboardShell";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@/hooks/useApi";
 import { ROLE_META, getRecommendations } from "@/lib/roles";
 import { InsightPanel } from "@/components/insights/InsightPanel";
-import { checkInStreak, badgeMeta } from "@/lib/streak-badges";
+import { checkInStreak, readStreak, badgeMeta } from "@/lib/streak-badges";
 
 function StatCard({ label, value, loading, href }: { label: string; value: string; loading: boolean; href?: string }) {
   const inner = (
@@ -52,7 +52,15 @@ export function DashboardOverview() {
   const activityCount = activity.data?.pagination.total ?? activity.data?.activity?.length ?? 0;
   const recentActivity = (activity.data?.activity ?? []).slice(0, 5);
 
-  const streak = checkInStreak();
+  // Read the streak purely for the first paint; recording today's check-in is a
+  // side effect (writes localStorage), so it belongs in an effect, not render body
+  // — React 18/19 can invoke a render speculatively and discard it, and a render
+  // that writes to storage anyway would record a "visit" that never actually
+  // committed. Same read-now/confirm-in-effect shape as useWebGL.ts.
+  const [streak, setStreak] = useState(() => readStreak());
+  useEffect(() => {
+    setStreak(checkInStreak());
+  }, []);
   const badge = badgeMeta(streak.badgeId);
 
   const loading =

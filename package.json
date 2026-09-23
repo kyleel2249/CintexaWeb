@@ -18,12 +18,13 @@
     "dev:api": "npm run build -w @cintexa/db && npm run dev -w api-server",
     "build": "npm run build -w @cintexa/db && npm run build -w api-server && npm run build -w cintexa",
     "build:pages": "npm run build -w @cintexa/db && npm run build -w cintexa",
-    "typecheck": "npm run build -w @cintexa/db && npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run build -w @cintexa/db && npm run typecheck --workspaces --if-present && tsc -p functions/tsconfig.json",
     "test": "npm run build -w @cintexa/db && npm run test -w api-server && npm run test -w cintexa",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260923.1",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.11.0",
     "eslint-plugin-react": "^7.37.5",

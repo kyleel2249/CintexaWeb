@@ -1,4 +1,5 @@
 import { opportunityBroadcastHtml, sendEmail } from "../../lib/email";
+import { constantTimeEquals } from "../../lib/auth";
 
 export interface Env {
   KV: KVNamespace;
@@ -24,7 +25,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const adminKey = context.env.ADMIN_API_KEY || "";
   const provided = context.request.headers.get("X-Admin-Key") || "";
-  if (!adminKey || provided !== adminKey) {
+  if (!adminKey || !constantTimeEquals(provided, adminKey)) {
     return Response.json({ error: "Unauthorized" }, { status: 401, headers: cors });
   }
 

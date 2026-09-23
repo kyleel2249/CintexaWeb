@@ -4,6 +4,8 @@ export type SendEmailInput = {
   html: string;
   text?: string;
   replyTo?: string;
+  /** Resend's email-categorization tags (shown in their dashboard/webhooks). */
+  tags?: { name: string; value: string }[];
 };
 
 export type SendEmailResult =
@@ -44,6 +46,7 @@ export async function sendEmail(
         html: input.html,
         text: input.text,
         reply_to: input.replyTo,
+        tags: input.tags,
       }),
     });
     const data = (await res.json()) as { id?: string; message?: string };

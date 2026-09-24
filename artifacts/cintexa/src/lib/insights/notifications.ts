@@ -23,7 +23,7 @@ export function readLocalNotifications(): LocalInsightNotification[] {
 export function pushLocalNotification(n: Omit<LocalInsightNotification, "id" | "createdAt" | "read">) {
   const item: LocalInsightNotification = {
     ...n,
-    id: `local_${Date.now()}`,
+    id: `local_${crypto.randomUUID()}`,
     read: false,
     createdAt: new Date().toISOString(),
   };

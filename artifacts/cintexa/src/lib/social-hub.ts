@@ -72,7 +72,11 @@ export function readPosts(): ContentPost[] {
 }
 
 export function createPost(input: { body: string; scheduledFor?: string; boost?: boolean }): ContentPost {
-  const id = `post_${Date.now()}`;
+  // crypto.randomUUID(), not Date.now() — this whole call is synchronous
+  // localStorage with no network delay, so two calls (e.g. a rapid double-click
+  // on "Post") really can land in the same millisecond, which would have given
+  // two posts the same id, the same React key, and the same public shareUrl.
+  const id = `post_${crypto.randomUUID()}`;
   const shareUrl = `${window.location.origin}/share/${id}`;
   const post: ContentPost = {
     id,

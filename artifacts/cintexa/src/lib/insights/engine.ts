@@ -13,7 +13,7 @@ const iso = () => new Date().toISOString();
 
 function base(s: InsightSpecialistConfig, ctx: InsightContext, p: Partial<InsightResult>): InsightResult {
   return {
-    id: `insight_${s.id}_${Date.now()}`,
+    id: `insight_${s.id}_${crypto.randomUUID()}`,
     specialistId: s.id,
     displayName: s.displayName,
     tab: s.tab,
@@ -425,7 +425,7 @@ export function generateInsightForTab(tab: string, ctx: InsightContext): Insight
   const specialist = getSpecialistByTab(tab);
   if (!specialist) {
     return {
-      id: `insight_unknown_${Date.now()}`, specialistId: "unknown", displayName: "Insight", tab,
+      id: `insight_unknown_${crypto.randomUUID()}`, specialistId: "unknown", displayName: "Insight", tab,
       accountId: ctx.accountId, generatedAt: iso(), dataAsOf: null, periodStart: null, periodEnd: null, status: "error",
       summary: "No specialist is registered for this tab.", keyFindings: [], recommendations: [],
       alerts: [], metrics: [], trends: [], opportunities: [], evidence: [], limitations: ["Unknown tab"], suggestedActions: [],

@@ -16,8 +16,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
 
-/** Mirrors src/data/jobs.ts — keep in sync when adding roles */
-const JOBS = [
+/** Mirrors src/data/jobs.ts — keep in sync when adding roles (checked by
+ *  src/data/__tests__/jobs-prerender-sync.test.ts, which fails loudly if these
+ *  two ever drift). */
+export const JOBS = [
   {
     id: "cleaner-ghana",
     slug: "cleaner",
@@ -285,4 +287,9 @@ function run() {
   console.log(`prerender: done (${open.length} jobs + list)`);
 }
 
-run();
+// Only run when executed directly (`node scripts/prerender-careers.mjs`), not
+// when imported — e.g. by jobs-prerender-sync.test.ts, which imports JOBS above
+// to check it against the real src/data/jobs.ts without triggering a dist/ write.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  run();
+}

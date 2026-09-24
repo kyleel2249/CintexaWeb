@@ -189,27 +189,36 @@ insightsRouter.post("/runs", requireAuth(), async (req, res) => {
   }
   const ctx = await loadAccountContext(userId);
   const report = buildReport(specialistId, userId, ctx);
-  const [run] = await db.insert(insightRunsTable).values({
-    userId, specialistId, tab: String(report.tab), status: String(report.status),
-    confidence: String(report.confidence), summary: String(report.summary), report,
-    dataAsOf: report.dataAsOf ? new Date(String(report.dataAsOf)) : null, version: String(report.version),
-  }).returning();
 
-  const attention = (report.keyFindings as Array<{ category?: string; severity?: string; title?: string }>).filter(
-    (f) => f.category === "attention" || f.severity === "high" || f.severity === "critical",
-  );
-  if (attention.length > 0) {
-    await db.insert(insightSignalsTable).values({
-      userId, sourceSpecialistId: specialistId, signalType: "attention_finding",
-      payload: { titles: attention.map((a) => a.title), runId: run.id }, severity: "warning",
-    });
-    await db.insert(insightNotificationsTable).values({
-      userId, specialistId,
-      title: `${DISPLAY[specialistId]} flagged attention items`,
-      body: attention.map((a) => a.title).join("; ").slice(0, 280),
-      href: `/dashboard/${report.tab === "contributions" ? "contributions" : report.tab}`,
-    });
-  }
+  // Wrapped in a transaction: without it, a failure inserting the attention
+  // signal/notification (after the run row already committed) would 500 the
+  // whole request even though the run itself succeeded - misleading to the
+  // client (looks like total failure when it wasn't) and, if the client retries
+  // on that 500, there's no idempotency guard against creating a duplicate run.
+  const { run } = await db.transaction(async (tx) => {
+    const [run] = await tx.insert(insightRunsTable).values({
+      userId, specialistId, tab: String(report.tab), status: String(report.status),
+      confidence: String(report.confidence), summary: String(report.summary), report,
+      dataAsOf: report.dataAsOf ? new Date(String(report.dataAsOf)) : null, version: String(report.version),
+    }).returning();
+
+    const attention = (report.keyFindings as Array<{ category?: string; severity?: string; title?: string }>).filter(
+      (f) => f.category === "attention" || f.severity === "high" || f.severity === "critical",
+    );
+    if (attention.length > 0) {
+      await tx.insert(insightSignalsTable).values({
+        userId, sourceSpecialistId: specialistId, signalType: "attention_finding",
+        payload: { titles: attention.map((a) => a.title), runId: run.id }, severity: "warning",
+      });
+      await tx.insert(insightNotificationsTable).values({
+        userId, specialistId,
+        title: `${DISPLAY[specialistId]} flagged attention items`,
+        body: attention.map((a) => a.title).join("; ").slice(0, 280),
+        href: `/dashboard/${report.tab === "contributions" ? "contributions" : report.tab}`,
+      });
+    }
+    return { run };
+  });
   res.status(201).json({ run, report });
 });
 
@@ -217,7 +226,12 @@ insightsRouter.get("/runs", requireAuth(), async (req, res) => {
   const { userId } = getAuth(req);
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   const specialistId = typeof req.query.specialistId === "string" ? req.query.specialistId : undefined;
-  const limit = Math.min(Number(req.query.limit) || 20, 50);
+  // Same safe-parsing shape as parsePageParams (lib/pagination.ts), but with this
+  // endpoint's own default/max (20/50) rather than the shared 50/200 - a plain
+  // `Number(...) || 20` here would let a negative limit (e.g. ?limit=-5, which is
+  // truthy) reach `.limit(-5)` and error out.
+  const rawLimit = Number(req.query.limit);
+  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(Math.floor(rawLimit), 50) : 20;
   const rows = specialistId
     ? await db.select().from(insightRunsTable).where(and(eq(insightRunsTable.userId, userId), eq(insightRunsTable.specialistId, specialistId))).orderBy(desc(insightRunsTable.createdAt)).limit(limit)
     : await db.select().from(insightRunsTable).where(eq(insightRunsTable.userId, userId)).orderBy(desc(insightRunsTable.createdAt)).limit(limit);

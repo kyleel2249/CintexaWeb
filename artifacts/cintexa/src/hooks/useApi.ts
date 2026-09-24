@@ -162,7 +162,7 @@ export function useDeleteMyData() {
       return true;
     },
     onSuccess: () => {
-      queryClient.setQueryData(["customer", "me"], { profile: null });
+      queryClient.setQueryData(["customer", "me"], { profile: null, source: "local" as const });
       queryClient.invalidateQueries({ queryKey: ["customer"] });
     },
   });

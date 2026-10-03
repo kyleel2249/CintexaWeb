@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { EcosystemHero } from "@/components/hero/EcosystemHero";
+import { HeroCarousel3D } from "@/components/hero/HeroCarousel3D";
 import { BrandStorySection } from "@/components/marketing/BrandStorySection";
 import { GlowField } from "@/components/decorative/GlowField";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
@@ -52,6 +53,8 @@ export function Home() {
 
   return (
     <>
+      <HeroCarousel3D className="pt-4 sm:pt-6" />
+
       <section className="relative overflow-hidden cx-section">
         <GlowField />
         <div className="cx-container relative grid items-center gap-10 md:grid-cols-2 md:gap-16">
@@ -93,28 +96,6 @@ export function Home() {
         </div>
       </section>
 
-      <section className="cx-section !py-8 border-t border-[hsl(var(--border))]">
-        <div className="cx-container">
-          <ScrollReveal>
-            <Link
-              href="/solutions/marketing"
-              className="group relative block overflow-hidden rounded-2xl border border-[hsl(var(--border))] shadow-[0_20px_60px_-20px_rgba(0,0,0,0.45)] transition-transform duration-300 hover:scale-[1.01] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
-              aria-label="CINTEXA marketing — grow your brand. Brand strategy, social media, digital campaigns, content, SEO and analytics."
-            >
-              <img
-                src="/images/cintexa-marketing-banner.png"
-                alt="CINTEXA marketing: Let's turn your marketing goals into reality. Brand strategy, social media marketing, digital campaigns, content creation, SEO and analytics. Grow your brand with CINTEXA."
-                width={1920}
-                height={1080}
-                className="h-auto w-full object-cover object-center"
-                loading="eager"
-                decoding="async"
-              />
-              <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100 sm:h-20" />
-            </Link>
-          </ScrollReveal>
-        </div>
-      </section>
 
       <BrandStorySection />
 

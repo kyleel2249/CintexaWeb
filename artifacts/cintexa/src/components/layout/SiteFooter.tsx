@@ -41,10 +41,6 @@ export function SiteFooter() {
             <a href="mailto:info@cintexa.com" className="hover:text-[hsl(var(--fg))]">
               info@cintexa.com
             </a>
-            <br />
-            <a href="tel:+233242483082" className="hover:text-[hsl(var(--fg))]">
-              +233 24 248 3082
-            </a>
           </p>
         </div>
         <div className="flex gap-12">

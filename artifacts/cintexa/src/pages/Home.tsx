@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { EcosystemHero } from "@/components/hero/EcosystemHero";
-import { BrandRevealHero } from "@/components/hero/BrandRevealHero";
 import { BrandStorySection } from "@/components/marketing/BrandStorySection";
 import { GlowField } from "@/components/decorative/GlowField";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
@@ -79,7 +78,7 @@ export function Home() {
             </div>
           </motion.div>
           <PointerParallax strength={10}>
-            <BrandRevealHero />
+            <EcosystemHero />
           </PointerParallax>
         </div>
       </section>
@@ -99,18 +98,13 @@ export function Home() {
       <SignupBanner />
 
       <section className="cx-section border-t border-[hsl(var(--border))]">
-        <div className="cx-container grid items-center gap-10 md:grid-cols-2">
-          <div>
-            <p className="cx-eyebrow">Connected systems</p>
-            <h2 className="cx-display mt-2 text-2xl sm:text-3xl">One ecosystem. Every growth surface.</h2>
-            <p className="mt-3 max-w-md text-sm text-[hsl(var(--fg-muted))]">
-              Marketing, sales, advertising, and commerce linked so people can act on real
-              information—not disconnected tools.
-            </p>
-          </div>
-          <PointerParallax strength={12}>
-            <EcosystemHero />
-          </PointerParallax>
+        <div className="cx-container max-w-2xl">
+          <p className="cx-eyebrow">Connected systems</p>
+          <h2 className="cx-display mt-2 text-2xl sm:text-3xl">One ecosystem. Every growth surface.</h2>
+          <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">
+            Marketing, sales, advertising, and commerce linked so people can act on real
+            information—not disconnected tools.
+          </p>
         </div>
       </section>
 

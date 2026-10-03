@@ -11,10 +11,7 @@
   ],
   "overrides": {
     "react": ">=19.0.0 <19.3.0",
-    "react-dom": ">=19.0.0 <19.3.0",
-    "eslint-plugin-react": {
-      "eslint": "$eslint"
-    }
+    "react-dom": ">=19.0.0 <19.3.0"
   },
   "scripts": {
     "dev:web": "npm run dev -w cintexa",
@@ -30,7 +27,6 @@
     "@cloudflare/workers-types": "^5.20260923.1",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.11.0",
-    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.12.0",

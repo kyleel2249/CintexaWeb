@@ -26,7 +26,7 @@ jobs:
         run: npm run build:pages
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Check Cloudflare deployment credentials
         id: cloudflare

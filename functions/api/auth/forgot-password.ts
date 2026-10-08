@@ -48,7 +48,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     // Require Resend (Pages env and/or KV secrets:RESEND_API_KEY)
-    const resend = await resolveResendConfigAsync(context.env as Record<string, unknown> & { KV?: KVNamespace });
+    const resend = await resolveResendConfigAsync(context.env);
     if (!resend.configured) {
       console.error(
         JSON.stringify({

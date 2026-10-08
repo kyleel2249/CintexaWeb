@@ -36,9 +36,13 @@ const Careers = lazy(() => import("@/pages/Careers").then((m) => ({ default: m.C
 const JobDetail = lazy(() => import("@/pages/JobDetail").then((m) => ({ default: m.JobDetail })));
 const Blog = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.Blog })));
 const BlogArticle = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.BlogArticle })));
-const { About, CaseStudies, PrivacyPolicy, Terms, CookiePolicy, Disclaimer } = await import("@/pages/TrustPages");
+const About = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.About })));
+const CaseStudies = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.CaseStudies })));
+const PrivacyPolicy = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.PrivacyPolicy })));
+const Terms = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.Terms })));
+const CookiePolicy = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.CookiePolicy })));
+const Disclaimer = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.Disclaimer })));
 const Platform = lazyRetry(() => import("@/pages/Platform"));
-const Pricing = lazy(() => import("@/pages/Pricing").then((m) => ({ default: m.Pricing })));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
 const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DashboardOverview = lazy(() => import("@/pages/dashboard/Overview").then((m) => ({ default: m.DashboardOverview })));

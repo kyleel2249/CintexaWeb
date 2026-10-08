@@ -35,3 +35,5 @@ export function Platform() {
     </div>
   );
 }
+
+export default Platform;

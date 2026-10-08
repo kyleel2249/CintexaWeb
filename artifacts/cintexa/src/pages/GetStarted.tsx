@@ -1,13 +1,18 @@
-import { useState, type FormEvent } from "react";
-import { Link, useLocation } from "wouter";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link } from "wouter";
 import { useAuth } from "@/lib/auth";
 
+function goToDashboard() {
+  // Full navigation so dashboard always loads a fresh authenticated shell
+  window.location.assign("/dashboard");
+}
+
 /**
- * CINTEXA authentication — create account or log in (native, no Clerk).
+ * CINTEXA authentication — create account or log in.
+ * Successful signup / login always redirects to the customer dashboard.
  */
 export function GetStarted() {
-  const { signIn, signUp, isSignedIn, user } = useAuth();
-  const [, setLocation] = useLocation();
+  const { signIn, signUp, isSignedIn, isLoaded, user } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("signup");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -18,16 +23,26 @@ export function GetStarted() {
   const [status, setStatus] = useState<"idle" | "working" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  if (isSignedIn && user) {
+  // Already signed in → dashboard immediately
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      goToDashboard();
+    }
+  }, [isLoaded, isSignedIn]);
+
+  if (!isLoaded || isSignedIn) {
     return (
       <section className="cx-section">
         <div className="cx-container max-w-md text-center">
-          <p className="cx-eyebrow">Signed in</p>
-          <h1 className="cx-display mt-2 text-3xl">Welcome, {user.fullName}</h1>
-          <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">{user.email}</p>
-          <Link href="/dashboard" className="cx-btn cx-btn-primary mt-8 inline-flex">
-            Open dashboard
-          </Link>
+          <p className="cx-eyebrow">CINTEXA</p>
+          <h1 className="cx-display mt-2 text-2xl">
+            {isSignedIn ? "Taking you to your dashboard…" : "Loading…"}
+          </h1>
+          {isSignedIn && (
+            <a href="/dashboard" className="cx-btn cx-btn-primary mt-8 inline-flex">
+              Continue to dashboard
+            </a>
+          )}
         </div>
       </section>
     );
@@ -44,7 +59,7 @@ export function GetStarted() {
         setMessage(result.error);
         return;
       }
-      setLocation("/dashboard");
+      goToDashboard();
       return;
     }
     const result = await signUp({
@@ -60,7 +75,7 @@ export function GetStarted() {
       setMessage(result.error);
       return;
     }
-    setLocation("/dashboard");
+    goToDashboard();
   }
 
   return (

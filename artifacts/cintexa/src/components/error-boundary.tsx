@@ -52,8 +52,8 @@ export class ErrorBoundary extends Component<Props, State> {
           This page hit a snag.
         </h1>
         <p style={{ color: "#A6AEB8", maxWidth: 420 }}>
-          Reloading usually fixes it. If it keeps happening, check the browser console and Cloudflare
-          env vars (especially authentication configuration).
+          Reloading usually fixes it. If it keeps happening after a new deploy, hard-refresh
+          the page (Ctrl+Shift+R) so the browser loads the latest assets.
         </p>
         {this.state.message ? (
           <pre

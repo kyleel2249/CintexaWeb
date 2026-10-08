@@ -8,13 +8,13 @@ const source = fs.readFileSync(path.join(appRoot, "src/pages/Blog.tsx"), "utf8")
 const posts = [...source.matchAll(/slug:\s*"([a-z0-9-]+)"[\s\S]*?date:\s*"([0-9]{4}-[0-9]{2}-[0-9]{2})"(?:,\s*updated:\s*"([0-9]{4}-[0-9]{2}-[0-9]{2})")?/g)]
   .map((match) => ({ slug: match[1], lastmod: match[3] || match[2] }));
 const routes = [
-  ["/", "1.0"], ["/about", "0.8"], ["/platform", "0.75"],
+  ["/", "1.0"], ["/about", "0.8"],
   ["/solutions/marketing", "0.8"], ["/solutions/sales", "0.8"],
   ["/solutions/ads-boost", "0.7"], ["/solutions/ecommerce", "0.8"],
   ["/solutions/website-development", "0.8"], ["/solutions/software-development", "0.8"],
   ["/blog", "0.9"], ["/case-studies", "0.8"], ["/careers", "0.9"],
   ["/careers/cleaner", "0.8"], ["/contact", "0.7"], ["/get-started", "0.85"],
-  ["/privacy-policy", "0.4"], ["/terms", "0.4"], ["/cookie-policy", "0.4"], ["/disclaimer", "0.4"], ["/disclaimer", "0.4"],
+  ["/privacy-policy", "0.4"], ["/terms", "0.4"], ["/cookie-policy", "0.4"], ["/disclaimer", "0.4"],
   ...posts.map((post) => [`/blog/${post.slug}`, "0.75", post.lastmod])
 ];
 const unique = [...new Map(routes.map((entry) => [entry[0], entry])).values()];

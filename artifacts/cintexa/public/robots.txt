@@ -21,7 +21,6 @@ Allow: /
 Allow: /careers
 Allow: /careers/
 Allow: /solutions/
-Allow: /platform
 Allow: /about
 Allow: /blog
 Allow: /case-studies

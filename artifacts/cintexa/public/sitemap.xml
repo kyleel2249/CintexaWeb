@@ -11,11 +11,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cintexa.com/platform</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://cintexa.com/solutions/marketing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

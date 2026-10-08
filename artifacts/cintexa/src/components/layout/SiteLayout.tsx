@@ -7,7 +7,7 @@ import { AdSenseFooterBanner } from "@/components/ads/AdSenseSlot";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  const showPublicContentAds = location === "/" || location === "/about" || location === "/platform" || location === "/blog" || location.startsWith("/blog/") || location === "/case-studies" || location.startsWith("/solutions/");
+  const showPublicContentAds = location === "/" || location === "/about" || location === "/blog" || location.startsWith("/blog/") || location === "/case-studies" || location.startsWith("/solutions/");
   return (
     <div className="relative min-h-screen bg-[hsl(var(--bg))] text-[hsl(var(--fg))]">
       <a

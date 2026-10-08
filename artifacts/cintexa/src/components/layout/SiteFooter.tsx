@@ -14,15 +14,23 @@ const COLUMNS = [
     ],
   },
   {
-    title: "Platform",
+    title: "Explore",
     links: [
-      { label: "Overview", href: "/platform" },
       { label: "About CINTEXA", href: "/about" },
       { label: "Blog & insights", href: "/blog" },
       { label: "Case studies", href: "/case-studies" },
       { label: "Careers & scholarships", href: "/careers" },
       { label: "Contact", href: "/contact" },
       { label: "Dashboard", href: "/dashboard" },
+    ],
+  },
+  {
+    title: "Legal & Privacy",
+    links: [
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms & Conditions", href: "/terms" },
+      { label: "Cookie Policy", href: "/cookie-policy" },
+      { label: "Disclaimer", href: "/disclaimer" },
     ],
   },
 ];
@@ -45,7 +53,7 @@ export function SiteFooter() {
             </a>
           </p>
         </div>
-        <div className="flex gap-12">
+        <div className="flex flex-wrap gap-8 md:gap-12">
           {COLUMNS.map((col) => (
             <div key={col.title} className="flex flex-col gap-2">
               <p className="cx-eyebrow">{col.title}</p>

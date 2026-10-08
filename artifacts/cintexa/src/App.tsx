@@ -1,24 +1,8 @@
 import { Route, Switch } from "wouter";
-import { lazy, Suspense, useEffect, type ComponentType } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { SiteLayout } from "@/components/layout/SiteLayout";
-
-/** Retry dynamic imports once — avoids stale-chunk failures after deploys. */
-function lazyRetry<T extends ComponentType<unknown>>(
-  factory: () => Promise<{ default: T }>,
-) {
-  return lazy(() =>
-    factory().catch(() => {
-      // Force a full reload once so the browser picks up new asset hashes
-      if (!sessionStorage.getItem("cx_chunk_reload")) {
-        sessionStorage.setItem("cx_chunk_reload", "1");
-        window.location.reload();
-      }
-      return factory();
-    }),
-  );
-}
 
 import { CookieConsent } from "@/components/CookieConsent";
 import { Home } from "@/pages/Home";
@@ -42,7 +26,6 @@ const PrivacyPolicy = lazy(() => import("@/pages/LegalPages").then((m) => ({ def
 const Terms = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.Terms })));
 const CookiePolicy = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.CookiePolicy })));
 const Disclaimer = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.Disclaimer })));
-const Platform = lazyRetry(() => import("@/pages/Platform"));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
 const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DashboardOverview = lazy(() => import("@/pages/dashboard/Overview").then((m) => ({ default: m.DashboardOverview })));
@@ -97,7 +80,6 @@ export default function App() {
               <Route path="/blog" component={Blog} />
               <Route path="/careers/:id" component={JobDetail} />
               <Route path="/careers" component={Careers} />
-              <Route path="/platform" component={Platform} />
               <Route path="/get-started" component={GetStarted} />
               <Route path="/sign-in" component={GetStarted} />
               <Route path="/sign-up" component={GetStarted} />

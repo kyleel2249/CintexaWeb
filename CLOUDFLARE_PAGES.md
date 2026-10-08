@@ -40,8 +40,17 @@ Ensure **KV** binding `KV` is attached (see `wrangler.jsonc`).
 | `NOTIFY_ADMIN_EMAIL` | Recommended | `info@cintexa.com` |
 | `ADMIN_API_KEY` | For broadcast | Admin email blasts |
 | `CLERK_WEBHOOK_SECRET` | For webhook verify | Clerk → `/api/webhooks/clerk` |
+| `VITE_FIREBASE_API_KEY` | Yes for Firebase | Firebase client API key |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Recommended | e.g. `your-project.firebaseapp.com` |
+| `VITE_FIREBASE_PROJECT_ID` | Yes for Firebase | Firebase project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Optional | Storage bucket |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Optional | FCM sender ID |
+| `VITE_FIREBASE_APP_ID` | Yes for Firebase | Firebase app ID |
+| `VITE_FIREBASE_MEASUREMENT_ID` | Optional | Google Analytics (G-…) |
 
 Without `RESEND_API_KEY`, signups still **save to KV** but admin email is **dry-run** (logged only).
+
+Firebase initializes on every page load via `initFirebase()` in `main.tsx`. If the three required `VITE_FIREBASE_*` vars are missing, the app continues without Firebase (dev warning only).
 
 ---
 

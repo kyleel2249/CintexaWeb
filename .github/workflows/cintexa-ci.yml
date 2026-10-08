@@ -30,3 +30,12 @@ jobs:
         run: npm test
       - name: Run lint
         run: npm run lint
+      - name: Package complete source archive
+        run: git archive --format=zip --output=CINTEXAWeb-source.zip HEAD
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: CINTEXAWeb-source
+          path: CINTEXAWeb-source.zip
+          if-no-files-found: error
+          retention-days: 14

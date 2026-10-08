@@ -89,9 +89,98 @@ export const POSTS: Post[] = [
     ],
     references: [{ label: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }, { label: "Google Search Central", url: "https://developers.google.com/search/docs/fundamentals/creating-helpful-content" }]
   }
-];
 
-function useArticleSeo(post: Post | undefined) {
+  {
+    slug: "business-automation-for-small-businesses",
+    title: "Business Automation for Small Businesses: Where to Start",
+    excerpt: "Map repeatable work and automate predictable steps without losing human oversight.",
+    date: "2026-10-08", category: "Business automation", readTime: "6 min", keyword: "business automation for small businesses",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Team collaborating with digital tools on a laptop",
+    intro: "Business automation works best when it removes a clear source of repeated effort. It does not mean removing people from every decision. For many small businesses, a useful first step is to make an existing workflow consistent, then automate predictable parts.",
+    sections: [
+      { heading: "Find repeatable work", paragraphs: ["Look for tasks that happen often and follow a stable sequence: capturing enquiries, sending acknowledgements, assigning tasks, preparing routine reports or reminding a team member about a due date. Record the current steps, including exceptions and approvals.", "Do not automate a process that staff cannot explain. Clarify ownership and remove unnecessary steps before choosing software."] },
+      { heading: "Design safeguards into the workflow", paragraphs: ["Specify what starts the workflow, what information is required, who receives the task and what happens if a step fails. Use validation to prevent incomplete records, logs to show what happened and an escalation path for exceptions. People should be able to correct mistakes and handle unusual cases.", "Protect customer and employee information with role-based access, retention rules and secure integrations. Test with sample records before connecting automation to live operations."] },
+      { heading: "Measure whether it helped", paragraphs: ["Track time per task, error rates, overdue work and user adoption before and after rollout. Document the baseline and other changes that may affect results. A workflow is useful when it improves reliability or frees time for valuable work—not simply because it contains automation."] }
+    ],
+    references: [{ label: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }]
+  },
+  {
+    slug: "technical-seo-checklist-for-business-websites",
+    title: "Technical SEO Checklist for a Business Website",
+    excerpt: "Review crawl access, metadata, canonical URLs, internal links, mobile usability and structured data.",
+    date: "2026-10-07", category: "SEO", readTime: "7 min", keyword: "technical SEO checklist for business websites",
+    image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Website analytics and search performance on a display",
+    intro: "Technical SEO helps search engines access and interpret useful pages. It cannot compensate for weak content, but broken routes, duplicate URLs or missing metadata can make a strong site harder to understand. Review technical health alongside content quality and user experience.",
+    sections: [
+      { heading: "Check indexing and crawl access", paragraphs: ["Confirm important pages return successful responses, are linked from relevant pages and are not accidentally marked noindex. Keep robots.txt focused on crawl guidance rather than using it to hide private information. Submit a valid XML sitemap in Google Search Console and review unexpected indexing exclusions."] },
+      { heading: "Give each page a clear purpose", paragraphs: ["Write a descriptive title and concise meta description for each page. Use a clear H1, logical subheadings, descriptive link text and useful image alternative text. Add canonical URLs where duplicate or parameterised versions may exist. Avoid repeating keywords unnaturally or creating thin pages solely for search phrases."] },
+      { heading: "Improve experience and validate markup", paragraphs: ["Test navigation and forms on mobile devices. Compress images, avoid unnecessary scripts, reserve image dimensions to reduce layout shifts and make key content keyboard-accessible. Add structured data only when it accurately describes visible content; valid markup does not guarantee rich results or higher rankings."] }
+    ],
+    references: [{ label: "Google Search Central SEO Starter Guide", url: "https://developers.google.com/search/docs/fundamentals/seo-starter-guide" }, { label: "Google Search Console", url: "https://search.google.com/search-console/about" }]
+  },
+  {
+    slug: "cybersecurity-basics-for-small-businesses-in-ghana",
+    title: "Cybersecurity Basics for Small Businesses in Ghana",
+    excerpt: "Practical steps for account security, backups, staff awareness and incident response.",
+    date: "2026-10-06", category: "Cybersecurity", readTime: "7 min", keyword: "cybersecurity for small businesses in Ghana",
+    image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Laptop displaying a digital security interface",
+    intro: "Small organisations hold customer contacts, invoices, credentials and operational records that can be valuable to attackers. Security does not require a large security department to begin; consistent basic practices can reduce common risks. The right controls depend on the business and its systems.",
+    sections: [
+      { heading: "Protect important accounts", paragraphs: ["Use unique passwords stored in a reputable password manager and enable multi-factor authentication wherever available, especially for email, banking, hosting, domain registration and administrator accounts. Remove access promptly when a worker or supplier no longer needs it. Avoid sharing administrator credentials in group chats."] },
+      { heading: "Maintain systems and backups", paragraphs: ["Install operating-system and application updates, remove unused software and restrict administrator privileges. Keep backups separate from everyday access where possible and test restoring a file or system; an untested backup may not be recoverable when needed.", "Check that website, domain and cloud accounts have current recovery details. Teach staff to verify unexpected payment changes, attachments and urgent requests through a known contact channel."] },
+      { heading: "Prepare for incidents", paragraphs: ["Write down who to contact, how to disable compromised accounts, where backups are stored and how to preserve evidence. If customer data may be affected, seek qualified incident-response and legal guidance and follow applicable notification requirements. This is general guidance, not a substitute for a security assessment."] }
+    ],
+    references: [{ label: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }, { label: "Cyber Security Authority Ghana", url: "https://csa.gov.gh/" }]
+  },
+  {
+    slug: "digital-marketing-metrics-small-businesses-should-track",
+    title: "Digital Marketing Metrics Small Businesses Should Track",
+    excerpt: "Connect marketing activity to qualified enquiries, sales outcomes and customer retention instead of relying on likes alone.",
+    date: "2026-10-05", category: "Digital marketing", readTime: "6 min", keyword: "digital marketing metrics for small businesses",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Marketing analytics charts on a computer monitor",
+    intro: "Views, followers and clicks can help explain attention, but they do not tell the whole story. A small business should choose a compact set of measures tied to its objective, then use consistent definitions to compare activity over time.",
+    sections: [
+      { heading: "Start with the business outcome", paragraphs: ["For a service business, the outcome may be qualified enquiries or booked consultations. For an online store, it may be completed orders, average order value or repeat purchases. Define what counts as a qualified lead or successful order before setting up reports."] },
+      { heading: "Track the path to action", paragraphs: ["Useful measures include landing-page visits, enquiry completion rate, cost per qualified lead when spend is known, lead-to-sale conversion and time to first response. Use campaign tags consistently and check that analytics events are not duplicated. A conversion after an ad click does not prove that the ad alone caused the sale."] },
+      { heading: "Turn reporting into a decision", paragraphs: ["Review missing campaign sources and mismatches between analytics and sales records. Configure analytics and advertising technologies in line with privacy requirements. Use each review to decide what to test, improve or stop, and record changes so the result can be interpreted honestly."] }
+    ],
+    references: [{ label: "Google Analytics Help", url: "https://support.google.com/analytics/" }, { label: "Google Ads Help", url: "https://support.google.com/google-ads/" }]
+  },
+  {
+    slug: "crm-data-quality-and-customer-follow-up",
+    title: "CRM Data Quality: Keep Customer Records Useful and Trustworthy",
+    excerpt: "Rules for duplicate prevention, consistent fields, record ownership, consent and routine CRM maintenance.",
+    date: "2026-10-04", category: "CRM", readTime: "6 min", keyword: "CRM data quality and customer records",
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Team reviewing customer records and business workflow",
+    intro: "A CRM is only useful when staff trust its records. Duplicate contacts, outdated details and unclear deal stages can lead to repeated messages, missed follow-ups and unreliable reports. Data quality is an ongoing process, not a one-time import task.",
+    sections: [
+      { heading: "Agree on shared fields", paragraphs: ["Define required fields, how phone numbers are formatted and what each sales stage means. Collect information that supports service and follow-up, not every possible detail. Make field instructions visible to staff and review them when the process changes."] },
+      { heading: "Assign ownership and handle duplicates", paragraphs: ["Decide who owns a customer record and how records are merged. Use appropriate matching rules to flag likely duplicates, but review uncertain identities before merging. Give staff a clear process for correcting inaccurate data instead of creating another shadow spreadsheet."] },
+      { heading: "Respect preferences and review quality", paragraphs: ["Record the source and purpose of customer information, keep marketing preferences separate from service communications and honour unsubscribe requests. Restrict sensitive notes and exports, define retention periods and review incomplete records, overdue tasks and stale opportunities on a regular schedule."] }
+    ],
+    references: [{ label: "NIST Privacy Framework", url: "https://www.nist.gov/privacy-framework" }]
+  },
+  {
+    slug: "using-business-data-to-make-better-decisions",
+    title: "How Small Businesses Can Use Data to Make Better Decisions",
+    excerpt: "Turn sales, customer and operational records into clear questions, trustworthy measures and decisions the team can review.",
+    date: "2026-10-02", category: "Data & analytics", readTime: "6 min", keyword: "business data analytics for small businesses",
+    image: "https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Data charts and a business performance report",
+    intro: "Business analytics does not begin with a complex dashboard. It begins with a question: which products are often returned, where do enquiries stall, or which service tasks take longer than expected? Reliable answers depend on consistent records and measures people understand.",
+    sections: [
+      { heading: "Start with a decision", paragraphs: ["Choose a decision the business needs to make and identify the data that could inform it. Define the measure, period, source and owner. If the data cannot support the question, record that limitation rather than filling gaps with assumptions."] },
+      { heading: "Check data quality", paragraphs: ["Look for missing values, duplicates, inconsistent date ranges and changes in how staff record activity. Compare totals with a trusted operational source where possible. Label estimated or incomplete values and document how metrics are calculated."] },
+      { heading: "Make reporting repeatable", paragraphs: ["A weekly report may show sales, qualified enquiries, fulfilment time and overdue work. Use consistent definitions and include context for unusual events. Record the action agreed, its owner and the review date. Protect personal information in reports and give users access only to data they need."] }
+    ],
+    references: [{ label: "Google Analytics Help", url: "https://support.google.com/analytics/" }, { label: "NIST Privacy Framework", url: "https://www.nist.gov/privacy-framework" }]
+  },
+];\n\nfunction useArticleSeo(post: Post | undefined) {
   useEffect(() => {
     if (!post) return;
     const canonical = `https://cintexa.com/blog/${post.slug}`;

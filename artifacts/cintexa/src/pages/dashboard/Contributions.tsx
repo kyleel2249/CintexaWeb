@@ -112,6 +112,95 @@ export function DashboardContributions() {
           ))}
         </div>
 
+
+        {/* Monthly contribution summary */}
+        {series.length > 0 && (
+          <motion.div variants={item} className="cx-card mb-6 overflow-hidden !p-0">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[hsl(var(--border))] px-5 py-4">
+              <div>
+                <p className="cx-eyebrow">Monthly contribution summary</p>
+                <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
+                  {schedule
+                    ? `GHS ${schedule.monthlyGhs.toFixed(2)} per month · ${series.length} months recorded`
+                    : `${series.length} month${series.length === 1 ? "" : "s"} with verified payments`}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-[hsl(var(--fg-muted))]">Period total</p>
+                <p className="cx-display text-xl tabular-nums text-[hsl(var(--accent))]">
+                  {formatGhs(totalPaid)}
+                </p>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[hsl(var(--border))] text-[hsl(var(--fg-muted))]">
+                    <th className="px-5 py-2.5 font-medium">#</th>
+                    <th className="px-5 py-2.5 font-medium">Month</th>
+                    <th className="px-5 py-2.5 font-medium">Amount</th>
+                    <th className="px-5 py-2.5 font-medium">Cumulative</th>
+                    <th className="px-5 py-2.5 font-medium">Share of total</th>
+                    <th className="px-5 py-2.5 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {series.map((s, i) => {
+                    const share = totalPaid > 0 ? (s.amount / totalPaid) * 100 : 0;
+                    return (
+                      <motion.tr
+                        key={s.id}
+                        className="border-b border-[hsl(var(--border))] last:border-0"
+                        initial={reduce ? false : { opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: reduce ? 0 : 0.03 * i }}
+                      >
+                        <td className="px-5 py-2.5 text-[hsl(var(--fg-muted))]">{String(i + 1).padStart(2, "0")}</td>
+                        <td className="px-5 py-2.5 font-medium">{s.label}</td>
+                        <td className="px-5 py-2.5 tabular-nums">{formatGhs(s.amount)}</td>
+                        <td className="px-5 py-2.5 tabular-nums text-[hsl(var(--fg-muted))]">
+                          {formatGhs(s.cumulative)}
+                        </td>
+                        <td className="px-5 py-2.5">
+                          <div className="flex min-w-[7rem] items-center gap-2">
+                            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[hsl(var(--bg-inset))]">
+                              <motion.div
+                                className="h-full rounded-full bg-[hsl(var(--accent))]"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${share}%` }}
+                                transition={{ delay: reduce ? 0 : 0.05 * i, duration: 0.5 }}
+                              />
+                            </div>
+                            <span className="w-10 text-right text-xs tabular-nums text-[hsl(var(--fg-muted))]">
+                              {share.toFixed(0)}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-2.5">
+                          <span className="cx-badge cx-badge-success">{s.status}</span>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t border-[hsl(var(--border))] bg-[hsl(var(--bg-inset)/0.4)]">
+                    <td className="px-5 py-3 font-medium" colSpan={2}>
+                      Total
+                    </td>
+                    <td className="px-5 py-3 font-semibold tabular-nums">{formatGhs(totalPaid)}</td>
+                    <td className="px-5 py-3 tabular-nums text-[hsl(var(--fg-muted))]">{formatGhs(totalPaid)}</td>
+                    <td className="px-5 py-3 text-xs text-[hsl(var(--fg-muted))]">100%</td>
+                    <td className="px-5 py-3 text-xs text-[hsl(var(--fg-muted))]">
+                      {series.length} payment{series.length === 1 ? "" : "s"}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
         {/* Progress ring + cumulative path */}
         <div className="mb-6 grid gap-4 lg:grid-cols-5">
           <motion.div variants={item} className="cx-card lg:col-span-2">

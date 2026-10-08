@@ -129,8 +129,8 @@ export function DashboardOverview() {
         <div className="cx-card lg:col-span-2">
           <div className="flex items-center justify-between gap-2">
             <p className="cx-eyebrow">Contribution summary</p>
-            <Link href="/dashboard/progress" className="text-xs text-[hsl(var(--accent))]">
-              View progress
+            <Link href="/dashboard/contributions" className="text-xs text-[hsl(var(--accent))]">
+              Monthly summary
             </Link>
           </div>
           <p className="cx-display mt-2 text-2xl">
@@ -146,6 +146,27 @@ export function DashboardOverview() {
           </p>
           {contribList.length === 0 && !contributions.isLoading && (
             <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">No contributions recorded on this account yet.</p>
+          )}
+          {contribList.length > 0 && (
+            <ul className="mt-4 space-y-2 border-t border-[hsl(var(--border))] pt-3">
+              {[...contribList]
+                .filter((c) => c.status === "paid" || c.status === "completed" || !c.status)
+                .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                .map((c) => (
+                  <li key={c.id} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-[hsl(var(--fg-muted))]">
+                      {new Date(c.createdAt).toLocaleString("en-GB", {
+                        month: "short",
+                        year: "numeric",
+                        timeZone: "UTC",
+                      })}
+                    </span>
+                    <span className="tabular-nums font-medium">
+                      {c.currency || "GHS"} {Number(c.amount).toFixed(2)}
+                    </span>
+                  </li>
+                ))}
+            </ul>
           )}
         </div>
 

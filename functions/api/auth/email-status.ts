@@ -17,7 +17,7 @@ export const onRequestOptions: PagesFunction<Env> = async () =>
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const headers = corsHeaders({ "Content-Type": "application/json", "Cache-Control": "no-store" });
   const resolved = await resolveResendConfigAsync(
-    context.env as Record<string, unknown> & { KV?: KVNamespace },
+    context.env,
   );
   const envKeys = Object.keys(context.env || {}).filter((k) =>
     /resend|email|from|kv/i.test(k),

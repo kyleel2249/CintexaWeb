@@ -38,10 +38,10 @@ const Blog = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.Blog })
 const BlogArticle = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.BlogArticle })));
 const About = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.About })));
 const CaseStudies = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.CaseStudies })));
-const PrivacyPolicy = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.PrivacyPolicy })));
-const Terms = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.Terms })));
-const CookiePolicy = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.CookiePolicy })));
-const Disclaimer = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.Disclaimer })));
+const PrivacyPolicy = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.PrivacyPolicy })));
+const Terms = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.Terms })));
+const CookiePolicy = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.CookiePolicy })));
+const Disclaimer = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.Disclaimer })));
 const Platform = lazyRetry(() => import("@/pages/Platform"));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
 const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));

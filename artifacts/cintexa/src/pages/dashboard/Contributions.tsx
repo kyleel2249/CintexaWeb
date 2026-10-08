@@ -4,7 +4,7 @@ import { DashboardShell } from "./DashboardShell";
 import { useMyContributions } from "@/hooks/useApi";
 import { useAuth } from "@/lib/auth";
 import { InsightPanel } from "@/components/insights/InsightPanel";
-import { SEEDED_CONTRIBUTOR_ID, SEEDED_TOTAL_GHS } from "@/data/contribution-seed";
+import { getSeededSchedule, getSeededTotalGhs } from "@/data/contribution-seed";
 
 function formatGhs(n: number) {
   return `GHS ${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -46,7 +46,9 @@ export function DashboardContributions() {
   }, [paid]);
 
   const maxBar = Math.max(...series.map((s) => s.amount), 1);
-  const targetTotal = userId === SEEDED_CONTRIBUTOR_ID ? SEEDED_TOTAL_GHS : Math.max(totalPaid, 1);
+  const seededTotal = userId ? getSeededTotalGhs(userId) : null;
+  const schedule = userId ? getSeededSchedule(userId) : undefined;
+  const targetTotal = seededTotal ?? Math.max(totalPaid, 1);
   const progressPct = Math.min(100, (totalPaid / targetTotal) * 100);
 
   const container = {
@@ -115,8 +117,8 @@ export function DashboardContributions() {
           <motion.div variants={item} className="cx-card lg:col-span-2">
             <p className="cx-eyebrow">Progress to schedule</p>
             <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
-              {userId === SEEDED_CONTRIBUTOR_ID
-                ? "Feb–Dec 2026 · GHS 20.00 / month · target GHS 220.00"
+              {schedule
+                ? `${schedule.months.length} months · GHS ${schedule.monthlyGhs.toFixed(2)} / month · target GHS ${targetTotal.toFixed(2)}`
                 : "Based on recorded contributions on this account"}
             </p>
             <div className="relative mx-auto mt-6 flex h-44 w-44 items-center justify-center">

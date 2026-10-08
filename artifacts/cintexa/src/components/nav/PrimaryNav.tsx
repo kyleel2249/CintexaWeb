@@ -30,8 +30,10 @@ const SOLUTIONS: NavGroup = {
 };
 
 const NAV_LINKS = [
+  { label: "About", href: "/about" },
   { label: "Platform", href: "/platform" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "Blog", href: "/blog" },
+  { label: "Case studies", href: "/case-studies" },
   { label: "Careers", href: "/careers" },
   { label: "Contact", href: "/contact" },
 ];

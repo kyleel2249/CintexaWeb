@@ -6,59 +6,64 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://cintexa.com/careers</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.95</priority>
-  </url>
-  <url>
-    <loc>https://cintexa.com/careers/cleaner</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.95</priority>
-  </url>
-  <url>
-    <loc>https://cintexa.com/solutions/marketing</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://cintexa.com/solutions/sales</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://cintexa.com/solutions/ads-boost</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://cintexa.com/solutions/ecommerce</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://cintexa.com/solutions/website-development</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://cintexa.com/solutions/software-development</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://cintexa.com/about</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://cintexa.com/platform</loc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://cintexa.com/pricing</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <loc>https://cintexa.com/solutions/marketing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cintexa.com/get-started</loc>
+    <loc>https://cintexa.com/solutions/sales</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/solutions/ads-boost</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/solutions/ecommerce</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/solutions/website-development</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/solutions/software-development</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/case-studies</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/careers</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/careers/cleaner</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://cintexa.com/contact</loc>
@@ -66,14 +71,33 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cintexa.com/blog</loc>
-    <lastmod>2026-10-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <loc>https://cintexa.com/get-started</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/cookie-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/disclaimer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
   </url>
   <url>
     <loc>https://cintexa.com/blog/connected-technology-systems-for-business-growth</loc>
-    <lastmod>2026-10-01</lastmod>
+    <lastmod>2026-10-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
@@ -102,13 +126,39 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://cintexa.com/sign-in</loc>
+    <loc>https://cintexa.com/blog/business-automation-for-small-businesses</loc>
+    <lastmod>2026-10-08</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://cintexa.com/sign-up</loc>
+    <loc>https://cintexa.com/blog/technical-seo-checklist-for-business-websites</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.55</priority>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/blog/cybersecurity-basics-for-small-businesses-in-ghana</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/blog/digital-marketing-metrics-small-businesses-should-track</loc>
+    <lastmod>2026-10-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/blog/crm-data-quality-and-customer-follow-up</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/blog/using-business-data-to-make-better-decisions</loc>
+    <lastmod>2026-10-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
   </url>
 </urlset>

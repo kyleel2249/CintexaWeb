@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
+import { useLocation } from "wouter";
 import { PrimaryNav } from "@/components/nav/PrimaryNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { AdSenseFooterBanner } from "@/components/ads/AdSenseSlot";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
+  const [location] = useLocation();
+  const showPublicContentAds = location === "/" || location === "/about" || location === "/platform" || location === "/blog" || location.startsWith("/blog/") || location === "/case-studies" || location.startsWith("/solutions/");
   return (
     <div className="relative min-h-screen bg-[hsl(var(--bg))] text-[hsl(var(--fg))]">
       <a
@@ -17,7 +20,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <PrimaryNav />
       <main id="main-content">{children}</main>
       {/* Mobile-safe display unit: full-width responsive, reserved height, no fixed px width */}
-      <AdSenseFooterBanner />
+      {showPublicContentAds && <AdSenseFooterBanner />}
       <SiteFooter />
     </div>
   );

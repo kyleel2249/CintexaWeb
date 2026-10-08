@@ -182,6 +182,48 @@ export function useAuth(): AuthContextValue {
   return ctx;
 }
 
+
+/** Request a 6-digit recovery code (email + SMS when available). */
+export async function requestPasswordReset(email: string): Promise<
+  | { ok: true; message: string; channels?: { email: boolean; sms: boolean }; hasPhoneOnFile?: boolean }
+  | { ok: false; error: string }
+> {
+  try {
+    const data = await postAuth<{
+      ok: boolean;
+      message: string;
+      channels?: { email: boolean; sms: boolean };
+      hasPhoneOnFile?: boolean;
+    }>("/api/auth/forgot-password", { email: email.trim().toLowerCase() });
+    return {
+      ok: true,
+      message: data.message,
+      channels: data.channels,
+      hasPhoneOnFile: data.hasPhoneOnFile,
+    };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Could not send recovery code" };
+  }
+}
+
+/** Verify recovery code and set a new password. */
+export async function resetPasswordWithCode(
+  email: string,
+  code: string,
+  newPassword: string,
+): Promise<{ ok: true; message: string } | { ok: false; error: string }> {
+  try {
+    const data = await postAuth<{ ok: boolean; message: string }>("/api/auth/reset-password", {
+      email: email.trim().toLowerCase(),
+      code: code.trim(),
+      newPassword,
+    });
+    return { ok: true, message: data.message || "Password updated." };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Could not reset password" };
+  }
+}
+
 /** Compatibility helpers for components that previously used Clerk hooks */
 export function useUser() {
   const { user, isLoaded, isSignedIn } = useAuth();

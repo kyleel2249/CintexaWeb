@@ -202,18 +202,6 @@ export const SEO_MASTER_MAP: SeoPageEntry[] = [
     schemaType: "Service",
   },
   {
-    path: "/pricing",
-    primary: ["CINTEXA pricing", "platform fee"],
-    secondary: ["get started", "subscription ready platform", "business growth platform pricing"],
-    longTail: ["affordable platform fee for growing businesses"],
-    h1: "Simple Platform Pricing to Start Growing",
-    metaTitle: "Pricing & Platform Fee | Get Started with CINTEXA",
-    metaDescription:
-      "CINTEXA pricing for a subscription-ready SaaS business platform. Start with a clear platform fee and scale sales, marketing and ecommerce tools.",
-    imageAlt: ["CINTEXA pricing plans", "platform fee for business growth"],
-    schemaType: "WebPage",
-  },
-  {
     path: "/get-started",
     primary: ["get started CINTEXA"],
     secondary: ["create account", "customer accounts dashboard", "lead generation platform"],

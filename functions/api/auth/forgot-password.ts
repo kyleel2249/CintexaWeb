@@ -1,4 +1,4 @@
-import { escapeHtml, resolveResendConfig, sendEmail } from "../../lib/email";
+import { escapeHtml, resolveResendConfigAsync, sendEmail } from "../../lib/email";
 import { sendSms } from "../../lib/sms";
 import { corsHeaders, userKey, type StoredUser } from "../../lib/cintexa-auth";
 
@@ -47,19 +47,20 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return Response.json({ error: "Enter a valid email address." }, { status: 400, headers });
     }
 
-    // Require Resend so we never pretend an email was sent
-    const resend = resolveResendConfig(context.env as Record<string, unknown>);
+    // Require Resend (Pages env and/or KV secrets:RESEND_API_KEY)
+    const resend = await resolveResendConfigAsync(context.env as Record<string, unknown> & { KV?: KVNamespace });
     if (!resend.configured) {
       console.error(
         JSON.stringify({
           msg: "forgot_password_no_resend_key",
-          hint: "Set RESEND_API_KEY (and EMAIL_FROM) in Cloudflare Pages → Settings → Environment variables → Production",
+          source: resend.source,
+          hint: "Set RESEND_API_KEY in Pages Production env and redeploy, or KV key secrets:RESEND_API_KEY",
         }),
       );
       return Response.json(
         {
           error:
-            "Password recovery email is not configured yet. The site operator must set RESEND_API_KEY in Cloudflare Pages (Production). Meanwhile contact info@cintexa.com for help.",
+            "Password recovery email is not configured yet. Set RESEND_API_KEY in Cloudflare Pages (Production) and redeploy, or store it in KV as secrets:RESEND_API_KEY. Meanwhile contact info@cintexa.com.",
           code: "EMAIL_NOT_CONFIGURED",
         },
         { status: 503, headers },

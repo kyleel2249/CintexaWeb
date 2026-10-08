@@ -1,12 +1,3 @@
-
-/** Resolve Resend credentials from Cloudflare Pages env (multiple key names supported). */
-export function resolveResendConfig(env: Record<string, unknown> | { RESEND_API_KEY?: string; EMAIL_FROM?: string; RESEND_KEY?: string }) {
-  const e = env as Record<string, string | undefined>;
-  const apiKey = (e.RESEND_API_KEY || e.RESEND_KEY || e.RESEND_TOKEN || "").trim();
-  const from = (e.EMAIL_FROM || e.RESEND_FROM || "").trim() || "CINTEXA <onboarding@resend.dev>";
-  return { apiKey, from, configured: Boolean(apiKey) };
-}
-
 export type SendEmailInput = {
   to: string | string[];
   subject: string;
@@ -20,14 +11,107 @@ export type SendEmailResult =
   | { ok: true; id: string; dryRun?: boolean }
   | { ok: false; error: string; status?: number };
 
+const RESEND_KEY_NAMES = [
+  "RESEND_API_KEY",
+  "RESEND_KEY",
+  "RESEND_TOKEN",
+  "RESEND_API_TOKEN",
+];
+
+/**
+ * Resolve Resend credentials from Cloudflare Pages env.
+ * Scans known names case-insensitively (dashboard typos / casing).
+ */
+export function resolveResendConfig(
+  env: Record<string, unknown> | object,
+): { apiKey: string; from: string; configured: boolean; matchedKey: string | null } {
+  const record = env as Record<string, unknown>;
+  const keys = Object.keys(record || {});
+
+  let apiKey = "";
+  let matchedKey: string | null = null;
+
+  for (const name of RESEND_KEY_NAMES) {
+    const direct = record[name];
+    if (typeof direct === "string" && direct.trim()) {
+      apiKey = direct.trim();
+      matchedKey = name;
+      break;
+    }
+  }
+
+  if (!apiKey) {
+    for (const k of keys) {
+      if (/^resend[_-]?(api[_-]?)?(key|token)$/i.test(k)) {
+        const v = record[k];
+        if (typeof v === "string" && v.trim()) {
+          apiKey = v.trim();
+          matchedKey = k;
+          break;
+        }
+      }
+    }
+  }
+
+  const fromRaw = record.EMAIL_FROM ?? record.RESEND_FROM ?? record.FROM_EMAIL;
+  const from =
+    typeof fromRaw === "string" && fromRaw.trim()
+      ? fromRaw.trim()
+      : "CINTEXA <onboarding@resend.dev>";
+
+  return { apiKey, from, configured: Boolean(apiKey), matchedKey };
+}
+
+/** Optional KV fallback when Pages env vars are not injected into Functions. */
+export async function resolveResendConfigAsync(
+  env: Record<string, unknown> & { KV?: KVNamespace },
+): Promise<{ apiKey: string; from: string; configured: boolean; source: "env" | "kv" | "none"; matchedKey: string | null }> {
+  const fromEnv = resolveResendConfig(env);
+  if (fromEnv.configured) {
+    return { ...fromEnv, source: "env" };
+  }
+
+  const kv = env.KV;
+  if (kv) {
+    try {
+      const fromKv =
+        (await kv.get("secrets:RESEND_API_KEY")) ||
+        (await kv.get("RESEND_API_KEY")) ||
+        (await kv.get("config:resend_api_key"));
+      if (fromKv && fromKv.trim()) {
+        const fromOverride =
+          (await kv.get("secrets:EMAIL_FROM")) ||
+          (await kv.get("EMAIL_FROM")) ||
+          fromEnv.from;
+        return {
+          apiKey: fromKv.trim(),
+          from: (fromOverride || fromEnv.from).trim(),
+          configured: true,
+          source: "kv",
+          matchedKey: "KV",
+        };
+      }
+    } catch (err) {
+      console.error(JSON.stringify({ msg: "resend_kv_read_failed", error: String(err) }));
+    }
+  }
+
+  return { apiKey: "", from: fromEnv.from, configured: false, source: "none", matchedKey: null };
+}
+
 export async function sendEmail(
-  env: { RESEND_API_KEY?: string; EMAIL_FROM?: string; RESEND_KEY?: string; RESEND_TOKEN?: string; RESEND_FROM?: string },
+  env: Record<string, unknown> & {
+    RESEND_API_KEY?: string;
+    EMAIL_FROM?: string;
+    KV?: KVNamespace;
+  },
   input: SendEmailInput,
   options?: { allowDryRun?: boolean },
 ): Promise<SendEmailResult> {
-  const { apiKey: key, from } = resolveResendConfig(env);
+  const resolved = await resolveResendConfigAsync(env);
+  const key = resolved.apiKey;
+  const from = resolved.from;
   const to = Array.isArray(input.to) ? input.to : [input.to];
-  // Default: allow dry-run for non-critical mail. Password reset passes allowDryRun: false.
   const allowDryRun = options?.allowDryRun !== false;
 
   if (!key) {
@@ -37,6 +121,9 @@ export async function sendEmail(
         msg: "email_missing_RESEND_API_KEY",
         to,
         subject: input.subject,
+        envKeysSample: Object.keys(env || {})
+          .filter((k) => /resend|email|from/i.test(k))
+          .slice(0, 20),
       }),
     );
     if (allowDryRun) {
@@ -71,7 +158,6 @@ export async function sendEmail(
       id?: string;
       message?: string;
       name?: string;
-      statusCode?: number;
     };
     if (!res.ok) {
       const errMsg = data.message || data.name || `Resend HTTP ${res.status}`;

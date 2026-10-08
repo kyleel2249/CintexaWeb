@@ -101,13 +101,18 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                     </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="cx-btn cx-btn-secondary cx-btn-sm"
-                  onClick={() => void signOut().then(() => { window.location.href = "/"; })}
-                >
-                  Log out
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link href="/" className="cx-btn cx-btn-secondary cx-btn-sm">
+                    ← Back to site
+                  </Link>
+                  <button
+                    type="button"
+                    className="cx-btn cx-btn-secondary cx-btn-sm"
+                    onClick={() => void signOut().then(() => { window.location.href = "/"; })}
+                  >
+                    Log out
+                  </button>
+                </div>
               </div>
 
               <nav

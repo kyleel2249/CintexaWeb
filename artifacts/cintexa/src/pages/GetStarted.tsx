@@ -1,18 +1,17 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/lib/auth";
+import { AuthLogo3D } from "@/components/brand/AuthLogo3D";
 
 function goToDashboard() {
-  // Full navigation so dashboard always loads a fresh authenticated shell
   window.location.assign("/dashboard");
 }
 
 /**
- * CINTEXA authentication — create account or log in.
- * Successful signup / login always redirects to the customer dashboard.
+ * Compact, centered CINTEXA auth card — create account or log in.
  */
 export function GetStarted() {
-  const { signIn, signUp, isSignedIn, isLoaded, user } = useAuth();
+  const { signIn, signUp, isSignedIn, isLoaded } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("signup");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,28 +22,27 @@ export function GetStarted() {
   const [status, setStatus] = useState<"idle" | "working" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  // Already signed in → dashboard immediately
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      goToDashboard();
-    }
+    if (isLoaded && isSignedIn) goToDashboard();
   }, [isLoaded, isSignedIn]);
 
   if (!isLoaded || isSignedIn) {
     return (
-      <section className="cx-section">
-        <div className="cx-container max-w-md text-center">
-          <p className="cx-eyebrow">CINTEXA</p>
-          <h1 className="cx-display mt-2 text-2xl">
+      <div className="cx-auth-page">
+        <div className="cx-auth-card text-center">
+          <AuthLogo3D size={64} />
+          <p className="cx-eyebrow mt-4">CINTEXA</p>
+          <h1 className="cx-display mt-2 text-xl">
             {isSignedIn ? "Taking you to your dashboard…" : "Loading…"}
           </h1>
           {isSignedIn && (
-            <a href="/dashboard" className="cx-btn cx-btn-primary mt-8 inline-flex">
+            <a href="/dashboard" className="cx-btn cx-btn-primary mt-6 inline-flex">
               Continue to dashboard
             </a>
           )}
         </div>
-      </section>
+        <AuthPageStyles />
+      </div>
     );
   }
 
@@ -79,19 +77,28 @@ export function GetStarted() {
   }
 
   return (
-    <section className="cx-section">
-      <div className="cx-container max-w-md">
-        <p className="cx-eyebrow">CINTEXA account</p>
-        <h1 className="cx-display mt-2 text-3xl sm:text-4xl">
-          {mode === "login" ? "Log in" : "Create your account"}
+    <div className="cx-auth-page">
+      <div className="cx-auth-card">
+        <Link
+          href="/"
+          className="mb-1 inline-flex text-xs text-[hsl(var(--fg-muted))] transition hover:text-[hsl(var(--fg))]"
+        >
+          ← Back to home
+        </Link>
+
+        <AuthLogo3D size={68} />
+
+        <p className="cx-eyebrow mt-1 text-center">CINTEXA account</p>
+        <h1 className="cx-display mt-1 text-center text-xl sm:text-2xl">
+          {mode === "login" ? "Log in" : "Create account"}
         </h1>
-        <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">
+        <p className="mt-1.5 text-center text-xs text-[hsl(var(--fg-muted))]">
           {mode === "login"
-            ? "Access your dashboard, progress, and growth tools."
-            : "Join CINTEXA to track growth, contributions, and your customer portal."}
+            ? "Access your dashboard and growth tools."
+            : "Join CINTEXA — then open your customer portal."}
         </p>
 
-        <div className="mt-6 flex gap-2">
+        <div className="mt-4 flex gap-1.5">
           <button
             type="button"
             className={`cx-btn cx-btn-sm flex-1 ${mode === "signup" ? "cx-btn-primary" : "cx-btn-secondary"}`}
@@ -101,7 +108,7 @@ export function GetStarted() {
               setMessage("");
             }}
           >
-            Create account
+            Sign up
           </button>
           <button
             type="button"
@@ -116,12 +123,12 @@ export function GetStarted() {
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="cx-card mt-6 flex flex-col gap-4 p-6">
+        <form onSubmit={onSubmit} className="mt-4 flex flex-col gap-2.5">
           {mode === "signup" && (
-            <label className="flex flex-col gap-1.5">
-              <span className="text-xs text-[hsl(var(--fg-muted))]">Full name *</span>
+            <label className="flex flex-col gap-1">
+              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Full name *</span>
               <input
-                className="cx-input"
+                className="cx-input cx-input--sm"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 autoComplete="name"
@@ -129,86 +136,126 @@ export function GetStarted() {
               />
             </label>
           )}
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs text-[hsl(var(--fg-muted))]">Email *</span>
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] text-[hsl(var(--fg-muted))]">Email *</span>
             <input
               type="email"
-              className="cx-input"
+              className="cx-input cx-input--sm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
               required
             />
           </label>
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs text-[hsl(var(--fg-muted))]">Password *</span>
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] text-[hsl(var(--fg-muted))]">Password *</span>
             <input
               type="password"
-              className="cx-input"
+              className="cx-input cx-input--sm"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
               minLength={8}
               required
             />
-            {mode === "signup" && (
-              <span className="text-[10px] text-[hsl(var(--fg-muted))]">At least 8 characters</span>
-            )}
           </label>
           {mode === "signup" && (
             <>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-xs text-[hsl(var(--fg-muted))]">Phone / WhatsApp</span>
+              <label className="flex flex-col gap-1">
+                <span className="text-[11px] text-[hsl(var(--fg-muted))]">Phone / WhatsApp</span>
                 <input
                   type="tel"
-                  className="cx-input"
+                  className="cx-input cx-input--sm"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   autoComplete="tel"
                 />
               </label>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-xs text-[hsl(var(--fg-muted))]">Company</span>
-                <input
-                  className="cx-input"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  autoComplete="organization"
-                />
-              </label>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-xs text-[hsl(var(--fg-muted))]">Role</span>
-                <input
-                  className="cx-input"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  autoComplete="organization-title"
-                />
-              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="flex flex-col gap-1">
+                  <span className="text-[11px] text-[hsl(var(--fg-muted))]">Company</span>
+                  <input
+                    className="cx-input cx-input--sm"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    autoComplete="organization"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[11px] text-[hsl(var(--fg-muted))]">Role</span>
+                  <input
+                    className="cx-input cx-input--sm"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    autoComplete="organization-title"
+                  />
+                </label>
+              </div>
             </>
           )}
           {status === "error" && (
-            <p className="text-sm text-red-400" role="alert">
+            <p className="text-xs text-red-400" role="alert">
               {message}
             </p>
           )}
-          <button type="submit" className="cx-btn cx-btn-primary w-full" disabled={status === "working"}>
+          <button
+            type="submit"
+            className="cx-btn cx-btn-primary mt-1 w-full"
+            disabled={status === "working"}
+          >
             {status === "working"
               ? "Please wait…"
               : mode === "login"
-                ? "Log in"
+                ? "Log in to dashboard"
                 : "Create account"}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-xs text-[hsl(var(--fg-muted))]">
-          Looking for plans?{" "}
+        <p className="mt-4 text-center text-[11px] text-[hsl(var(--fg-muted))]">
           <Link href="/pricing" className="underline underline-offset-2 hover:text-[hsl(var(--fg))]">
-            See pricing
+            Pricing
+          </Link>
+          <span className="mx-1.5 opacity-40">·</span>
+          <Link href="/contact" className="underline underline-offset-2 hover:text-[hsl(var(--fg))]">
+            Contact
+          </Link>
+          <span className="mx-1.5 opacity-40">·</span>
+          <Link href="/platform" className="underline underline-offset-2 hover:text-[hsl(var(--fg))]">
+            Platform
           </Link>
         </p>
       </div>
-    </section>
+      <AuthPageStyles />
+    </div>
+  );
+}
+
+function AuthPageStyles() {
+  return (
+    <style>{`
+      .cx-auth-page {
+        min-height: calc(100vh - 8rem);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.25rem 1rem 2.5rem;
+      }
+      .cx-auth-card {
+        width: 100%;
+        max-width: 360px;
+        padding: 1.25rem 1.35rem 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid hsl(var(--border));
+        background: hsl(var(--bg-elevated) / 0.92);
+        box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(12px);
+      }
+      .cx-input--sm {
+        padding-top: 0.45rem;
+        padding-bottom: 0.45rem;
+        font-size: 0.875rem;
+      }
+    `}</style>
   );
 }
 

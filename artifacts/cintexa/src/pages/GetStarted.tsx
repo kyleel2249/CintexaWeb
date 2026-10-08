@@ -177,7 +177,7 @@ export function GetStarted() {
 
   const subtitle =
     mode === "login"
-      ? "Use your saved email and password — autofill is supported."
+      ? "Use your saved email and password."
       : mode === "signup"
         ? "Join CINTEXA — then open your customer portal."
         : mode === "forgot"
@@ -502,37 +502,18 @@ export function GetStarted() {
               type="button"
               className="text-center text-[11px] text-[hsl(var(--fg-muted))] hover:text-[hsl(var(--fg))]"
               onClick={() => {
-                setMode("forgot");
-                setStatus("idle");
-                setMessage("");
-                setCode("");
-              }}
-            >
-              Resend code
-            </button>
-            <button
-              type="button"
-              className="text-center text-[11px] text-[hsl(var(--fg-muted))] hover:text-[hsl(var(--fg))]"
-              onClick={() => {
                 setMode("login");
                 setStatus("idle");
                 setMessage("");
+                setCode("");
+                setNewPassword("");
+                setConfirmPassword("");
               }}
             >
               ← Back to log in
             </button>
           </form>
         )}
-
-        <p className="mt-4 text-center text-[11px] text-[hsl(var(--fg-muted))]">
-          <Link href="/pricing" className="underline underline-offset-2 hover:text-[hsl(var(--fg))]">
-            Pricing
-          </Link>
-          <span className="mx-1.5 opacity-40">·</span>
-          <Link href="/contact" className="underline underline-offset-2 hover:text-[hsl(var(--fg))]">
-            Contact
-          </Link>
-        </p>
       </div>
       <AuthPageStyles />
     </div>
@@ -543,29 +524,22 @@ function AuthPageStyles() {
   return (
     <style>{`
       .cx-auth-page {
-        min-height: calc(100vh - 8rem);
+        min-height: 100dvh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 1.25rem 1rem 2.5rem;
+        padding: 1.5rem;
+        background: hsl(var(--bg));
       }
       .cx-auth-card {
         width: 100%;
-        max-width: 360px;
-        padding: 1.25rem 1.35rem 1.5rem;
+        max-width: 400px;
+        padding: 1.75rem 1.5rem;
         border-radius: 1rem;
         border: 1px solid hsl(var(--border));
-        background: hsl(var(--bg-elevated) / 0.92);
-        box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.55);
-        backdrop-filter: blur(12px);
-      }
-      .cx-input--sm {
-        padding-top: 0.45rem;
-        padding-bottom: 0.45rem;
-        font-size: 0.875rem;
+        background: hsl(var(--bg-elevated));
+        box-shadow: 0 8px 32px hsl(0 0% 0% / 0.35);
       }
     `}</style>
   );
 }
-
-export default GetStarted;

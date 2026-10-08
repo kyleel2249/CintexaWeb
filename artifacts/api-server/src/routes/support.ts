@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAuth, getAuth } from "@clerk/express";
+import { requireAuth, getAuth } from "../middleware/cintexaAuth.js";
 import { z } from "zod";
 import { desc, eq, sql } from "drizzle-orm";
 import { db, supportTicketsTable } from "@cintexa/db";

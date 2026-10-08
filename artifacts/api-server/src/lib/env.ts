@@ -4,8 +4,9 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(8080),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  CLERK_SECRET_KEY: z.string().min(1, "CLERK_SECRET_KEY is required"),
-  CLERK_PUBLISHABLE_KEY: z.string().min(1, "CLERK_PUBLISHABLE_KEY is required"),
+  /** Optional shared secret for validating session tokens across services */
+  AUTH_SECRET: z.string().optional(),
+  AUTH_DEV_BYPASS: z.string().optional(),
   ADMIN_API_KEY: z.string().min(16, "ADMIN_API_KEY must be a long random string"),
   WEBHOOK_SECRET: z.string().min(16, "WEBHOOK_SECRET must be a long random string"),
   CORS_ORIGINS: z

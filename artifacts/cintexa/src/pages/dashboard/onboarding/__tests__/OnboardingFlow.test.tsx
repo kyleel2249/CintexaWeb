@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { OnboardingFlow } from "../OnboardingFlow";
 
-vi.mock("@clerk/clerk-react", () => ({
-  useAuth: () => ({ getToken: async () => "fake-token" }),
+vi.mock("@/lib/auth", () => ({
+  useAuth: () => ({ getToken: async () => "fake-token", isSignedIn: true, userId: "test-user" }),
 }));
 
 function renderFlow() {

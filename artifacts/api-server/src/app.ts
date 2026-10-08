@@ -2,7 +2,7 @@ import express, { type Request } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { clerkMiddleware } from "@clerk/express";
+import { cintexaAuthMiddleware } from "./middleware/cintexaAuth.js";
 import { pinoHttp } from "pino-http";
 import { logger } from "./lib/logger.js";
 import { healthRouter } from "./routes/health.js";
@@ -56,14 +56,14 @@ export function createApp() {
 
   app.use("/health", healthRouter);
 
-  // Clerk-authenticated routes only. Scoped here (not app-wide) so public
-  // routes are never affected by Clerk key validation.
-  app.use("/api/customer", clerkMiddleware(), customerRouter);
-  app.use("/api/contributions", clerkMiddleware(), contributionsRouter);
-  app.use("/api/activity", clerkMiddleware(), activityRouter);
-  app.use("/api/subscriptions", clerkMiddleware(), subscriptionsRouter);
-  app.use("/api/loyalty", clerkMiddleware(), loyaltyRouter);
-  app.use("/api/insights", clerkMiddleware(), insightsRouter);
+  // Authenticated routes only. Scoped here (not app-wide) so public
+  // routes are never affected by auth failures on public paths.
+  app.use("/api/customer", cintexaAuthMiddleware(), customerRouter);
+  app.use("/api/contributions", cintexaAuthMiddleware(), contributionsRouter);
+  app.use("/api/activity", cintexaAuthMiddleware(), activityRouter);
+  app.use("/api/subscriptions", cintexaAuthMiddleware(), subscriptionsRouter);
+  app.use("/api/loyalty", cintexaAuthMiddleware(), loyaltyRouter);
+  app.use("/api/insights", cintexaAuthMiddleware(), insightsRouter);
 
   app.use("/api/leaderboard", leaderboardRouter);
 

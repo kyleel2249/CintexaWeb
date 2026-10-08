@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { useClerk, useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@/lib/auth";
 import { DashboardShell } from "./DashboardShell";
 import { useDeleteMyData, useExportMyData, useMyProfile, useUpdateProfile } from "@/hooks/useApi";
 import { AVATAR_OPTIONS } from "@/lib/local-profile";
-import { clerkAppearance } from "@/lib/clerk-appearance";
 import { InsightPanel } from "@/components/insights/InsightPanel";
 
 export function DashboardSettings() {
   const { user } = useUser();
-  const clerk = useClerk();
+  const { signOut } = useAuth();
   const profile = useMyProfile();
   const updateProfile = useUpdateProfile();
   const exportData = useExportMyData();
@@ -144,16 +143,16 @@ export function DashboardSettings() {
 
         <div className="flex max-w-md flex-col gap-6">
           <section className="cx-card space-y-3">
-            <h2 className="cx-display text-lg">Security · two-factor authentication</h2>
+            <h2 className="cx-display text-lg">Session</h2>
             <p className="text-sm text-[hsl(var(--fg-muted))]">
-              Enable TOTP / 2FA in your account security center. Multi-factor options are managed by your identity provider for this deployment.
+              You are signed in with your CINTEXA account. Log out on shared devices when you are done.
             </p>
             <button
               type="button"
               className="cx-btn cx-btn-secondary w-fit"
-              onClick={() => clerk.openUserProfile({ appearance: clerkAppearance })}
+              onClick={() => void signOut().then(() => { window.location.href = "/get-started"; })}
             >
-              Open security settings
+              Log out
             </button>
           </section>
 

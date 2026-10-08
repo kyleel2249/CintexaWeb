@@ -1,7 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 
 /** Separate from lib/api.ts on purpose: admin calls authenticate with a static
- * key, never a Clerk token, and must never accidentally share that code path. */
+ * key, never a session token, and must never accidentally share that code path. */
 export async function adminFetch<T>(
   path: string,
   adminKey: string,

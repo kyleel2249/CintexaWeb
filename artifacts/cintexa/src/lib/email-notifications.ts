@@ -21,7 +21,7 @@ export type SignupPayload = {
   role?: string;
   message?: string;
   source?: string;
-  clerkUserId?: string;
+  accountId?: string;
 };
 
 export type NotifyResponse = {

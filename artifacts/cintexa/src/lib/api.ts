@@ -7,7 +7,7 @@ export class ApiError extends Error {
   }
 }
 
-/** Thin fetch wrapper: JSON in/out, Clerk bearer token, typed error on non-2xx. */
+/** Thin fetch wrapper: JSON in/out, CINTEXA bearer token, typed error on non-2xx. */
 export async function apiFetch<T>(
   path: string,
   options: { method?: string; body?: unknown; token?: string | null } = {},

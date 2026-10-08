@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<Props, State> {
         </h1>
         <p style={{ color: "#A6AEB8", maxWidth: 420 }}>
           Reloading usually fixes it. If it keeps happening, check the browser console and Cloudflare
-          env vars (especially VITE_CLERK_PUBLISHABLE_KEY).
+          env vars (especially authentication configuration).
         </p>
         {this.state.message ? (
           <pre

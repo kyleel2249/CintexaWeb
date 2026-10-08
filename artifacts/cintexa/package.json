@@ -13,8 +13,6 @@
   },
   "dependencies": {
     "@cintexa/db": "*",
-    "@clerk/clerk-react": "^5.19.0",
-    "@clerk/themes": "^2.2.14",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.7.0",
     "@tanstack/react-query": "^5.62.0",

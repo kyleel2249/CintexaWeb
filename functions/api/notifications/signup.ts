@@ -15,7 +15,7 @@ type Body = {
   role?: string;
   message?: string;
   source?: string;
-  clerkUserId?: string;
+  accountId?: string;
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -49,7 +49,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       role: (body.role || "").trim().slice(0, 80),
       message: (body.message || "").trim().slice(0, 2000),
       source: (body.source || "get_started").slice(0, 64),
-      clerkUserId: (body.clerkUserId || "").trim().slice(0, 128) || null,
+      accountId: (body.accountId || "").trim().slice(0, 128) || null,
       createdAt: new Date().toISOString(),
     };
 
@@ -77,7 +77,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           <tr><td style="padding:6px;color:#666">Company</td><td style="padding:6px">${escapeHtml(record.company || "—")}</td></tr>
           <tr><td style="padding:6px;color:#666">Role</td><td style="padding:6px">${escapeHtml(record.role || "—")}</td></tr>
           <tr><td style="padding:6px;color:#666">Source</td><td style="padding:6px">${escapeHtml(record.source)}</td></tr>
-          <tr><td style="padding:6px;color:#666">Clerk ID</td><td style="padding:6px">${escapeHtml(record.clerkUserId || "—")}</td></tr>
+          <tr><td style="padding:6px;color:#666">Account ID</td><td style="padding:6px">${escapeHtml(record.accountId || "—")}</td></tr>
           <tr><td style="padding:6px;color:#666">Message</td><td style="padding:6px">${escapeHtml(record.message || "—")}</td></tr>
           <tr><td style="padding:6px;color:#666">When</td><td style="padding:6px">${escapeHtml(record.createdAt)}</td></tr>
         </table>

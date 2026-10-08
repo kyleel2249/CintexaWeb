@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import { useAuth } from "@/lib/auth";
 import type { SubscriptionPlan } from "@cintexa/db/schema";
 import { useMySubscription, useSetSubscription } from "@/hooks/useApi";
 import {
@@ -104,6 +104,7 @@ function PlanButton({ plan }: { plan: (typeof PLANS)[number] }) {
 }
 
 export function Pricing() {
+  const { isSignedIn } = useAuth();
   const [code, setCode] = useState(readPromoCode() ?? "");
   const [msg, setMsg] = useState("");
   const promoOn = hasActivePromo();
@@ -175,23 +176,20 @@ export function Pricing() {
                   </li>
                 ))}
               </ul>
-              <SignedIn>
+              {isSignedIn ? (
                 <PlanButton plan={p} />
-              </SignedIn>
-              <SignedOut>
-                {p.id === "enterprise" ? (
-                  <Link href="/platform" className="cx-btn cx-btn-secondary mt-6 w-full">
-                    Talk with us
-                  </Link>
-                ) : (
-                  <Link
-                    href="/get-started"
-                    className={`cx-btn mt-6 w-full ${p.highlighted ? "cx-btn-primary" : "cx-btn-secondary"}`}
-                  >
-                    Get started
-                  </Link>
-                )}
-              </SignedOut>
+              ) : p.id === "enterprise" ? (
+                <Link href="/platform" className="cx-btn cx-btn-secondary mt-6 w-full">
+                  Talk with us
+                </Link>
+              ) : (
+                <Link
+                  href="/get-started"
+                  className={`cx-btn mt-6 w-full ${p.highlighted ? "cx-btn-primary" : "cx-btn-secondary"}`}
+                >
+                  Get started
+                </Link>
+              )}
             </div>
           ))}
         </div>

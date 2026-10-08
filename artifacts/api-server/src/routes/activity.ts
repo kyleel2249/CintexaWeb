@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAuth, getAuth } from "@clerk/express";
+import { requireAuth, getAuth } from "../middleware/cintexaAuth.js";
 import { desc, eq, sql } from "drizzle-orm";
 import { db, activityEventsTable } from "@cintexa/db";
 import { parsePageParams, buildPaginationMeta } from "../lib/pagination.js";

@@ -1,5 +1,5 @@
 import { Link, useRoute } from "wouter";
-import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@/lib/auth";
 import { useEffect, useState, type ReactNode } from "react";
 import { useMyProfile } from "@/hooks/useApi";
 import { OnboardingFlow } from "./onboarding/OnboardingFlow";
@@ -40,6 +40,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const [, params] = useRoute("/dashboard/:tab?");
   const activeHref = params?.tab ? `/dashboard/${params.tab}` : "/dashboard";
   const { user } = useUser();
+  const { isSignedIn, signOut } = useAuth();
   const profile = useMyProfile();
 
   const [streakDays, setStreakDays] = useState(0);
@@ -59,11 +60,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <SignedOut>
+      {!isSignedIn ? (
         <SignedOutPrompt />
-      </SignedOut>
-      <SignedIn>
-        {profile.isLoading ? (
+      ) : profile.isLoading ? (
           <div className="cx-section">
             <div className="cx-container">
               <p className="text-sm text-[hsl(var(--fg-muted))]">Loading your portal…</p>
@@ -102,7 +101,13 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                     </p>
                   </div>
                 </div>
-                <UserButton afterSignOutUrl="/" />
+                <button
+                  type="button"
+                  className="cx-btn cx-btn-secondary cx-btn-sm"
+                  onClick={() => void signOut().then(() => { window.location.href = "/"; })}
+                >
+                  Log out
+                </button>
               </div>
 
               <nav
@@ -127,7 +132,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         ) : (
           <OnboardingFlow />
         )}
-      </SignedIn>
     </>
   );
 }

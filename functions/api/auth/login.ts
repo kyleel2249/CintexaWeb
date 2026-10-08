@@ -1,3 +1,4 @@
+import { escapeHtml, sendEmail } from "../../lib/email";
 import {
   corsHeaders,
   createSession,
@@ -8,6 +9,9 @@ import {
 
 export interface Env {
   KV: KVNamespace;
+  RESEND_API_KEY?: string;
+  EMAIL_FROM?: string;
+  NOTIFY_ADMIN_EMAIL?: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,6 +42,48 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const token = await createSession(context.env.KV, user);
+
+    // Notify the user of this sign-in (fire-and-forget)
+    const when = new Date().toISOString();
+    const signInNotify = sendEmail(context.env, {
+      to: user.email,
+      subject: "You signed in to CINTEXA",
+      html: `
+        <div style="font-family:system-ui,sans-serif;max-width:560px;color:#0B0F14">
+          <p style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#B8860B;margin:0 0 8px">
+            CINTEXA · Security
+          </p>
+          <h2 style="margin:0 0 12px;font-size:20px">New sign-in</h2>
+          <p>Hi ${escapeHtml(user.fullName)},</p>
+          <p>Your CINTEXA account was just signed in successfully.</p>
+          <p style="color:#555;font-size:14px">Time: ${escapeHtml(when)}</p>
+          <p style="color:#555;font-size:14px">
+            If this wasn’t you, reset your password immediately at
+            <a href="https://cintexa.com/get-started">cintexa.com/get-started</a>
+            and contact <a href="mailto:info@cintexa.com">info@cintexa.com</a>.
+          </p>
+          <p style="margin-top:24px;font-size:13px;color:#777">— CINTEXA Team</p>
+        </div>`,
+      text: `Hi ${user.fullName}, your CINTEXA account was signed in at ${when}. If this wasn’t you, reset your password at https://cintexa.com/get-started`,
+      tags: [
+        { name: "type", value: "signin_notify" },
+        { name: "source", value: "auth_login" },
+      ],
+    }).catch((err) => {
+      console.error(
+        JSON.stringify({
+          msg: "signin_notify_failed",
+          email: user.email,
+          error: err instanceof Error ? err.message : String(err),
+        }),
+      );
+      return { ok: false as const, error: "notify_failed" };
+    });
+
+    if (context.waitUntil) {
+      context.waitUntil(signInNotify);
+    }
+
     return Response.json(
       {
         ok: true,

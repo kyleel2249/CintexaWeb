@@ -108,6 +108,66 @@ async function notifyAdminOfSignup(
   }
 }
 
+function welcomeEmailHtml(fullName: string): string {
+  const name = escapeHtml(fullName);
+  return `
+  <div style="font-family:system-ui,-apple-system,sans-serif;max-width:600px;margin:0 auto;color:#0B0F14;line-height:1.55">
+    <p style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#B8860B;margin:0 0 12px">
+      CINTEXA
+    </p>
+    <p>Hi ${name},</p>
+    <p>Thank you for signing up with CINTEXA. We’re pleased to have you connected with us.</p>
+    <p>CINTEXA provides technology and digital business solutions that help individuals, startups, and organizations build better systems, improve their operations, reach customers, and grow. Our work includes software development, website development, business automation, mobile applications, e-commerce solutions, digital marketing and advertising, SEO, customer relationship management, analytics, and other technology solutions tailored to business needs.</p>
+
+    <h3 style="font-size:16px;margin:28px 0 8px;color:#0B0F14">Staying Connected</h3>
+    <p>By signing up with CINTEXA, you agree to receive relevant information, announcements, opportunities, and updates from us as they become available.</p>
+    <p>We’ll keep you informed when there is something new that may be relevant to you, including CINTEXA services, initiatives, opportunities, announcements, and other updates.</p>
+
+    <h3 style="font-size:16px;margin:28px 0 8px;color:#0B0F14">Explore CINTEXA Career Opportunities</h3>
+    <p>We also encourage you to check our careers page regularly if you’re interested in working with CINTEXA or would like to hear about future opportunities.</p>
+    <p><a href="https://cintexa.com/careers" style="color:#B8860B;font-weight:600">CINTEXA Careers — https://cintexa.com/careers</a></p>
+    <p>New opportunities can become available at different times, so we encourage you to check back periodically.</p>
+
+    <p style="margin-top:28px">Thank you again for choosing to connect with CINTEXA. We look forward to keeping you informed and sharing what’s ahead.</p>
+    <p><strong>Your CINTEXA account is ready.</strong> Open your dashboard:
+      <a href="https://cintexa.com/dashboard" style="color:#B8860B;font-weight:600">cintexa.com/dashboard</a></p>
+
+    <p style="margin-top:32px">Best regards,<br/>
+    <strong>CINTEXA Team</strong><br/>
+    <span style="font-size:13px;color:#555">Software · Systems · Automation · Digital Solutions</span><br/>
+    <a href="https://cintexa.com" style="color:#B8860B">https://cintexa.com</a></p>
+  </div>`;
+}
+
+function welcomeEmailText(fullName: string): string {
+  return `Hi ${fullName},
+
+Thank you for signing up with CINTEXA. We’re pleased to have you connected with us.
+
+CINTEXA provides technology and digital business solutions that help individuals, startups, and organizations build better systems, improve their operations, reach customers, and grow. Our work includes software development, website development, business automation, mobile applications, e-commerce solutions, digital marketing and advertising, SEO, customer relationship management, analytics, and other technology solutions tailored to business needs.
+
+Staying Connected
+By signing up with CINTEXA, you agree to receive relevant information, announcements, opportunities, and updates from us as they become available.
+
+We’ll keep you informed when there is something new that may be relevant to you, including CINTEXA services, initiatives, opportunities, announcements, and other updates.
+
+Explore CINTEXA Career Opportunities
+We also encourage you to check our careers page regularly if you’re interested in working with CINTEXA or would like to hear about future opportunities.
+
+CINTEXA Careers — https://cintexa.com/careers
+
+New opportunities can become available at different times, so we encourage you to check back periodically.
+
+Thank you again for choosing to connect with CINTEXA. We look forward to keeping you informed and sharing what’s ahead.
+
+Your CINTEXA account is ready. Open your dashboard: https://cintexa.com/dashboard
+
+Best regards,
+CINTEXA Team
+Software · Systems · Automation · Digital Solutions
+https://cintexa.com`;
+}
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const headers = corsHeaders({ "Content-Type": "application/json" });
   try {
@@ -174,15 +234,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       await adminNotify;
     }
 
-    // Optional welcome to the user (account confirmation only — no mention of admin notify)
+    // Full welcome email to the new user
     const welcome = sendEmail(context.env, {
       to: email,
       subject: "Welcome to CINTEXA",
-      html: `<p>Hi ${escapeHtml(fullName)},</p>
-        <p>Your CINTEXA account is ready. Open your dashboard:
-        <a href="https://cintexa.com/dashboard">cintexa.com/dashboard</a></p>
-        <p>— CINTEXA</p>`,
-      text: `Welcome to CINTEXA. Dashboard: https://cintexa.com/dashboard`,
+      html: welcomeEmailHtml(fullName),
+      text: welcomeEmailText(fullName),
+      tags: [
+        { name: "type", value: "signup_welcome" },
+        { name: "source", value: "auth_signup" },
+      ],
     }).catch(() => ({ ok: false as const, error: "welcome_failed" }));
     if (context.waitUntil) context.waitUntil(welcome);
 

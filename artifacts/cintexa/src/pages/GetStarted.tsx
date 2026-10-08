@@ -3,18 +3,40 @@ import { Link } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { AuthLogo3D } from "@/components/brand/AuthLogo3D";
 
+const LAST_EMAIL_KEY = "cintexa_last_email";
+
 function goToDashboard() {
   window.location.assign("/dashboard");
 }
 
+function rememberEmail(email: string) {
+  try {
+    localStorage.setItem(LAST_EMAIL_KEY, email.trim().toLowerCase());
+  } catch {
+    /* private mode */
+  }
+}
+
+function readRememberedEmail(): string {
+  try {
+    return localStorage.getItem(LAST_EMAIL_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
 /**
  * Compact, centered CINTEXA auth card — create account or log in.
+ * Login/signup use separate forms + standard autocomplete tokens so
+ * browsers and password managers can autofill saved credentials.
  */
 export function GetStarted() {
   const { signIn, signUp, isSignedIn, isLoaded } = useAuth();
-  const [mode, setMode] = useState<"login" | "signup">("signup");
+  const remembered = readRememberedEmail();
+  // Returning visitors with a saved email land on Log in
+  const [mode, setMode] = useState<"login" | "signup">(remembered ? "login" : "signup");
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(remembered);
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
@@ -25,6 +47,14 @@ export function GetStarted() {
   useEffect(() => {
     if (isLoaded && isSignedIn) goToDashboard();
   }, [isLoaded, isSignedIn]);
+
+  // Re-apply remembered email when switching to login (helps after signup tab)
+  useEffect(() => {
+    if (mode === "login") {
+      const saved = readRememberedEmail();
+      if (saved && !email) setEmail(saved);
+    }
+  }, [mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLoaded || isSignedIn) {
     return (
@@ -46,24 +76,35 @@ export function GetStarted() {
     );
   }
 
-  async function onSubmit(e: FormEvent) {
+  async function onLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("working");
     setMessage("");
-    if (mode === "login") {
-      const result = await signIn(email.trim(), password);
-      if (!result.ok) {
-        setStatus("error");
-        setMessage(result.error);
-        return;
-      }
-      goToDashboard();
+    const fd = new FormData(e.currentTarget);
+    const loginEmail = String(fd.get("username") || email).trim();
+    const loginPassword = String(fd.get("password") || password);
+    const result = await signIn(loginEmail, loginPassword);
+    if (!result.ok) {
+      setStatus("error");
+      setMessage(result.error);
       return;
     }
+    rememberEmail(loginEmail);
+    goToDashboard();
+  }
+
+  async function onSignup(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setStatus("working");
+    setMessage("");
+    const fd = new FormData(e.currentTarget);
+    const signupEmail = String(fd.get("email") || email).trim();
+    const signupPassword = String(fd.get("password") || password);
+    const signupName = String(fd.get("name") || fullName).trim();
     const result = await signUp({
-      fullName: fullName.trim(),
-      email: email.trim(),
-      password,
+      fullName: signupName,
+      email: signupEmail,
+      password: signupPassword,
       phone: phone.trim() || undefined,
       company: company.trim() || undefined,
       role: role.trim() || undefined,
@@ -73,6 +114,7 @@ export function GetStarted() {
       setMessage(result.error);
       return;
     }
+    rememberEmail(signupEmail);
     goToDashboard();
   }
 
@@ -94,40 +136,110 @@ export function GetStarted() {
         </h1>
         <p className="mt-1.5 text-center text-xs text-[hsl(var(--fg-muted))]">
           {mode === "login"
-            ? "Access your dashboard and growth tools."
+            ? "Use your saved email and password — autofill is supported."
             : "Join CINTEXA — then open your customer portal."}
         </p>
 
-        <div className="mt-4 flex gap-1.5">
+        <div className="mt-4 flex gap-1.5" role="tablist" aria-label="Account mode">
           <button
             type="button"
+            role="tab"
+            aria-selected={mode === "signup"}
             className={`cx-btn cx-btn-sm flex-1 ${mode === "signup" ? "cx-btn-primary" : "cx-btn-secondary"}`}
             onClick={() => {
               setMode("signup");
               setStatus("idle");
               setMessage("");
+              setPassword("");
             }}
           >
             Sign up
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={mode === "login"}
             className={`cx-btn cx-btn-sm flex-1 ${mode === "login" ? "cx-btn-primary" : "cx-btn-secondary"}`}
             onClick={() => {
               setMode("login");
               setStatus("idle");
               setMessage("");
+              setPassword("");
+              const saved = readRememberedEmail();
+              if (saved) setEmail(saved);
             }}
           >
             Log in
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="mt-4 flex flex-col gap-2.5">
-          {mode === "signup" && (
-            <label className="flex flex-col gap-1">
+        {mode === "login" ? (
+          <form
+            key="login-form"
+            method="post"
+            action="/get-started"
+            autoComplete="on"
+            onSubmit={onLogin}
+            className="mt-4 flex flex-col gap-2.5"
+          >
+            <label className="flex flex-col gap-1" htmlFor="cintexa-login-email">
+              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Email *</span>
+              <input
+                id="cintexa-login-email"
+                name="username"
+                type="email"
+                inputMode="email"
+                className="cx-input cx-input--sm"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1" htmlFor="cintexa-login-password">
+              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Password *</span>
+              <input
+                id="cintexa-login-password"
+                name="password"
+                type="password"
+                className="cx-input cx-input--sm"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+            </label>
+            {status === "error" && (
+              <p className="text-xs text-red-400" role="alert">
+                {message}
+              </p>
+            )}
+            <button
+              type="submit"
+              className="cx-btn cx-btn-primary mt-1 w-full"
+              disabled={status === "working"}
+            >
+              {status === "working" ? "Please wait…" : "Log in to dashboard"}
+            </button>
+          </form>
+        ) : (
+          <form
+            key="signup-form"
+            method="post"
+            action="/get-started"
+            autoComplete="on"
+            onSubmit={onSignup}
+            className="mt-4 flex flex-col gap-2.5"
+          >
+            <label className="flex flex-col gap-1" htmlFor="cintexa-signup-name">
               <span className="text-[11px] text-[hsl(var(--fg-muted))]">Full name *</span>
               <input
+                id="cintexa-signup-name"
+                name="name"
+                type="text"
                 className="cx-input cx-input--sm"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -135,81 +247,89 @@ export function GetStarted() {
                 required
               />
             </label>
-          )}
-          <label className="flex flex-col gap-1">
-            <span className="text-[11px] text-[hsl(var(--fg-muted))]">Email *</span>
-            <input
-              type="email"
-              className="cx-input cx-input--sm"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-[11px] text-[hsl(var(--fg-muted))]">Password *</span>
-            <input
-              type="password"
-              className="cx-input cx-input--sm"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              minLength={8}
-              required
-            />
-          </label>
-          {mode === "signup" && (
-            <>
-              <label className="flex flex-col gap-1">
-                <span className="text-[11px] text-[hsl(var(--fg-muted))]">Phone / WhatsApp</span>
+            <label className="flex flex-col gap-1" htmlFor="cintexa-signup-email">
+              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Email *</span>
+              <input
+                id="cintexa-signup-email"
+                name="email"
+                type="email"
+                inputMode="email"
+                className="cx-input cx-input--sm"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1" htmlFor="cintexa-signup-password">
+              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Password *</span>
+              <input
+                id="cintexa-signup-password"
+                name="password"
+                type="password"
+                className="cx-input cx-input--sm"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1" htmlFor="cintexa-signup-phone">
+              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Phone / WhatsApp</span>
+              <input
+                id="cintexa-signup-phone"
+                name="tel"
+                type="tel"
+                className="cx-input cx-input--sm"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                autoComplete="tel"
+              />
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex flex-col gap-1" htmlFor="cintexa-signup-company">
+                <span className="text-[11px] text-[hsl(var(--fg-muted))]">Company</span>
                 <input
-                  type="tel"
+                  id="cintexa-signup-company"
+                  name="organization"
+                  type="text"
                   className="cx-input cx-input--sm"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  autoComplete="tel"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  autoComplete="organization"
                 />
               </label>
-              <div className="grid grid-cols-2 gap-2">
-                <label className="flex flex-col gap-1">
-                  <span className="text-[11px] text-[hsl(var(--fg-muted))]">Company</span>
-                  <input
-                    className="cx-input cx-input--sm"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    autoComplete="organization"
-                  />
-                </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-[11px] text-[hsl(var(--fg-muted))]">Role</span>
-                  <input
-                    className="cx-input cx-input--sm"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    autoComplete="organization-title"
-                  />
-                </label>
-              </div>
-            </>
-          )}
-          {status === "error" && (
-            <p className="text-xs text-red-400" role="alert">
-              {message}
-            </p>
-          )}
-          <button
-            type="submit"
-            className="cx-btn cx-btn-primary mt-1 w-full"
-            disabled={status === "working"}
-          >
-            {status === "working"
-              ? "Please wait…"
-              : mode === "login"
-                ? "Log in to dashboard"
-                : "Create account"}
-          </button>
-        </form>
+              <label className="flex flex-col gap-1" htmlFor="cintexa-signup-role">
+                <span className="text-[11px] text-[hsl(var(--fg-muted))]">Role</span>
+                <input
+                  id="cintexa-signup-role"
+                  name="organization-title"
+                  type="text"
+                  className="cx-input cx-input--sm"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  autoComplete="organization-title"
+                />
+              </label>
+            </div>
+            {status === "error" && (
+              <p className="text-xs text-red-400" role="alert">
+                {message}
+              </p>
+            )}
+            <button
+              type="submit"
+              className="cx-btn cx-btn-primary mt-1 w-full"
+              disabled={status === "working"}
+            >
+              {status === "working" ? "Please wait…" : "Create account"}
+            </button>
+          </form>
+        )}
 
         <p className="mt-4 text-center text-[11px] text-[hsl(var(--fg-muted))]">
           <Link href="/pricing" className="underline underline-offset-2 hover:text-[hsl(var(--fg))]">

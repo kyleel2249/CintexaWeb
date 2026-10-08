@@ -40,6 +40,7 @@ const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ defaul
 const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DashboardOverview = lazy(() => import("@/pages/dashboard/Overview").then((m) => ({ default: m.DashboardOverview })));
 const DashboardProgress = lazy(() => import("@/pages/dashboard/Progress").then((m) => ({ default: m.DashboardProgress })));
+const DashboardContributions = lazy(() => import("@/pages/dashboard/Contributions").then((m) => ({ default: m.DashboardContributions })));
 const DashboardLeaderboard = lazy(() => import("@/pages/dashboard/Leaderboard").then((m) => ({ default: m.DashboardLeaderboard })));
 const DashboardSettings = lazy(() => import("@/pages/dashboard/Settings").then((m) => ({ default: m.DashboardSettings })));
 const DashboardAnalytics = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardAnalytics })));
@@ -92,6 +93,7 @@ export default function App() {
               <Route path="/dashboard/email" component={DashboardEmail} />
               <Route path="/dashboard/faq" component={DashboardFaq} />
               <Route path="/dashboard/progress" component={DashboardProgress} />
+              <Route path="/dashboard/contributions" component={DashboardContributions} />
               <Route path="/dashboard/leaderboard" component={DashboardLeaderboard} />
               <Route path="/dashboard/careers" component={DashboardCareers} />
               <Route path="/dashboard/settings" component={DashboardSettings} />

@@ -14,6 +14,7 @@ const TABS = [
   { label: "Email", href: "/dashboard/email" },
   { label: "FAQ", href: "/dashboard/faq" },
   { label: "Progress", href: "/dashboard/progress" },
+  { label: "Contributions", href: "/dashboard/contributions" },
   { label: "Leaderboard", href: "/dashboard/leaderboard" },
   { label: "Careers", href: "/dashboard/careers" },
   { label: "Settings", href: "/dashboard/settings" },

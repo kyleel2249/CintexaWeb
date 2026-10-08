@@ -35,6 +35,8 @@ const Contact = lazy(() => import("@/pages/Contact").then((m) => ({ default: m.C
 const Careers = lazy(() => import("@/pages/Careers").then((m) => ({ default: m.Careers })));
 const JobDetail = lazy(() => import("@/pages/JobDetail").then((m) => ({ default: m.JobDetail })));
 const Blog = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.Blog })));
+const BlogArticle = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.BlogArticle })));
+const { About, CaseStudies, PrivacyPolicy, Terms, CookiePolicy, Disclaimer } = await import("@/pages/TrustPages");
 const Platform = lazyRetry(() => import("@/pages/Platform"));
 const Pricing = lazy(() => import("@/pages/Pricing").then((m) => ({ default: m.Pricing })));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
@@ -80,12 +82,18 @@ export default function App() {
               <Route path="/solutions/ecommerce" component={Ecommerce} />
               <Route path="/solutions/website-development" component={WebsiteDev} />
               <Route path="/solutions/software-development" component={SoftwareDev} />
+              <Route path="/about" component={About} />
+              <Route path="/case-studies" component={CaseStudies} />
+              <Route path="/privacy-policy" component={PrivacyPolicy} />
+              <Route path="/terms" component={Terms} />
+              <Route path="/cookie-policy" component={CookiePolicy} />
+              <Route path="/disclaimer" component={Disclaimer} />
               <Route path="/contact" component={Contact} />
+              <Route path="/blog/:slug" component={BlogArticle} />
               <Route path="/blog" component={Blog} />
               <Route path="/careers/:id" component={JobDetail} />
               <Route path="/careers" component={Careers} />
               <Route path="/platform" component={Platform} />
-              <Route path="/pricing" component={Pricing} />
               <Route path="/get-started" component={GetStarted} />
               <Route path="/sign-in" component={GetStarted} />
               <Route path="/sign-up" component={GetStarted} />

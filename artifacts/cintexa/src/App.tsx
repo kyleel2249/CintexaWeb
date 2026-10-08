@@ -42,7 +42,6 @@ const PrivacyPolicy = lazy(() => import("@/pages/LegalPages").then((m) => ({ def
 const Terms = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.Terms })));
 const CookiePolicy = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.CookiePolicy })));
 const Disclaimer = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.Disclaimer })));
-const Platform = lazyRetry(() => import("@/pages/Platform"));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
 const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DashboardOverview = lazy(() => import("@/pages/dashboard/Overview").then((m) => ({ default: m.DashboardOverview })));
@@ -97,7 +96,6 @@ export default function App() {
               <Route path="/blog" component={Blog} />
               <Route path="/careers/:id" component={JobDetail} />
               <Route path="/careers" component={Careers} />
-              <Route path="/platform" component={Platform} />
               <Route path="/get-started" component={GetStarted} />
               <Route path="/sign-in" component={GetStarted} />
               <Route path="/sign-up" component={GetStarted} />

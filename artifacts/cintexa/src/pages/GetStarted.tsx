@@ -30,7 +30,7 @@ export function GetStarted() {
     return (
       <div className="cx-auth-page">
         <div className="cx-auth-card text-center">
-          <AuthLogo3D size={64} />
+          <AuthLogo3D size={36} />
           <p className="cx-eyebrow mt-4">CINTEXA</p>
           <h1 className="cx-display mt-2 text-xl">
             {isSignedIn ? "Taking you to your dashboard…" : "Loading…"}
@@ -86,7 +86,7 @@ export function GetStarted() {
           ← Back to home
         </Link>
 
-        <AuthLogo3D size={68} />
+        <AuthLogo3D size={36} />
 
         <p className="cx-eyebrow mt-1 text-center">CINTEXA account</p>
         <h1 className="cx-display mt-1 text-center text-xl sm:text-2xl">

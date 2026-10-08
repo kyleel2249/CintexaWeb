@@ -1,9 +1,9 @@
 /**
- * CINTEXA mark for the auth card — CSS 3D stage with entrance tumble,
- * float, dual orbit rings, breathing shadow, and drifting gold glows.
+ * Compact CINTEXA mark that travels continuously around a spin circle.
+ * Perspective stage, dual rings, gold glows, breathing shadow.
  * Honors prefers-reduced-motion.
  */
-export function AuthLogo3D({ size = 72 }: { size?: number }) {
+export function AuthLogo3D({ size = 40 }: { size?: number }) {
   return (
     <div className="cx-auth-logo" style={{ ["--logo-size" as string]: `${size}px` }} aria-hidden>
       <div className="cx-auth-logo__stage">
@@ -11,45 +11,61 @@ export function AuthLogo3D({ size = 72 }: { size?: number }) {
         <div className="cx-auth-logo__glow cx-auth-logo__glow--b" />
         <div className="cx-auth-logo__ring cx-auth-logo__ring--outer" />
         <div className="cx-auth-logo__ring cx-auth-logo__ring--inner" />
-        <div className="cx-auth-logo__mark-wrap">
-          <img
-            src="/favicon.svg"
-            alt=""
-            width={size}
-            height={size}
-            className="cx-auth-logo__mark"
-            draggable={false}
-          />
+
+        {/* Rotating carrier — logo rides the circle */}
+        <div className="cx-auth-logo__spin">
+          <div className="cx-auth-logo__mark-wrap">
+            <img
+              src="/favicon.svg"
+              alt=""
+              width={size}
+              height={size}
+              className="cx-auth-logo__mark"
+              draggable={false}
+            />
+          </div>
         </div>
+
         <div className="cx-auth-logo__shadow" />
       </div>
       <style>{`
         .cx-auth-logo {
-          --logo-size: 72px;
+          --logo-size: 40px;
+          --orbit: calc(var(--logo-size) * 1.55);
           display: flex;
           justify-content: center;
           align-items: center;
-          height: calc(var(--logo-size) * 1.85);
-          margin: 0 auto;
+          height: calc(var(--orbit) * 2 + var(--logo-size) * 0.35);
+          margin: 0 auto 0.15rem;
         }
         .cx-auth-logo__stage {
           position: relative;
-          width: calc(var(--logo-size) * 1.7);
-          height: calc(var(--logo-size) * 1.7);
+          width: calc(var(--orbit) * 2 + var(--logo-size));
+          height: calc(var(--orbit) * 2 + var(--logo-size));
           perspective: 1200px;
           transform-style: preserve-3d;
         }
-        .cx-auth-logo__mark-wrap {
+        /* Continuous spin around the circle */
+        .cx-auth-logo__spin {
           position: absolute;
           inset: 50% auto auto 50%;
+          width: 0;
+          height: 0;
+          transform-style: preserve-3d;
+          animation: cx-auth-spin 7s linear infinite;
+          z-index: 3;
+        }
+        .cx-auth-logo__mark-wrap {
+          position: absolute;
+          left: 0;
+          top: 0;
           width: var(--logo-size);
           height: var(--logo-size);
-          margin: calc(var(--logo-size) / -2) 0 0 calc(var(--logo-size) / -2);
+          /* Sit on the ring path */
+          transform: translate(-50%, calc(-1 * var(--orbit))) rotateX(8deg);
           transform-style: preserve-3d;
-          animation:
-            cx-auth-entrance 1.1s cubic-bezier(0.16, 1, 0.3, 1) both,
-            cx-auth-float 4.5s ease-in-out 1.1s infinite;
-          z-index: 3;
+          /* Counter-rotate so the mark stays upright while orbiting */
+          animation: cx-auth-counter 7s linear infinite;
         }
         .cx-auth-logo__mark {
           display: block;
@@ -57,45 +73,44 @@ export function AuthLogo3D({ size = 72 }: { size?: number }) {
           height: 100%;
           border-radius: 22%;
           box-shadow:
-            0 8px 28px rgba(0, 0, 0, 0.45),
-            0 0 0 1px rgba(245, 197, 24, 0.25);
+            0 6px 18px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(245, 197, 24, 0.3),
+            0 0 16px rgba(245, 197, 24, 0.2);
         }
         .cx-auth-logo__ring {
           position: absolute;
           inset: 50% auto auto 50%;
           border-radius: 50%;
-          border: 1.5px solid rgba(245, 197, 24, 0.45);
-          transform-style: preserve-3d;
           pointer-events: none;
           z-index: 2;
+          transform-style: preserve-3d;
         }
         .cx-auth-logo__ring--outer {
-          width: calc(var(--logo-size) * 1.45);
-          height: calc(var(--logo-size) * 1.45);
-          margin: calc(var(--logo-size) * -0.725) 0 0 calc(var(--logo-size) * -0.725);
-          animation: cx-auth-orbit-a 10s linear infinite;
-          border-color: rgba(245, 197, 24, 0.4);
-          box-shadow: 0 0 18px rgba(245, 197, 24, 0.12);
+          width: calc(var(--orbit) * 2);
+          height: calc(var(--orbit) * 2);
+          margin: calc(var(--orbit) * -1) 0 0 calc(var(--orbit) * -1);
+          border: 1.5px solid rgba(245, 197, 24, 0.4);
+          box-shadow: 0 0 14px rgba(245, 197, 24, 0.12);
+          animation: cx-auth-ring-tilt-a 10s linear infinite;
         }
         .cx-auth-logo__ring--inner {
-          width: calc(var(--logo-size) * 1.15);
-          height: calc(var(--logo-size) * 1.15);
-          margin: calc(var(--logo-size) * -0.575) 0 0 calc(var(--logo-size) * -0.575);
-          animation: cx-auth-orbit-b 7s linear infinite;
-          border-color: rgba(245, 197, 24, 0.28);
-          border-style: dashed;
+          width: calc(var(--orbit) * 1.55);
+          height: calc(var(--orbit) * 1.55);
+          margin: calc(var(--orbit) * -0.775) 0 0 calc(var(--orbit) * -0.775);
+          border: 1px dashed rgba(245, 197, 24, 0.28);
+          animation: cx-auth-ring-tilt-b 8s linear infinite;
         }
         .cx-auth-logo__shadow {
           position: absolute;
           left: 50%;
-          bottom: 6%;
-          width: calc(var(--logo-size) * 0.85);
-          height: 10px;
-          margin-left: calc(var(--logo-size) * -0.425);
+          bottom: 8%;
+          width: calc(var(--logo-size) * 1.4);
+          height: 8px;
+          margin-left: calc(var(--logo-size) * -0.7);
           border-radius: 50%;
-          background: radial-gradient(ellipse, rgba(0, 0, 0, 0.55) 0%, transparent 70%);
-          filter: blur(4px);
-          animation: cx-auth-shadow 4.5s ease-in-out 1.1s infinite;
+          background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
+          filter: blur(3px);
+          animation: cx-auth-shadow 7s linear infinite;
           z-index: 1;
         }
         .cx-auth-logo__glow {
@@ -103,59 +118,57 @@ export function AuthLogo3D({ size = 72 }: { size?: number }) {
           border-radius: 50%;
           pointer-events: none;
           z-index: 0;
-          filter: blur(18px);
+          filter: blur(16px);
         }
         .cx-auth-logo__glow--a {
-          width: 70%;
-          height: 70%;
-          top: 5%;
-          left: 5%;
-          background: radial-gradient(circle, rgba(245, 197, 24, 0.35) 0%, transparent 70%);
+          width: 65%;
+          height: 65%;
+          top: 8%;
+          left: 8%;
+          background: radial-gradient(circle, rgba(245, 197, 24, 0.32) 0%, transparent 70%);
           animation: cx-auth-glow-a 6s ease-in-out infinite;
         }
         .cx-auth-logo__glow--b {
-          width: 55%;
-          height: 55%;
-          bottom: 8%;
-          right: 4%;
-          background: radial-gradient(circle, rgba(245, 197, 24, 0.22) 0%, transparent 70%);
+          width: 50%;
+          height: 50%;
+          bottom: 10%;
+          right: 6%;
+          background: radial-gradient(circle, rgba(245, 197, 24, 0.2) 0%, transparent 70%);
           animation: cx-auth-glow-b 7.5s ease-in-out infinite;
         }
-        @keyframes cx-auth-entrance {
-          0% {
-            opacity: 0;
-            transform: rotateX(48deg) rotateY(-36deg) rotateZ(18deg) scale(0.35);
-          }
-          100% {
-            opacity: 1;
-            transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
-          }
+        @keyframes cx-auth-spin {
+          from { transform: rotateZ(0deg); }
+          to { transform: rotateZ(360deg); }
         }
-        @keyframes cx-auth-float {
-          0%, 100% { transform: translateY(0) rotateX(4deg) rotateY(-3deg); }
-          50% { transform: translateY(-7px) rotateX(-3deg) rotateY(4deg); }
+        @keyframes cx-auth-counter {
+          from { transform: translate(-50%, calc(-1 * var(--orbit))) rotateZ(0deg); }
+          to { transform: translate(-50%, calc(-1 * var(--orbit))) rotateZ(-360deg); }
         }
-        @keyframes cx-auth-orbit-a {
-          from { transform: rotateX(68deg) rotateZ(0deg); }
-          to { transform: rotateX(68deg) rotateZ(360deg); }
+        @keyframes cx-auth-ring-tilt-a {
+          from { transform: rotateX(72deg) rotateZ(0deg); }
+          to { transform: rotateX(72deg) rotateZ(360deg); }
         }
-        @keyframes cx-auth-orbit-b {
-          from { transform: rotateX(62deg) rotateY(12deg) rotateZ(0deg); }
-          to { transform: rotateX(62deg) rotateY(12deg) rotateZ(-360deg); }
+        @keyframes cx-auth-ring-tilt-b {
+          from { transform: rotateX(66deg) rotateY(10deg) rotateZ(0deg); }
+          to { transform: rotateX(66deg) rotateY(10deg) rotateZ(-360deg); }
         }
         @keyframes cx-auth-shadow {
-          0%, 100% { opacity: 0.55; transform: scaleX(1); }
-          50% { opacity: 0.35; transform: scaleX(0.82); }
+          0%   { opacity: 0.5; transform: scaleX(1) translateX(0); }
+          25%  { opacity: 0.4; transform: scaleX(0.9) translateX(6px); }
+          50%  { opacity: 0.35; transform: scaleX(0.8) translateX(0); }
+          75%  { opacity: 0.4; transform: scaleX(0.9) translateX(-6px); }
+          100% { opacity: 0.5; transform: scaleX(1) translateX(0); }
         }
         @keyframes cx-auth-glow-a {
           0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
-          50% { transform: translate(10%, 8%) scale(1.12); opacity: 1; }
+          50% { transform: translate(8%, 6%) scale(1.1); opacity: 1; }
         }
         @keyframes cx-auth-glow-b {
           0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
-          50% { transform: translate(-12%, -6%) scale(1.15); opacity: 0.95; }
+          50% { transform: translate(-10%, -5%) scale(1.12); opacity: 0.95; }
         }
         @media (prefers-reduced-motion: reduce) {
+          .cx-auth-logo__spin,
           .cx-auth-logo__mark-wrap,
           .cx-auth-logo__ring--outer,
           .cx-auth-logo__ring--inner,
@@ -164,9 +177,13 @@ export function AuthLogo3D({ size = 72 }: { size?: number }) {
           .cx-auth-logo__glow--b {
             animation: none !important;
           }
-          .cx-auth-logo__mark-wrap {
-            opacity: 1;
+          .cx-auth-logo__spin {
             transform: none;
+          }
+          .cx-auth-logo__mark-wrap {
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
           }
         }
       `}</style>

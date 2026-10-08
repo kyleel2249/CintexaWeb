@@ -64,7 +64,7 @@ export function resolveResendConfig(
 
 /** Optional KV fallback when Pages env vars are not injected into Functions. */
 export async function resolveResendConfigAsync(
-  env: Record<string, unknown> & { KV?: KVNamespace },
+  env: object & { RESEND_API_KEY?: string; EMAIL_FROM?: string; RESEND_KEY?: string; RESEND_TOKEN?: string; RESEND_API_TOKEN?: string; RESEND_FROM?: string; FROM_EMAIL?: string; KV?: KVNamespace },
 ): Promise<{ apiKey: string; from: string; configured: boolean; source: "env" | "kv" | "none"; matchedKey: string | null }> {
   const fromEnv = resolveResendConfig(env);
   if (fromEnv.configured) {
@@ -100,9 +100,14 @@ export async function resolveResendConfigAsync(
 }
 
 export async function sendEmail(
-  env: Record<string, unknown> & {
+  env: object & {
     RESEND_API_KEY?: string;
     EMAIL_FROM?: string;
+    RESEND_KEY?: string;
+    RESEND_TOKEN?: string;
+    RESEND_API_TOKEN?: string;
+    RESEND_FROM?: string;
+    FROM_EMAIL?: string;
     KV?: KVNamespace;
   },
   input: SendEmailInput,

@@ -4,59 +4,77 @@ export type SendEmailInput = {
   html: string;
   text?: string;
   replyTo?: string;
-  /** Resend's email-categorization tags (shown in their dashboard/webhooks). */
   tags?: { name: string; value: string }[];
 };
 
 export type SendEmailResult =
   | { ok: true; id: string; dryRun?: boolean }
-  | { ok: false; error: string };
+  | { ok: false; error: string; status?: number };
 
 export async function sendEmail(
   env: { RESEND_API_KEY?: string; EMAIL_FROM?: string },
   input: SendEmailInput,
+  options?: { allowDryRun?: boolean },
 ): Promise<SendEmailResult> {
-  const from = env.EMAIL_FROM || "CINTEXA <onboarding@resend.dev>";
+  const from = (env.EMAIL_FROM || "").trim() || "CINTEXA <onboarding@resend.dev>";
   const to = Array.isArray(input.to) ? input.to : [input.to];
-  const key = env.RESEND_API_KEY?.trim();
+  const key = (env.RESEND_API_KEY || "").trim();
+  // Default: allow dry-run for non-critical mail. Password reset passes allowDryRun: false.
+  const allowDryRun = options?.allowDryRun !== false;
 
   if (!key) {
-    console.log(
+    console.error(
       JSON.stringify({
-        level: "warn",
-        msg: "email_dry_run_missing_RESEND_API_KEY",
+        level: "error",
+        msg: "email_missing_RESEND_API_KEY",
         to,
         subject: input.subject,
       }),
     );
-    return { ok: true, id: `dry_${Date.now()}`, dryRun: true };
+    if (allowDryRun) {
+      return { ok: true, id: `dry_${Date.now()}`, dryRun: true };
+    }
+    return {
+      ok: false,
+      error: "Email service is not configured (RESEND_API_KEY). Contact info@cintexa.com.",
+    };
   }
 
   try {
+    const payload: Record<string, unknown> = {
+      from,
+      to,
+      subject: input.subject,
+      html: input.html,
+    };
+    if (input.text) payload.text = input.text;
+    if (input.replyTo) payload.reply_to = input.replyTo;
+    if (input.tags?.length) payload.tags = input.tags;
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from,
-        to,
-        subject: input.subject,
-        html: input.html,
-        text: input.text,
-        reply_to: input.replyTo,
-        tags: input.tags,
-      }),
+      body: JSON.stringify(payload),
     });
-    const data = (await res.json()) as { id?: string; message?: string };
+    const data = (await res.json().catch(() => ({}))) as {
+      id?: string;
+      message?: string;
+      name?: string;
+      statusCode?: number;
+    };
     if (!res.ok) {
-      console.error(JSON.stringify({ msg: "resend_error", status: res.status, data }));
-      return { ok: false, error: data.message || `Resend HTTP ${res.status}` };
+      const errMsg = data.message || data.name || `Resend HTTP ${res.status}`;
+      console.error(JSON.stringify({ msg: "resend_error", status: res.status, data, from, to }));
+      return { ok: false, error: errMsg, status: res.status };
     }
     return { ok: true, id: data.id || `resend_${Date.now()}` };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "send_failed" };
+    const error = err instanceof Error ? err.message : "send_failed";
+    console.error(JSON.stringify({ msg: "resend_exception", error }));
+    return { ok: false, error };
   }
 }
 

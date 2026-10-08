@@ -305,6 +305,35 @@ export const SEO_MASTER_MAP: SeoPageEntry[] = [
     imageAlt: [],
     noIndex: true,
   },
+  {
+    path: "/blog",
+    primary: [
+      "CINTEXA blog",
+      "growth technology insights",
+      "sales marketing technology articles",
+    ],
+    secondary: [
+      "connected technology systems",
+      "digital commerce platform",
+      "lead generation platform",
+      "business growth blog",
+    ],
+    longTail: [
+      "articles on sales and marketing technology platforms",
+      "how connected technology helps businesses grow",
+      "ecommerce and digital commerce for SMEs",
+    ],
+    h1: "Insights on Growth Technology, Sales & Digital Commerce",
+    metaTitle: "Blog | Growth Technology, Sales & Digital Commerce — CINTEXA",
+    metaDescription:
+      "CINTEXA blog: practical articles on connected technology systems, sales and marketing platforms, ecommerce, lead generation and tools that help businesses convert visitors into customers.",
+    imageAlt: [
+      "CINTEXA growth technology blog",
+      "sales and marketing technology insights",
+      "digital commerce articles",
+    ],
+    schemaType: "CollectionPage",
+  },
 ];
 
 const byPath = new Map(SEO_MASTER_MAP.map((e) => [e.path, e]));
@@ -319,6 +348,9 @@ export function getSeoForPath(pathname: string): SeoPageEntry {
       byPath.get("/careers") ||
       byPath.get("/")!
     );
+  }
+  if (clean.startsWith("/blog/") && clean !== "/blog") {
+    return byPath.get("/blog") || byPath.get("/")!;
   }
   if (clean.startsWith("/dashboard") || clean.startsWith("/admin")) {
     return {

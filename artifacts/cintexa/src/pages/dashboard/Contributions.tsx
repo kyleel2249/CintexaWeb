@@ -419,7 +419,7 @@ export function DashboardContributions() {
         )}
 
         <motion.div variants={item} className="mt-8">
-          <InsightPanel specialistId="contributions" title="Contributions Insight" />
+          <InsightPanel tab="contributions" />
         </motion.div>
       </motion.div>
     </DashboardShell>

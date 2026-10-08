@@ -30,19 +30,17 @@ export function DashboardContributions() {
     const sorted = [...paid].sort(
       (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );
-    let running = 0;
-    return sorted.map((c) => {
-      running += Number(c.amount) || 0;
-      return {
-        id: c.id,
-        label: monthLabel(c.createdAt),
-        amount: Number(c.amount) || 0,
-        cumulative: running,
-        reference: c.reference,
-        description: c.description,
-        status: c.status,
-      };
-    });
+    return sorted.map((c, index) => ({
+      id: c.id,
+      label: monthLabel(c.createdAt),
+      amount: Number(c.amount) || 0,
+      cumulative: sorted
+        .slice(0, index + 1)
+        .reduce((sum, contribution) => sum + (Number(contribution.amount) || 0), 0),
+      reference: c.reference,
+      description: c.description,
+      status: c.status,
+    }));
   }, [paid]);
 
   const maxBar = Math.max(...series.map((s) => s.amount), 1);

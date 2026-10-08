@@ -46,10 +46,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: cintexa-growth-platform
-          directory: artifacts/cintexa/dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          command: pages deploy artifacts/cintexa/dist --project-name=cintexa-growth-platform --branch=main
 
       - name: Skip notice
         if: steps.cloudflare.outputs.configured != 'true'

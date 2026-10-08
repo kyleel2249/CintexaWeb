@@ -14,15 +14,23 @@ const COLUMNS = [
     ],
   },
   {
-    title: "Platform",
+    title: "Explore",
     links: [
-      { label: "Overview", href: "/platform" },
       { label: "About CINTEXA", href: "/about" },
       { label: "Blog & insights", href: "/blog" },
       { label: "Case studies", href: "/case-studies" },
       { label: "Careers & scholarships", href: "/careers" },
       { label: "Contact", href: "/contact" },
       { label: "Dashboard", href: "/dashboard" },
+    ],
+  },
+  {
+    title: "Legal & Privacy",
+    links: [
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms & Conditions", href: "/terms" },
+      { label: "Cookie Policy", href: "/cookie-policy" },
+      { label: "Disclaimer", href: "/disclaimer" },
     ],
   },
 ];

@@ -1,11 +1,13 @@
 /**
  * Firebase client initialization.
- * Secrets / config are provided via Vite env (set in Cloudflare Pages).
- * The app is initialized once on import so Analytics / Auth / Firestore
- * are ready wherever they are used.
+ * Core Firebase app services can initialise for requested account functionality,
+ * but analytics is gated behind the visitor's explicit analytics preference.
  */
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
+import { deleteAnalytics, getAnalytics, isSupported, type Analytics } from "firebase/analytics";
+
+const CONSENT_KEY = "cintexa.cookie.consent";
+const CONSENT_EVENT = "cintexa:consent-updated";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
@@ -18,65 +20,74 @@ const firebaseConfig = {
 };
 
 function hasMinimalConfig(): boolean {
-  return Boolean(
-    firebaseConfig.apiKey &&
-      firebaseConfig.projectId &&
-      firebaseConfig.appId,
-  );
+  return Boolean(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
+}
+
+function hasAnalyticsConsent(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.localStorage.getItem(CONSENT_KEY);
+    if (!raw) return false;
+    const consent = JSON.parse(raw) as { analytics?: unknown };
+    return consent.analytics === true;
+  } catch {
+    return false;
+  }
 }
 
 let app: FirebaseApp | null = null;
 let analytics: Analytics | null = null;
+let consentListenerRegistered = false;
 
-/**
- * Initialize Firebase (idempotent). Returns the app instance or null if
- * config is missing so the rest of the app can still run.
- */
 export function getFirebaseApp(): FirebaseApp | null {
   if (app) return app;
   if (!hasMinimalConfig()) {
-    if (import.meta.env.DEV) {
-      console.warn(
-        "[firebase] Missing VITE_FIREBASE_* env vars — Firebase disabled.",
-      );
-    }
+    if (import.meta.env.DEV) console.warn("[firebase] Missing VITE_FIREBASE_* env vars — Firebase disabled.");
     return null;
   }
-  if (getApps().length > 0) {
-    app = getApps()[0]!;
-  } else {
-    app = initializeApp(firebaseConfig);
-  }
+  if (getApps().length > 0) app = getApps()[0]!;
+  else app = initializeApp(firebaseConfig);
   return app;
 }
 
-/**
- * Lazy Analytics (only in browser + when supported + measurementId present).
- */
+/** Starts Firebase Analytics only after the visitor opts in. */
 export async function getFirebaseAnalytics(): Promise<Analytics | null> {
-  if (analytics) return analytics;
+  if (analytics || !hasAnalyticsConsent()) return analytics;
   const firebaseApp = getFirebaseApp();
-  if (!firebaseApp || !firebaseConfig.measurementId) return null;
+  if (!firebaseApp || !firebaseConfig.measurementId || typeof window === "undefined") return null;
   try {
-    if (typeof window === "undefined") return null;
-    const supported = await isSupported();
-    if (!supported) return null;
+    if (!(await isSupported()) || !hasAnalyticsConsent()) return null;
     analytics = getAnalytics(firebaseApp);
     return analytics;
   } catch (err) {
-    if (import.meta.env.DEV) {
-      console.warn("[firebase] Analytics init failed", err);
-    }
+    if (import.meta.env.DEV) console.warn("[firebase] Analytics init failed", err);
     return null;
   }
 }
 
-/** Call once at app boot so Firebase is active for the session. */
+async function applyAnalyticsConsent(): Promise<void> {
+  if (hasAnalyticsConsent()) {
+    await getFirebaseAnalytics();
+    return;
+  }
+  if (analytics) {
+    const current = analytics;
+    analytics = null;
+    try {
+      await deleteAnalytics(current);
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn("[firebase] Analytics cleanup failed", err);
+    }
+  }
+}
+
+/** Initialises the app and responds to consent changes during the current page session. */
 export function initFirebase(): FirebaseApp | null {
   const firebaseApp = getFirebaseApp();
-  if (firebaseApp) {
-    // Fire-and-forget Analytics; do not block render
-    void getFirebaseAnalytics();
+  if (typeof window !== "undefined" && !consentListenerRegistered) {
+    window.addEventListener(CONSENT_EVENT, () => { void applyAnalyticsConsent(); });
+    consentListenerRegistered = true;
+    if (hasAnalyticsConsent()) void getFirebaseAnalytics();
   }
   return firebaseApp;
 }

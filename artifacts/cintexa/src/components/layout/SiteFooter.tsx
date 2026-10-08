@@ -53,7 +53,7 @@ export function SiteFooter() {
             </a>
           </p>
         </div>
-        <div className="flex gap-12">
+        <div className="flex flex-wrap gap-8 md:gap-12">
           {COLUMNS.map((col) => (
             <div key={col.title} className="flex flex-col gap-2">
               <p className="cx-eyebrow">{col.title}</p>

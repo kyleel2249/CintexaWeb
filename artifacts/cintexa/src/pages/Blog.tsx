@@ -88,8 +88,7 @@ export const POSTS: Post[] = [
       { heading: "Review the process regularly", paragraphs: ["Review overdue tasks, duplicate contacts, stage conversion and reasons deals are lost. Use the findings to improve the process and training. Keep exports, access controls and retention rules in place so customer records remain secure and useful."] }
     ],
     references: [{ label: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }, { label: "Google Search Central", url: "https://developers.google.com/search/docs/fundamentals/creating-helpful-content" }]
-  }
-
+  },
   {
     slug: "business-automation-for-small-businesses",
     title: "Business Automation for Small Businesses: Where to Start",
@@ -180,7 +179,9 @@ export const POSTS: Post[] = [
     ],
     references: [{ label: "Google Analytics Help", url: "https://support.google.com/analytics/" }, { label: "NIST Privacy Framework", url: "https://www.nist.gov/privacy-framework" }]
   },
-];\n\nfunction useArticleSeo(post: Post | undefined) {
+];
+
+function useArticleSeo(post: Post | undefined) {
   useEffect(() => {
     if (!post) return;
     const canonical = `https://cintexa.com/blog/${post.slug}`;

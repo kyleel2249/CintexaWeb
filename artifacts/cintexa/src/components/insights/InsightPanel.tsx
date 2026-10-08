@@ -127,7 +127,7 @@ export function InsightPanel({ tab, specialistId, extraContext }: Props) {
       } catch { /* offline */ }
     })();
     return () => { cancelled = true; };
-  }, [tab]);
+  }, [resolvedTab]);
 
   const enabled = specialist ? flags[specialist.id] !== false : true;
 
@@ -148,14 +148,14 @@ export function InsightPanel({ tab, specialistId, extraContext }: Props) {
             specialistId: specialist.id,
             title: `${specialist.displayName} attention`,
             body: report.summary.slice(0, 160),
-            href: `/dashboard/${tab}`,
+            href: `/dashboard/${resolvedTab}`,
           });
         }
         return;
       } catch (e) {
         setServerError(e instanceof Error ? e.message : "Server unavailable — using on-device engine");
       }
-      const r = generateInsightForTab(tab, ctx);
+      const r = generateInsightForTab(resolvedTab, ctx);
       saveInsightHistory(r);
       setResult(r);
       setServerRunId(null);
@@ -164,13 +164,13 @@ export function InsightPanel({ tab, specialistId, extraContext }: Props) {
           specialistId: specialist.id,
           title: `${specialist.displayName} attention`,
           body: r.summary.slice(0, 160),
-          href: `/dashboard/${tab}`,
+          href: `/dashboard/${resolvedTab}`,
         });
       }
     } finally {
       setGenerating(false);
     }
-  }, [specialist, tab, ctx]);
+  }, [specialist, resolvedTab, ctx]);
 
   const history = historyOpen ? readInsightHistory(specialist?.id) : [];
 
@@ -345,7 +345,7 @@ export function InsightPanel({ tab, specialistId, extraContext }: Props) {
 
           <div className="cx-card flex flex-col items-center justify-center">
             <p className="cx-eyebrow mb-3 self-start">Visualization</p>
-            <InsightVisual result={result} tab={tab} />
+            <InsightVisual result={result} tab={resolvedTab} />
             <p className="mt-3 text-center text-[10px] text-[hsl(var(--fg-muted))]">Decorative only — all facts remain in the report. Respects reduced motion.</p>
           </div>
         </div>

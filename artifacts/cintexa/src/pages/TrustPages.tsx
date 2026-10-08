@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Link } from "wouter";
 
 function PageMeta({ title, description, path }: { title: string; description: string; path: string }) {
@@ -16,10 +16,10 @@ function PageMeta({ title, description, path }: { title: string; description: st
   }, [title, description, path]);
   return null;
 }
-function Shell({ eyebrow, title, intro, children, path, description }: { eyebrow: string; title: string; intro: string; children: React.ReactNode; path: string; description: string }) {
+function Shell({ eyebrow, title, intro, children, path, description }: { eyebrow: string; title: string; intro: string; children: ReactNode; path: string; description: string }) {
   return <div className="cx-section"><PageMeta title={title + " | CINTEXA"} description={description} path={path} /><div className="cx-container max-w-4xl"><p className="cx-eyebrow">{eyebrow}</p><h1 className="cx-display mt-3 text-3xl sm:text-5xl">{title}</h1><p className="mt-5 max-w-3xl text-lg leading-8 text-[hsl(var(--fg-muted))]">{intro}</p><div className="mt-10 space-y-8">{children}</div></div></div>;
 }
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return <section><h2 className="cx-display text-2xl">{title}</h2><div className="mt-3 space-y-3 leading-7 text-[hsl(var(--fg-muted))]">{children}</div></section>;
 }
 

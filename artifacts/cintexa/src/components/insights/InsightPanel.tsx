@@ -46,11 +46,20 @@ function sourceLabel(src: string) {
   }
 }
 
-type Props = { tab: string; extraContext?: Record<string, unknown> };
+type Props = {
+  /** Dashboard tab key, e.g. "contributions", "progress" */
+  tab?: string;
+  /** @deprecated Alias for `tab` — accepted so older call sites typecheck */
+  specialistId?: string;
+  /** @deprecated Unused; kept for backward-compatible call sites */
+  title?: string;
+  extraContext?: Record<string, unknown>;
+};
 
 /** Structured [Tab] Insight workspace. Client engine always available; server runs preferred when API works. Does not modify Overview command center. */
-export function InsightPanel({ tab, extraContext }: Props) {
-  const specialist = getSpecialistByTab(tab);
+export function InsightPanel({ tab, specialistId, extraContext }: Props) {
+  const resolvedTab = tab || specialistId || "overview";
+  const specialist = getSpecialistByTab(resolvedTab);
   const profile = useMyProfile();
   const activity = useMyActivity();
   const contributionsQ = useMyContributions();

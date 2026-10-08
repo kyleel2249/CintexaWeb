@@ -4,7 +4,7 @@
  * but analytics is gated behind the visitor's explicit analytics preference.
  */
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { deleteAnalytics, getAnalytics, isSupported, type Analytics } from "firebase/analytics";
+import { getAnalytics, isSupported, setAnalyticsCollectionEnabled, type Analytics } from "firebase/analytics";
 
 const CONSENT_KEY = "cintexa.cookie.consent";
 const CONSENT_EVENT = "cintexa:consent-updated";
@@ -67,16 +67,21 @@ export async function getFirebaseAnalytics(): Promise<Analytics | null> {
 
 async function applyAnalyticsConsent(): Promise<void> {
   if (hasAnalyticsConsent()) {
-    await getFirebaseAnalytics();
+    const current = await getFirebaseAnalytics();
+    if (current) {
+      try {
+        await setAnalyticsCollectionEnabled(current, true);
+      } catch (err) {
+        if (import.meta.env.DEV) console.warn("[firebase] Could not enable Analytics collection", err);
+      }
+    }
     return;
   }
   if (analytics) {
-    const current = analytics;
-    analytics = null;
     try {
-      await deleteAnalytics(current);
+      await setAnalyticsCollectionEnabled(analytics, false);
     } catch (err) {
-      if (import.meta.env.DEV) console.warn("[firebase] Analytics cleanup failed", err);
+      if (import.meta.env.DEV) console.warn("[firebase] Could not disable Analytics collection", err);
     }
   }
 }

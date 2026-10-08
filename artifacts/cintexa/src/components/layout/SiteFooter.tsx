@@ -17,7 +17,9 @@ const COLUMNS = [
     title: "Platform",
     links: [
       { label: "Overview", href: "/platform" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "About CINTEXA", href: "/about" },
+      { label: "Blog & insights", href: "/blog" },
+      { label: "Case studies", href: "/case-studies" },
       { label: "Careers & scholarships", href: "/careers" },
       { label: "Contact", href: "/contact" },
       { label: "Dashboard", href: "/dashboard" },
@@ -60,7 +62,7 @@ export function SiteFooter() {
           ))}
         </div>
       </div>
-      <div className="cx-container mt-8 border-t border-[hsl(var(--border))] pt-6 text-xs text-[hsl(var(--fg-muted))]">
+      <div className="cx-container mt-8 flex flex-wrap gap-x-5 gap-y-2 border-t border-[hsl(var(--border))] pt-6 text-xs text-[hsl(var(--fg-muted))]">\n        <Link href="/privacy-policy" className="hover:text-[hsl(var(--fg))]">Privacy Policy</Link><Link href="/terms" className="hover:text-[hsl(var(--fg))]">Terms</Link><Link href="/cookie-policy" className="hover:text-[hsl(var(--fg))]">Cookie Policy</Link><Link href="/disclaimer" className="hover:text-[hsl(var(--fg))]">Disclaimer</Link>
         © {new Date().getFullYear()} CINTEXA. All rights reserved.
       </div>
     </footer>

@@ -138,6 +138,42 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      <section className="cx-section border-t border-[hsl(var(--border))]">
+        <div className="cx-container">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div><p className="cx-eyebrow">What we do</p><h2 className="cx-display mt-2 text-2xl sm:text-3xl">Digital solutions for real business needs</h2></div>
+            <Link href="/about" className="text-sm font-medium text-[hsl(var(--accent))] underline">About CINTEXA →</Link>
+          </div>
+          <p className="mt-4 max-w-3xl leading-7 text-[hsl(var(--fg-muted))]">CINTEXA serves small and medium-sized businesses, founders and teams that need better digital experiences or more organised operations. We plan and build websites, custom software, e-commerce experiences, sales and marketing systems, automation workflows and data-informed business tools.</p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[["Software development","Custom applications shaped around the work your team needs to do.","/solutions/software-development"],["Website development","Responsive, accessible websites that explain services and help visitors take action.","/solutions/website-development"],["E-commerce","Product catalogues and online selling experiences with clear order workflows.","/solutions/ecommerce"],["Business automation","Reduce repetitive hand-offs with validated forms, connected records and useful notifications.","/platform"],["Digital marketing & SEO","Build discoverable content, measure campaigns and improve the path from visit to enquiry.","/solutions/marketing"],["Sales & CRM workflows","Keep lead ownership, customer history and next actions visible to the right people.","/solutions/sales"]].map(([title,copy,href]) => <Link key={title} href={href} className="cx-card cx-card-interactive block"><h3 className="cx-display text-lg">{title}</h3><p className="mt-2 text-sm leading-6 text-[hsl(var(--fg-muted))]">{copy}</p><span className="mt-4 inline-block text-sm font-medium text-[hsl(var(--accent))]">Explore solution →</span></Link>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="cx-section">
+        <div className="cx-container">
+          <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="cx-eyebrow">Latest articles</p><h2 className="cx-display mt-2 text-2xl sm:text-3xl">Practical advice for business technology</h2></div><Link href="/blog" className="text-sm font-medium text-[hsl(var(--accent))] underline">Visit the blog →</Link></div>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[["How Connected Technology Systems Support Business Growth","/blog/connected-technology-systems-for-business-growth","Business technology"],["Choosing Sales and Marketing Technology for a Growing Team","/blog/sales-marketing-technology-platform-guide","Sales & marketing"],["Planning an E-commerce Website for a Small Business in Ghana","/blog/ecommerce-and-digital-commerce-for-smes","E-commerce"]].map(([title,href,category]) => <article key={href} className="cx-card"><p className="cx-eyebrow">{category}</p><h3 className="cx-display mt-2 text-lg">{title}</h3><Link href={href} className="mt-4 inline-block text-sm font-medium text-[hsl(var(--accent))] underline">Read article →</Link></article>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="cx-section border-y border-[hsl(var(--border))]">
+        <div className="cx-container grid gap-8 md:grid-cols-2">
+          <div><p className="cx-eyebrow">Case studies</p><h2 className="cx-display mt-2 text-2xl sm:text-3xl">See how solutions are planned and measured</h2><p className="mt-3 leading-7 text-[hsl(var(--fg-muted))]">Explore clearly labelled illustrative scenarios covering website enquiries, e-commerce operations and workflow automation. We do not invent client names or performance results.</p><Link href="/case-studies" className="cx-btn cx-btn-secondary mt-5">View case studies</Link></div>
+          <div className="cx-card"><p className="cx-eyebrow">Careers & opportunities</p><h3 className="cx-display mt-2 text-xl">Explore current vacancies and career updates</h3><p className="mt-3 text-sm leading-6 text-[hsl(var(--fg-muted))]">Review listed opportunities, application requirements and career alerts on the CINTEXA careers page.</p><Link href="/careers" className="cx-btn cx-btn-primary mt-5">Visit careers</Link></div>
+        </div>
+      </section>
+
+      <section className="cx-section">
+        <div className="cx-container cx-card flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div><p className="cx-eyebrow">Start a conversation</p><h2 className="cx-display mt-2 text-2xl">Tell us what your business needs to improve.</h2><p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">Share your goals, project requirements and current challenges.</p></div>
+          <div className="flex flex-wrap gap-3"><Link href="/get-started" className="cx-btn cx-btn-primary">Get started</Link><Link href="/contact" className="cx-btn cx-btn-secondary">Contact us</Link></div>
+        </div>
+      </section>
     </>
   );
 }

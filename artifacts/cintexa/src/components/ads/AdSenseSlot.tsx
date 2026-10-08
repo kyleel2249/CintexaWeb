@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
 declare global {
@@ -30,7 +30,6 @@ function hasMarketingConsent(): boolean {
 export function AdSenseSlot({ slot, placement = "display", className = "" }: AdSenseSlotProps) {
   const [location] = useLocation();
   const [enabled, setEnabled] = useState(false);
-  const pushed = useRef(false);
 
   const hide =
     location.startsWith("/dashboard") ||
@@ -51,7 +50,6 @@ export function AdSenseSlot({ slot, placement = "display", className = "" }: AdS
 
   useEffect(() => {
     if (!enabled || hide) {
-      pushed.current = false;
       if (!enabled) {
         document.querySelectorAll('script[data-cx-adsense="true"]').forEach((script) => script.remove());
         delete window.adsbygoogle;
@@ -70,7 +68,6 @@ export function AdSenseSlot({ slot, placement = "display", className = "" }: AdS
     }
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
-      pushed.current = true;
     } catch {
       // The provider may not be ready or may be blocked by the browser.
     }

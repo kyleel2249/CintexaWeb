@@ -22,7 +22,13 @@ Allow: /careers
 Allow: /careers/
 Allow: /solutions/
 Allow: /platform
-Allow: /pricing
+Allow: /about
+Allow: /blog
+Allow: /case-studies
+Allow: /privacy-policy
+Allow: /terms
+Allow: /cookie-policy
+Allow: /disclaimer
 Allow: /contact
 Allow: /get-started
 Allow: /sitemap.xml

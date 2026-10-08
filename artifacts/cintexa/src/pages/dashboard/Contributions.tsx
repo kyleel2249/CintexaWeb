@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { DashboardShell } from "./DashboardShell";
 import { useMyContributions } from "@/hooks/useApi";
@@ -26,22 +25,20 @@ export function DashboardContributions() {
   const currency = paid[0]?.currency || contributions[0]?.currency || "GHS";
   const monthly = paid.length ? totalPaid / paid.length : 0;
 
-  const series = useMemo(() => {
-    const sorted = [...paid].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    );
-    return sorted.map((c, index) => ({
-      id: c.id,
-      label: monthLabel(c.createdAt),
-      amount: Number(c.amount) || 0,
-      cumulative: sorted
-        .slice(0, index + 1)
-        .reduce((sum, contribution) => sum + (Number(contribution.amount) || 0), 0),
-      reference: c.reference,
-      description: c.description,
-      status: c.status,
-    }));
-  }, [paid]);
+  const sortedPaid = [...paid].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+  const series = sortedPaid.map((c, index) => ({
+    id: c.id,
+    label: monthLabel(c.createdAt),
+    amount: Number(c.amount) || 0,
+    cumulative: sortedPaid
+      .slice(0, index + 1)
+      .reduce((sum, contribution) => sum + (Number(contribution.amount) || 0), 0),
+    reference: c.reference,
+    description: c.description,
+    status: c.status,
+  }));
 
   const maxBar = Math.max(...series.map((s) => s.amount), 1);
   const seededTotal = userId ? getSeededTotalGhs(userId) : null;

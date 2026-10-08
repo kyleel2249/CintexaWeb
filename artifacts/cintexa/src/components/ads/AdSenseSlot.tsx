@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
 declare global {
@@ -8,24 +8,28 @@ declare global {
 }
 
 const AD_CLIENT = "ca-pub-2604547500089196";
+const CONSENT_KEY = "cintexa.cookie.consent";
+const CONSENT_EVENT = "cintexa:consent-updated";
 
 type AdSenseSlotProps = {
-  /** Optional AdSense ad unit slot ID from AdSense UI. Omit for auto-sized display. */
   slot?: string;
-  /** Placement for analytics / layout */
   placement?: "in-article" | "in-feed" | "display" | "anchor-reserve";
   className?: string;
 };
 
-/**
- * Mobile-first responsive AdSense unit.
- * - full-width-responsive on small screens
- * - reserved min-height to limit CLS
- * - hidden on dashboard / admin / auth routes
- */
+function hasMarketingConsent(): boolean {
+  try {
+    const raw = localStorage.getItem(CONSENT_KEY);
+    return raw ? JSON.parse(raw).marketing === true : false;
+  } catch {
+    return false;
+  }
+}
+
+/** Advertising scripts and ad slots remain inactive until marketing consent is granted. */
 export function AdSenseSlot({ slot, placement = "display", className = "" }: AdSenseSlotProps) {
   const [location] = useLocation();
-  const pushed = useRef(false);
+  const [enabled, setEnabled] = useState(false);
 
   const hide =
     location.startsWith("/dashboard") ||
@@ -34,23 +38,45 @@ export function AdSenseSlot({ slot, placement = "display", className = "" }: AdS
     location.startsWith("/sign-up");
 
   useEffect(() => {
-    if (hide || pushed.current) return;
+    const sync = () => setEnabled(hasMarketingConsent());
+    sync();
+    window.addEventListener(CONSENT_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(CONSENT_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!enabled || hide) {
+      if (!enabled) {
+        document.querySelectorAll('script[data-cx-adsense="true"]').forEach((script) => script.remove());
+        delete window.adsbygoogle;
+      }
+      return;
+    }
+
+    let script = document.querySelector<HTMLScriptElement>('script[data-cx-adsense="true"]');
+    if (!script) {
+      script = document.createElement("script");
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.dataset.cxAdsense = "true";
+      script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}`;
+      document.head.appendChild(script);
+    }
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
-      pushed.current = true;
     } catch {
-      // Ad blocker or script not ready — ignore
+      // The provider may not be ready or may be blocked by the browser.
     }
-  }, [hide, location]);
+  }, [enabled, hide, location]);
 
-  if (hide) return null;
+  if (hide || !enabled) return null;
 
   return (
-    <div
-      className={`cx-ad-slot cx-ad-slot--${placement} ${className}`.trim()}
-      data-ad-placement={placement}
-      aria-hidden="true"
-    >
+    <div className={`cx-ad-slot cx-ad-slot--${placement} ${className}`.trim()} data-ad-placement={placement}>
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
@@ -63,24 +89,10 @@ export function AdSenseSlot({ slot, placement = "display", className = "" }: AdS
   );
 }
 
-/** Bottom-of-page display unit — safe on mobile between main and footer */
 export function AdSenseFooterBanner() {
-  return (
-    <div className="cx-ad-region cx-ad-region--footer">
-      <div className="cx-container">
-        <AdSenseSlot placement="display" />
-      </div>
-    </div>
-  );
+  return <div className="cx-ad-region cx-ad-region--footer"><div className="cx-container"><AdSenseSlot placement="display" /></div></div>;
 }
 
-/** Mid-content unit for long public pages (careers, solutions) */
 export function AdSenseInContent() {
-  return (
-    <div className="cx-ad-region cx-ad-region--in-content">
-      <div className="cx-container">
-        <AdSenseSlot placement="in-article" />
-      </div>
-    </div>
-  );
+  return <div className="cx-ad-region cx-ad-region--in-content"><div className="cx-container"><AdSenseSlot placement="in-article" /></div></div>;
 }

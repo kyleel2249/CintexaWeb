@@ -14,7 +14,7 @@ const routes = [
   ["/solutions/website-development", "0.8"], ["/solutions/software-development", "0.8"],
   ["/blog", "0.9"], ["/case-studies", "0.8"], ["/careers", "0.9"],
   ["/careers/cleaner", "0.8"], ["/contact", "0.7"], ["/get-started", "0.85"],
-  ["/privacy-policy", "0.4"], ["/terms", "0.4"], ["/cookie-policy", "0.4"], ["/disclaimer", "0.4"],
+  ["/privacy-policy", "0.4"], ["/terms", "0.4"], ["/cookie-policy", "0.4"], ["/disclaimer", "0.4"], ["/disclaimer", "0.4"],
   ...posts.map((post) => [`/blog/${post.slug}`, "0.75", post.lastmod])
 ];
 const unique = [...new Map(routes.map((entry) => [entry[0], entry])).values()];

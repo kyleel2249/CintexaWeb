@@ -34,13 +34,13 @@ const SoftwareDev = lazy(() => import("@/pages/SoftwareDev").then((m) => ({ defa
 const Contact = lazy(() => import("@/pages/Contact").then((m) => ({ default: m.Contact })));
 const Careers = lazy(() => import("@/pages/Careers").then((m) => ({ default: m.Careers })));
 const JobDetail = lazy(() => import("@/pages/JobDetail").then((m) => ({ default: m.JobDetail })));
+const Blog = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.Blog })));
 const Platform = lazyRetry(() => import("@/pages/Platform"));
 const Pricing = lazy(() => import("@/pages/Pricing").then((m) => ({ default: m.Pricing })));
 const GetStarted = lazy(() => import("@/pages/GetStarted").then((m) => ({ default: m.GetStarted })));
 const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DashboardOverview = lazy(() => import("@/pages/dashboard/Overview").then((m) => ({ default: m.DashboardOverview })));
 const DashboardProgress = lazy(() => import("@/pages/dashboard/Progress").then((m) => ({ default: m.DashboardProgress })));
-const DashboardContributions = lazy(() => import("@/pages/dashboard/Contributions").then((m) => ({ default: m.DashboardContributions })));
 const DashboardLeaderboard = lazy(() => import("@/pages/dashboard/Leaderboard").then((m) => ({ default: m.DashboardLeaderboard })));
 const DashboardSettings = lazy(() => import("@/pages/dashboard/Settings").then((m) => ({ default: m.DashboardSettings })));
 const DashboardAnalytics = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardAnalytics })));
@@ -81,6 +81,7 @@ export default function App() {
               <Route path="/solutions/website-development" component={WebsiteDev} />
               <Route path="/solutions/software-development" component={SoftwareDev} />
               <Route path="/contact" component={Contact} />
+              <Route path="/blog" component={Blog} />
               <Route path="/careers/:id" component={JobDetail} />
               <Route path="/careers" component={Careers} />
               <Route path="/platform" component={Platform} />
@@ -93,7 +94,6 @@ export default function App() {
               <Route path="/dashboard/email" component={DashboardEmail} />
               <Route path="/dashboard/faq" component={DashboardFaq} />
               <Route path="/dashboard/progress" component={DashboardProgress} />
-              <Route path="/dashboard/contributions" component={DashboardContributions} />
               <Route path="/dashboard/leaderboard" component={DashboardLeaderboard} />
               <Route path="/dashboard/careers" component={DashboardCareers} />
               <Route path="/dashboard/settings" component={DashboardSettings} />

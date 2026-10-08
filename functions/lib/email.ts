@@ -1,3 +1,12 @@
+
+/** Resolve Resend credentials from Cloudflare Pages env (multiple key names supported). */
+export function resolveResendConfig(env: Record<string, unknown> | { RESEND_API_KEY?: string; EMAIL_FROM?: string; RESEND_KEY?: string }) {
+  const e = env as Record<string, string | undefined>;
+  const apiKey = (e.RESEND_API_KEY || e.RESEND_KEY || e.RESEND_TOKEN || "").trim();
+  const from = (e.EMAIL_FROM || e.RESEND_FROM || "").trim() || "CINTEXA <onboarding@resend.dev>";
+  return { apiKey, from, configured: Boolean(apiKey) };
+}
+
 export type SendEmailInput = {
   to: string | string[];
   subject: string;
@@ -12,13 +21,12 @@ export type SendEmailResult =
   | { ok: false; error: string; status?: number };
 
 export async function sendEmail(
-  env: { RESEND_API_KEY?: string; EMAIL_FROM?: string },
+  env: { RESEND_API_KEY?: string; EMAIL_FROM?: string; RESEND_KEY?: string; RESEND_TOKEN?: string; RESEND_FROM?: string },
   input: SendEmailInput,
   options?: { allowDryRun?: boolean },
 ): Promise<SendEmailResult> {
-  const from = (env.EMAIL_FROM || "").trim() || "CINTEXA <onboarding@resend.dev>";
+  const { apiKey: key, from } = resolveResendConfig(env);
   const to = Array.isArray(input.to) ? input.to : [input.to];
-  const key = (env.RESEND_API_KEY || "").trim();
   // Default: allow dry-run for non-critical mail. Password reset passes allowDryRun: false.
   const allowDryRun = options?.allowDryRun !== false;
 

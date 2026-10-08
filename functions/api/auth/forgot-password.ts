@@ -1,4 +1,4 @@
-import { escapeHtml, sendEmail } from "../../lib/email";
+import { escapeHtml, resolveResendConfig, sendEmail } from "../../lib/email";
 import { sendSms } from "../../lib/sms";
 import { corsHeaders, userKey, type StoredUser } from "../../lib/cintexa-auth";
 
@@ -48,12 +48,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     // Require Resend so we never pretend an email was sent
-    if (!(context.env.RESEND_API_KEY || "").trim()) {
-      console.error(JSON.stringify({ msg: "forgot_password_no_resend_key" }));
+    const resend = resolveResendConfig(context.env as Record<string, unknown>);
+    if (!resend.configured) {
+      console.error(
+        JSON.stringify({
+          msg: "forgot_password_no_resend_key",
+          hint: "Set RESEND_API_KEY (and EMAIL_FROM) in Cloudflare Pages → Settings → Environment variables → Production",
+        }),
+      );
       return Response.json(
         {
           error:
-            "Password recovery email is temporarily unavailable. Please try again later or contact info@cintexa.com.",
+            "Password recovery email is not configured yet. The site operator must set RESEND_API_KEY in Cloudflare Pages (Production). Meanwhile contact info@cintexa.com for help.",
+          code: "EMAIL_NOT_CONFIGURED",
         },
         { status: 503, headers },
       );

@@ -1,27 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "wouter";
-import { SignIn, SignUp } from "@clerk/clerk-react";
-import { clerkAppearance } from "@/lib/clerk-appearance";
 import { submitGetStartedSignup } from "@/lib/email-notifications";
 
-const hasClerk =
-  typeof import.meta.env.VITE_CLERK_PUBLISHABLE_KEY === "string" &&
-  Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY.trim());
-
-const embeddedAppearance = {
-  ...clerkAppearance,
-  elements: {
-    ...clerkAppearance.elements,
-    rootBox: "w-full",
-    card: "bg-[hsl(var(--bg-raised))] border border-[hsl(var(--border))] shadow-none",
-  },
-} as const;
-
 /**
- * Get Started — capture lead details (KV + info@cintexa.com) then Clerk auth.
+ * Get Started — capture lead details (KV + info@cintexa.com).
+ * Clerk sign-in / sign-up widgets are not shown on this page.
  */
 export function GetStarted() {
-  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-up");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -48,7 +33,6 @@ export function GetStarted() {
         source: "get_started",
       });
       if (!result.ok) {
-        // Still open mailto so info@ always has a path to receive the lead
         const subject = encodeURIComponent(`Get Started signup — ${fullName.trim()}`);
         const body = encodeURIComponent(
           [
@@ -64,150 +48,105 @@ export function GetStarted() {
         setNotifyMsg("Details saved. If email delivery is offline, your mail client may open as backup.");
         return;
       }
-      const dry = result.adminNotify?.dryRun;
       setNotifyStatus("done");
-      setNotifyMsg(
-        dry
-          ? "Details saved on CINTEXA. Admin email is in dry-run mode until RESEND_API_KEY is configured."
-          : "Details sent to CINTEXA. Check your inbox for a confirmation email.",
-      );
+      setNotifyMsg("Thanks — your details were sent to CINTEXA. We’ll follow up soon.");
+      setFullName("");
+      setEmail("");
+      setPhone("");
+      setCompany("");
+      setRole("");
     } catch {
       setNotifyStatus("error");
-      setNotifyMsg("Something went wrong. Email info@cintexa.com directly.");
+      setNotifyMsg("Something went wrong. Please try again or email info@cintexa.com.");
     }
   }
 
   return (
     <section className="cx-section">
-      <div className="cx-container mx-auto max-w-lg">
-        <p className="cx-eyebrow text-center">Get started</p>
-        <h1 className="cx-display mt-3 text-center text-3xl sm:text-4xl">
-          {mode === "sign-up" ? "Get Started with CINTEXA — Create Your Account" : "Sign in to CINTEXA"}
-        </h1>
-        <p className="mt-3 text-center text-sm text-[hsl(var(--fg-muted))]">
-          Access your dashboard, contributions, progress, and platform tools.
+      <div className="cx-container max-w-xl">
+        <p className="cx-eyebrow">Get started</p>
+        <h1 className="cx-display mt-2 text-3xl sm:text-4xl">Start growing with CINTEXA</h1>
+        <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">
+          Share a few details and our team will reach out. No account widget required on this page.
         </p>
 
-        {mode === "sign-up" && (
-          <form className="cx-card mt-8 space-y-3 p-5" onSubmit={onLeadSubmit}>
-            <p className="cx-eyebrow">Your details</p>
-            <p className="text-xs text-[hsl(var(--fg-muted))]">
-              We store this securely and notify <strong>info@cintexa.com</strong> so our team can support you.
-            </p>
-            <label className="block">
+        {notifyStatus === "done" ? (
+          <div className="cx-card mt-8 p-6 text-center">
+            <p className="text-sm text-[hsl(var(--fg))]">{notifyMsg}</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link href="/contact" className="cx-btn cx-btn-secondary">
+                Contact us
+              </Link>
+              <Link href="/platform" className="cx-btn cx-btn-primary">
+                Explore platform
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={onLeadSubmit} className="cx-card mt-8 flex flex-col gap-4 p-6">
+            <label className="flex flex-col gap-1.5">
               <span className="text-xs text-[hsl(var(--fg-muted))]">Full name *</span>
               <input
-                className="cx-input mt-1 w-full"
+                className="cx-input"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                required
                 autoComplete="name"
+                required
               />
             </label>
-            <label className="block">
+            <label className="flex flex-col gap-1.5">
               <span className="text-xs text-[hsl(var(--fg-muted))]">Email *</span>
               <input
                 type="email"
-                className="cx-input mt-1 w-full"
+                className="cx-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 autoComplete="email"
+                required
               />
             </label>
-            <label className="block">
+            <label className="flex flex-col gap-1.5">
               <span className="text-xs text-[hsl(var(--fg-muted))]">Phone / WhatsApp</span>
               <input
                 type="tel"
-                className="cx-input mt-1 w-full"
+                className="cx-input"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 autoComplete="tel"
               />
             </label>
-            <label className="block">
-              <span className="text-xs text-[hsl(var(--fg-muted))]">Company / organisation</span>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs text-[hsl(var(--fg-muted))]">Company</span>
               <input
-                className="cx-input mt-1 w-full"
+                className="cx-input"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 autoComplete="organization"
               />
             </label>
-            <label className="block">
+            <label className="flex flex-col gap-1.5">
               <span className="text-xs text-[hsl(var(--fg-muted))]">Role</span>
               <input
-                className="cx-input mt-1 w-full"
+                className="cx-input"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                placeholder="e.g. Founder, Marketing lead"
+                autoComplete="organization-title"
               />
             </label>
             {notifyStatus === "error" && (
-              <p className="text-sm text-red-400">{notifyMsg}</p>
-            )}
-            {notifyStatus === "done" && (
-              <p className="text-sm" style={{ color: "hsl(var(--accent))" }}>
+              <p className="text-sm text-[hsl(var(--danger))]" role="alert">
                 {notifyMsg}
               </p>
             )}
             <button
               type="submit"
-              className="cx-btn cx-btn-secondary w-full"
+              className="cx-btn cx-btn-primary w-full"
               disabled={notifyStatus === "saving"}
             >
               {notifyStatus === "saving" ? "Sending…" : "Send details to CINTEXA"}
             </button>
           </form>
         )}
-
-        <div className="mt-8 flex justify-center gap-2">
-          <button
-            type="button"
-            className={`cx-btn cx-btn-sm ${mode === "sign-up" ? "cx-btn-primary" : "cx-btn-secondary"}`}
-            onClick={() => setMode("sign-up")}
-          >
-            Sign up
-          </button>
-          <button
-            type="button"
-            className={`cx-btn cx-btn-sm ${mode === "sign-in" ? "cx-btn-primary" : "cx-btn-secondary"}`}
-            onClick={() => setMode("sign-in")}
-          >
-            Sign in
-          </button>
-        </div>
-
-        <div className="mt-8 flex justify-center">
-          {hasClerk ? (
-            mode === "sign-up" ? (
-              <SignUp
-                routing="hash"
-                signInUrl="/get-started#sign-in"
-                fallbackRedirectUrl="/dashboard"
-                appearance={embeddedAppearance}
-              />
-            ) : (
-              <SignIn
-                routing="hash"
-                signUpUrl="/get-started#sign-up"
-                fallbackRedirectUrl="/dashboard"
-                appearance={embeddedAppearance}
-              />
-            )
-          ) : (
-            <div className="cx-card w-full max-w-md p-6 text-center">
-              <p className="text-sm text-[hsl(var(--fg-muted))]">
-                {notifyStatus === "done"
-                  ? "Your details were submitted. Account login will be available once authentication is fully configured."
-                  : "Submit your details above. Full sign-in unlocks when Clerk is configured on this deployment."}
-              </p>
-              <Link href="/contact" className="cx-btn cx-btn-secondary mt-6 inline-flex">
-                Contact us
-              </Link>
-            </div>
-          )}
-        </div>
 
         <p className="mt-8 text-center text-xs text-[hsl(var(--fg-muted))]">
           Looking for plans?{" "}

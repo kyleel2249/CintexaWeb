@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import type { SubscriptionPlan } from "@cintexa/db/schema";
 import { useMySubscription, useSetSubscription } from "@/hooks/useApi";
 import {
@@ -184,14 +184,12 @@ export function Pricing() {
                     Talk with us
                   </Link>
                 ) : (
-                  <SignInButton mode="modal">
-                    <button
-                      type="button"
-                      className={`cx-btn mt-6 w-full ${p.highlighted ? "cx-btn-primary" : "cx-btn-secondary"}`}
-                    >
-                      Sign in to continue
-                    </button>
-                  </SignInButton>
+                  <Link
+                    href="/get-started"
+                    className={`cx-btn mt-6 w-full ${p.highlighted ? "cx-btn-primary" : "cx-btn-secondary"}`}
+                  >
+                    Get started
+                  </Link>
                 )}
               </SignedOut>
             </div>

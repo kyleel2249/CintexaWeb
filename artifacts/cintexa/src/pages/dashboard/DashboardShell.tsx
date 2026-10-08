@@ -1,5 +1,5 @@
 import { Link, useRoute } from "wouter";
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useMyProfile } from "@/hooks/useApi";
 import { OnboardingFlow } from "./onboarding/OnboardingFlow";
@@ -24,15 +24,13 @@ function SignedOutPrompt() {
     <div className="cx-section">
       <div className="cx-container flex flex-col items-center text-center">
         <p className="cx-eyebrow">Customer portal</p>
-        <h1 className="cx-display mt-3 text-3xl">Sign in to see your dashboard.</h1>
+        <h1 className="cx-display mt-3 text-3xl">Get started to access your dashboard.</h1>
         <p className="mt-3 max-w-sm text-[hsl(var(--fg-muted))]">
-          Your account metrics, progress, leaderboard, and tools live here after sign-in.
+          Share your details on Get Started. Your metrics, progress, leaderboard, and tools will be available once your account is active.
         </p>
-        <SignInButton mode="modal">
-          <button type="button" className="cx-btn cx-btn-primary mt-6">
-            Sign in
-          </button>
-        </SignInButton>
+        <Link href="/get-started" className="cx-btn cx-btn-primary mt-6">
+          Get started
+        </Link>
       </div>
     </div>
   );

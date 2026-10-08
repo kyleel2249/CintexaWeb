@@ -55,6 +55,8 @@ export function applySeo(entry: SeoPageEntry, pathname: string) {
 
 export function usePageSeo(pathname: string) {
   useEffect(() => {
+    // These routes set metadata from their own editorial content; do not overwrite it with the global fallback.
+    if (pathname.startsWith("/blog/") || ["/about", "/case-studies", "/privacy-policy", "/terms", "/cookie-policy", "/disclaimer"].includes(pathname)) return;
     const entry = getSeoForPath(pathname);
     applySeo(entry, pathname);
   }, [pathname]);

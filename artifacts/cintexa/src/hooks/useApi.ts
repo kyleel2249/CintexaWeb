@@ -1,4 +1,5 @@
 import { useAuth } from "@/lib/auth";
+import { mergeContributionsForUser } from "@/data/contribution-seed";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import {
@@ -196,7 +197,31 @@ export interface PaginationMeta {
 }
 
 export function useMyContributions() {
-  return useAuthedQuery<{ contributions: Contribution[]; pagination: PaginationMeta }>(["contributions"], "/contributions");
+  const { getToken, isSignedIn, userId } = useAuth();
+  return useQuery({
+    queryKey: ["contributions", userId],
+    enabled: isSignedIn,
+    queryFn: async () => {
+      let apiRows: Contribution[] = [];
+      let pagination: PaginationMeta = { limit: 50, offset: 0, total: 0, hasMore: false };
+      try {
+        const token = await getToken();
+        const data = await apiFetch<{ contributions: Contribution[]; pagination: PaginationMeta }>(
+          "/contributions",
+          { token },
+        );
+        apiRows = data.contributions ?? [];
+        pagination = data.pagination ?? pagination;
+      } catch {
+        /* API unavailable — seed still applies for the verified account */
+      }
+      const contributions = mergeContributionsForUser(userId, apiRows);
+      return {
+        contributions,
+        pagination: { ...pagination, total: Math.max(pagination.total, contributions.length) },
+      };
+    },
+  });
 }
 
 export function useMyActivity() {

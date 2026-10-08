@@ -26,8 +26,7 @@ ${form.get("message")}`);
         <p className="cx-eyebrow">Contact</p>
         <h1 className="cx-display mt-3 text-3xl sm:text-4xl">Contact CINTEXA</h1>
         <p className="mt-4 text-[hsl(var(--fg-muted))]">
-          Whether you need a custom website, software, growth technology, or a full platform conversation—reach us
-          directly.
+          Contact CINTEXA about website development, custom software, automation, e-commerce and digital business support. We work with businesses and project teams in Ghana and beyond.
         </p>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-1">

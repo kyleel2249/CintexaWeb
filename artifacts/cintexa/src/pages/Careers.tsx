@@ -225,7 +225,7 @@ export function Careers() {
           <div className="grid gap-0 lg:grid-cols-2">
             <div className="relative min-h-[320px] bg-[hsl(var(--bg))]">
               <img
-                src="/careers/bybeth-boutique-sales-girl.jpeg"
+                src="/careers/bybeth-boutique-sales-girl.svg"
                 alt="ByBeth Boutique is hiring a Sales Girl near East Legon, Madina and surrounding areas"
                 className="absolute inset-0 h-full w-full object-contain"
                 loading="lazy"

@@ -118,7 +118,7 @@ function jsonLd(job) {
 
 function injectHead(template, { title, description, canonical, image, ldJson }) {
   let html = template;
-  html = html.replace(/<title>[^<]*<\/title>/, \`<title>\${escapeHtml(title)}</title>\`);
+  html = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`);
 
   // Remove inherited homepage metadata before adding route-specific metadata.
   // Social crawlers can choose the wrong image when multiple og:image tags exist.
@@ -132,35 +132,35 @@ function injectHead(template, { title, description, canonical, image, ldJson }) 
   if (/<meta\s+name=["']description["'][^>]*>/i.test(html)) {
     html = html.replace(
       /<meta\s+name=["']description["'][^>]*>/i,
-      \`<meta name="description" content="\${escapeHtml(description)}" />\`,
+      `<meta name="description" content="${escapeHtml(description)}" />`,
     );
   } else {
     html = html.replace(
       "</head>",
-      \`    <meta name="description" content="\${escapeHtml(description)}" />\n  </head>\`,
+      `    <meta name="description" content="${escapeHtml(description)}" />\n  </head>`,
     );
   }
 
   const socialImage = escapeHtml(image);
   const extra = [
-    \`<link rel="canonical" href="\${escapeHtml(canonical)}" />\`,
+    `<link rel="canonical" href="${escapeHtml(canonical)}" />`,
     '<meta property="og:type" content="website" />',
-    \`<meta property="og:url" content="\${escapeHtml(canonical)}" />\`,
-    \`<meta property="og:title" content="\${escapeHtml(title)}" />\`,
-    \`<meta property="og:description" content="\${escapeHtml(description)}" />\`,
-    \`<meta property="og:image" content="\${socialImage}" />\`,
-    \`<meta property="og:image:secure_url" content="\${socialImage}" />\`,
+    `<meta property="og:url" content="${escapeHtml(canonical)}" />`,
+    `<meta property="og:title" content="${escapeHtml(title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(description)}" />`,
+    `<meta property="og:image" content="${socialImage}" />`,
+    `<meta property="og:image:secure_url" content="${socialImage}" />`,
     '<meta property="og:image:width" content="1200" />',
     '<meta property="og:image:height" content="630" />',
-    \`<meta property="og:image:alt" content="\${escapeHtml(title)} — vacancy image" />\`,
+    `<meta property="og:image:alt" content="${escapeHtml(title)} — vacancy image" />`,
     '<meta name="twitter:card" content="summary_large_image" />',
-    \`<meta name="twitter:title" content="\${escapeHtml(title)}" />\`,
-    \`<meta name="twitter:description" content="\${escapeHtml(description)}" />\`,
-    \`<meta name="twitter:image" content="\${socialImage}" />\`,
-    \`<meta name="twitter:image:alt" content="\${escapeHtml(title)} — vacancy image" />\`,
-    \`<script type="application/ld+json">\${JSON.stringify(ldJson)}</script>\`,
+    `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
+    `<meta name="twitter:image" content="${socialImage}" />`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(title)} — vacancy image" />`,
+    `<script type="application/ld+json">${JSON.stringify(ldJson)}</script>`,
   ].join("\n    ");
-  html = html.replace("</head>", \`    \${extra}\n  </head>\`);
+  html = html.replace("</head>", `    ${extra}\n  </head>`);
   return html;
 }
 
@@ -233,7 +233,7 @@ function run() {
     canonical: "https://cintexa.com/careers",
     // Use the newest open vacancy image so the listing preview follows new vacancy uploads.
     image: open.slice().sort((a, b) => (b.datePosted || "").localeCompare(a.datePosted || ""))[0]?.image
-      ? \`https://cintexa.com\${open.slice().sort((a, b) => (b.datePosted || "").localeCompare(a.datePosted || ""))[0].image}\`
+      ? `https://cintexa.com${open.slice().sort((a, b) => (b.datePosted || "").localeCompare(a.datePosted || ""))[0].image}`
       : "https://cintexa.com/careers/cleaner-job-vacancy.jpeg",
     ldJson: {
       "@context": "https://schema.org",

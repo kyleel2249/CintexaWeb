@@ -118,32 +118,49 @@ function jsonLd(job) {
 
 function injectHead(template, { title, description, canonical, image, ldJson }) {
   let html = template;
-  html = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`);
-  // Replace or insert description
-  if (html.includes('name="description"')) {
+  html = html.replace(/<title>[^<]*<\\/title>/, `<title>${escapeHtml(title)}</title>`);
+
+  // Remove inherited homepage metadata before adding route-specific metadata.
+  // Social crawlers can choose the wrong image when multiple og:image tags exist.
+  html = html
+    .replace(/<meta\\b(?=[^>]*\\bproperty=["']og:[^"']+["'])[^>]*\\/?\\s*>/gi, "")
+    .replace(/<meta\\b(?=[^>]*\\bname=["']twitter:[^"']+["'])[^>]*\\/?\\s*>/gi, "")
+    .replace(/<link\\b(?=[^>]*\\brel=["']canonical["'])[^>]*\\/?\\s*>/gi, "")
+    .replace(/<script\\b(?=[^>]*\\btype=["']application\\/ld\\+json["'])[^>]*>[\\s\\S]*?<\\/script>/gi, "");
+
+  // Replace or insert the route-specific description.
+  if (/<meta\\s+name=["']description["'][^>]*>/i.test(html)) {
     html = html.replace(
-      /<meta\s+name="description"\s+content="[^"]*"\s*\/>/,
+      /<meta\\s+name=["']description["'][^>]*>/i,
       `<meta name="description" content="${escapeHtml(description)}" />`,
     );
   } else {
     html = html.replace(
       "</head>",
-      `    <meta name="description" content="${escapeHtml(description)}" />\n  </head>`,
+      `    <meta name="description" content="${escapeHtml(description)}" />\\n  </head>`,
     );
   }
+
+  const socialImage = escapeHtml(image);
   const extra = [
     `<link rel="canonical" href="${escapeHtml(canonical)}" />`,
-    `<meta property="og:type" content="article" />`,
+    '<meta property="og:type" content="website" />',
     `<meta property="og:url" content="${escapeHtml(canonical)}" />`,
     `<meta property="og:title" content="${escapeHtml(title)}" />`,
     `<meta property="og:description" content="${escapeHtml(description)}" />`,
-    `<meta property="og:image" content="${escapeHtml(image)}" />`,
-    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta property="og:image" content="${socialImage}" />`,
+    `<meta property="og:image:secure_url" content="${socialImage}" />`,
+    '<meta property="og:image:width" content="1200" />',
+    '<meta property="og:image:height" content="630" />',
+    `<meta property="og:image:alt" content="${escapeHtml(title)} — vacancy image" />`,
+    '<meta name="twitter:card" content="summary_large_image" />',
     `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
+    `<meta name="twitter:image" content="${socialImage}" />`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(title)} — vacancy image" />`,
     `<script type="application/ld+json">${JSON.stringify(ldJson)}</script>`,
-  ].join("\n    ");
-  html = html.replace("</head>", `    ${extra}\n  </head>`);
+  ].join("\\n    ");
+  html = html.replace("</head>", `    ${extra}\\n  </head>`);
   return html;
 }
 
@@ -214,7 +231,7 @@ function run() {
     description:
       "Browse open job vacancies including Cleaners roles in Ghana for homes, offices, churches and more. Apply by call or WhatsApp. Job and scholarship alerts available.",
     canonical: "https://cintexa.com/careers",
-    image: "https://cintexa.com/careers/cleaner-job-vacancy.jpeg",
+    // Use the newest open vacancy image so the listing preview follows new vacancy uploads.\n    image: open.slice().sort((a, b) => (b.datePosted || "").localeCompare(a.datePosted || ""))[0]?.image\n      ? `https://cintexa.com${open.slice().sort((a, b) => (b.datePosted || "").localeCompare(a.datePosted || ""))[0].image}`\n      : "https://cintexa.com/careers/cleaner-job-vacancy.jpeg",
     ldJson: {
       "@context": "https://schema.org",
       "@graph": [

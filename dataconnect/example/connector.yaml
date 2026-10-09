@@ -1,0 +1,15 @@
+connectorId: example
+generate:
+  javascriptSdk:
+    - outputDir: ..\..\src\dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ..\..
+      react: false
+      angular: false
+      clientCache: {}
+    - outputDir: ..\..\artifacts\cintexa\src\dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ..\..\artifacts\cintexa
+      react: true
+      angular: false
+      clientCache: {}

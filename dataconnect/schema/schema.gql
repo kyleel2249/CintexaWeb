@@ -1,0 +1,49 @@
+type User @table {
+  username: String!
+  email: String!
+  joinedAt: Timestamp!
+  bio: String
+  avatarUrl: String
+}
+
+type Movie @table {
+  title: String!
+  releaseYear: Int!
+  genre: String
+  director: String
+  posterUrl: String
+}
+
+type WatchStatus @table {
+  status: String!
+  updatedAt: Timestamp!
+  user: User!
+  movie: Movie!
+}
+
+type CineList @table {
+  title: String!
+  createdAt: Timestamp!
+  description: String
+  isPublic: Boolean
+  user: User!
+}
+
+type ListItem @table {
+  addedAt: Timestamp!
+  cineList: CineList!
+  movie: Movie!
+}
+
+type MicroReview @table {
+  content: String!
+  createdAt: Timestamp!
+  user: User!
+  movie: Movie!
+}
+
+type Follow @table {
+  createdAt: Timestamp!
+  follower: User!
+  following: User!
+}

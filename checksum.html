@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Generate and verify SHA-256 checksums for text and files locally in your browser. Compare files and check data integrity without uploading your content.">
+  <meta name="theme-color" content="#070d1a">
+  <link rel="canonical" href="https://cintexa.com/checksum.html">
+  <title>SHA-256 Checksum Generator & Verifier | CINTEXA</title>
+  <style>
+    :root{color-scheme:dark;--bg:#070d1a;--surface:#111a2e;--surface2:#17243b;--line:#263752;--text:#eaf2ff;--muted:#9aaec6;--blue:#1e6bff;--cyan:#19d3ff;--green:#48d597;--red:#ff747e}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#143568 0,transparent 38%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}
+    a{color:#82cfff}.wrap{width:min(1080px,calc(100% - 36px));margin:auto}.topbar{border-bottom:1px solid #ffffff16;background:#070d1ad9;backdrop-filter:blur(12px)}.topbar-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{color:var(--text);font-weight:800;letter-spacing:.12em;text-decoration:none;font-size:1.1rem}.brand-mark{color:var(--cyan);margin-right:9px}.back{font-size:.9rem;text-decoration:none;color:var(--muted)}.hero{padding:54px 0 28px}.eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--cyan);font-size:.76rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.eyebrow:before{content:"";width:24px;height:2px;background:var(--cyan)}h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.08;letter-spacing:-.045em;margin:15px 0}.gradient{background:linear-gradient(90deg,#fff,#83dfff 60%,#6b9bff);-webkit-background-clip:text;background-clip:text;color:transparent}.lead{max-width:720px;color:var(--muted);font-size:1.06rem;margin:0}.privacy-note{display:flex;gap:12px;align-items:flex-start;border:1px solid #19d3ff45;background:#19d3ff0c;border-radius:14px;padding:15px 17px;margin:24px 0 30px;color:#c9eaff}.privacy-note strong{display:block;color:#fff}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:10px 15px;border-radius:10px;font:inherit;font-size:.92rem;cursor:pointer}.tab[aria-selected=true]{color:white;border-color:#1e6bff;background:#1e6bff28}.panel{display:none}.panel.active{display:block}.card{border:1px solid var(--line);background:linear-gradient(145deg,#111a2e,#0c1425);border-radius:18px;padding:clamp(18px,3vw,28px);box-shadow:0 18px 50px #0002;margin-bottom:18px}.card h2{margin:0 0 5px;font-size:1.35rem}.hint{color:var(--muted);font-size:.92rem;margin:0 0 18px}label{display:block;font-weight:650;font-size:.9rem;margin:0 0 8px}textarea,input[type=text],input[type=file]{width:100%;font:inherit;color:var(--text);background:#080f1e;border:1px solid #30435f;border-radius:10px;padding:12px 13px}textarea{min-height:155px;resize:vertical}input[type=file]{padding:10px}textarea:focus,input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.field{margin-bottom:17px}.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.btn{border:1px solid transparent;border-radius:10px;padding:11px 16px;font:inherit;font-weight:750;cursor:pointer;transition:transform .15s,background .15s}.btn:hover{transform:translateY(-1px)}.primary{background:linear-gradient(120deg,var(--blue),#3159e9);color:white}.secondary{background:#1b2a43;border-color:#344763;color:var(--text)}.ghost{background:transparent;border-color:#344763;color:#c5d7ee}.result{margin-top:18px;border:1px solid var(--line);border-radius:12px;background:#080f1e;padding:15px;min-width:0}.result-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}.result-label{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.09em;font-weight:800}.hash{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:.88rem;line-height:1.8;overflow-wrap:anywhere;word-break:break-word;color:#b9eaff}.status{display:none;margin-top:13px;padding:12px 14px;border-radius:10px;font-weight:650;overflow-wrap:anywhere}.status.show{display:block}.status.ok{color:#a5f2cd;background:#48d59713;border:1px solid #48d59750}.status.bad{color:#ffb4ba;background:#ff747e12;border:1px solid #ff747e55}.status.info{color:#b9eaff;background:#19d3ff12;border:1px solid #19d3ff44}.small{color:var(--muted);font-size:.82rem}.checkrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.checkrow input{flex:1;min-width:220px}.footer{border-top:1px solid #ffffff16;margin-top:42px;padding:24px 0 34px;color:var(--muted);font-size:.86rem}.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.footer a{color:#b8d9ff;text-decoration:none}.footer a:hover{text-decoration:underline}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:680px){.row{grid-template-columns:1fr}.hero{padding-top:38px}.topbar-inner{min-height:62px}.back{font-size:.8rem}.actions .btn{flex:1}.footer-inner{align-items:flex-start;flex-direction:column}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="wrap topbar-inner"><a class="brand" href="https://cintexa.com/" aria-label="CINTEXA home"><span class="brand-mark">◈</span>CINTEXA</a><a class="back" href="https://cintexa.com/">← Back to website</a></div></header>
+  <main class="wrap">
+    <section class="hero">
+      <span class="eyebrow">Free integrity tool</span>
+      <h1>SHA-256 <span class="gradient">Checksum Generator</span></h1>
+      <p class="lead">Generate SHA-256 fingerprints for text and files, verify a file against a trusted checksum, or compare two files. Everything runs locally in your browser; your selected content is not uploaded by this tool.</p>
+      <div class="privacy-note"><span aria-hidden="true">🔒</span><div><strong>Private, local processing</strong><span class="small">This page uses your browser's Web Crypto API. Files and text are processed on your device and are not sent to CINTEXA.</span></div></div>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="Checksum tools">
+      <button class="tab" id="tab-text" role="tab" aria-controls="panel-text" aria-selected="true" data-panel="text">Text checksum</button>
+      <button class="tab" id="tab-file" role="tab" aria-controls="panel-file" aria-selected="false" data-panel="file">File checksum</button>
+      <button class="tab" id="tab-verify" role="tab" aria-controls="panel-verify" aria-selected="false" data-panel="verify">Verify checksum</button>
+      <button class="tab" id="tab-compare" role="tab" aria-controls="panel-compare" aria-selected="false" data-panel="compare">Compare files</button>
+    </div>
+
+    <section class="panel active" id="panel-text" role="tabpanel" aria-labelledby="tab-text">
+      <div class="card">
+        <h2>Generate a checksum from text</h2><p class="hint">The exact UTF-8 bytes are hashed. Spaces, punctuation, capitalization, and line breaks affect the result.</p>
+        <div class="field"><label for="text-input">Text to hash</label><textarea id="text-input" placeholder="Type or paste your text here…">hello</textarea></div>
+        <div class="actions"><button class="btn primary" id="text-generate">Generate SHA-256</button><button class="btn secondary" id="text-clear">Clear text</button></div>
+        <div class="result" id="text-result" aria-live="polite"><div class="result-head"><span class="result-label">SHA-256 · 256 bits</span><button class="btn ghost" id="text-copy" disabled>Copy hash</button></div><div class="hash" id="text-hash">Select Generate SHA-256 to calculate the fingerprint.</div></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-file" role="tabpanel" aria-labelledby="tab-file" aria-hidden="true">
+      <div class="card">
+        <h2>Generate a checksum from a file</h2><p class="hint">Select a file to calculate its SHA-256 checksum. The file is read locally in your browser.</p>
+        <div class="field"><label for="file-input">Choose a file</label><input id="file-input" type="file"></div>
+        <div class="actions"><button class="btn primary" id="file-generate">Calculate file checksum</button></div>
+        <div class="result" aria-live="polite"><div class="result-head"><span class="result-label">File SHA-256</span><button class="btn ghost" id="file-copy" disabled>Copy hash</button></div><div class="hash" id="file-hash">Choose a file to begin.</div><div class="small" id="file-meta"></div><div class="actions"><button class="btn secondary" id="download-sum" disabled>Download .sha256 file</button></div></div>
+        <div class="status" id="file-status" role="status"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-verify" role="tabpanel" aria-labelledby="tab-verify" aria-hidden="true">
+      <div class="card">
+        <h2>Verify a file against a known checksum</h2><p class="hint">Use a checksum obtained from a trusted source, such as the official software publisher.</p>
+        <div class="field"><label for="verify-file">File to verify</label><input id="verify-file" type="file"></div>
+        <div class="field"><label for="expected-hash">Expected SHA-256 hash (64 hexadecimal characters)</label><input id="expected-hash" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Paste the trusted SHA-256 hash"></div>
+        <div class="actions"><button class="btn primary" id="verify-button">Verify file</button></div>
+        <div class="status" id="verify-status" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-compare" role="tabpanel" aria-labelledby="tab-compare" aria-hidden="true">
+      <div class="card">
+        <h2>Compare two files</h2><p class="hint">Calculate both SHA-256 hashes and check whether the file contents are identical.</p>
+        <div class="row">
+          <div class="field"><label for="compare-a">Original or file A</label><input id="compare-a" type="file"></div>
+          <div class="field"><label for="compare-b">Received or file B</label><input id="compare-b" type="file"></div>
+        </div>
+        <div class="actions"><button class="btn primary" id="compare-button">Compare files</button></div>
+        <div class="result"><div class="result-label">File A SHA-256</div><div class="hash" id="compare-hash-a">—</div><div class="result-label" style="margin-top:12px">File B SHA-256</div><div class="hash" id="compare-hash-b">—</div></div>
+        <div class="status" id="compare-status" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+    <p class="small">A matching SHA-256 checksum is strong evidence that two files are identical. It does not prove who created a file or that its contents are trustworthy. For authenticity, verify a trusted checksum or digital signature.</p>
+  </main>
+  <footer class="footer"><div class="wrap footer-inner"><span>© <span id="year"></span> CINTEXA · SHA-256 Checksum Tool</span><span><a href="https://cintexa.com/">CINTEXA Home</a> · <a href="https://cintexa.com/privacy-policy">Privacy Policy</a></span></div></footer>
+  <script>
+    (() => {
+      "use strict";
+      const $ = (id) => document.getElementById(id);
+      const MAX_TEXT_BYTES = 64 * 1024 * 1024;
+      const hex = (buffer) => Array.from(new Uint8Array(buffer), byte => byte.toString(16).padStart(2, "0")).join("");
+      const sha256Bytes = async (bytes) => {
+        if (!globalThis.crypto || !crypto.subtle) throw new Error("SHA-256 requires a secure browser context (HTTPS or localhost).");
+        return hex(await crypto.subtle.digest("SHA-256", bytes));
+      };
+      const hashText = async (text) => sha256Bytes(new TextEncoder().encode(text));
+      const hashFile = async (file) => {
+        if (!file) throw new Error("Please select a file first.");
+        if (file.size > MAX_TEXT_BYTES) throw new Error("This browser tool currently supports files up to 64 MB per hash. For larger files, use a streaming SHA-256 utility such as OpenSSL.");
+        return sha256Bytes(await file.arrayBuffer());
+      };
+      const setStatus = (node, message, type = "info") => {
+        node.textContent = message;
+        node.className = "status show " + type;
+      };
+      const clearStatus = (node) => { node.textContent = ""; node.className = "status"; };
+      const copyText = async (value) => {
+        if (!value) return;
+        try {
+          await navigator.clipboard.writeText(value);
+        } catch {
+          const helper = document.createElement("textarea");
+          helper.value = value; helper.setAttribute("readonly", ""); helper.style.position = "fixed"; helper.style.opacity = "0";
+          document.body.appendChild(helper); helper.select();
+          const copied = document.execCommand("copy"); helper.remove();
+          if (!copied) throw new Error("Copy was blocked by the browser. Select the hash and copy it manually.");
+        }
+      };
+      const setBusy = (button, busy, label) => {
+        if (busy) { button.dataset.label = button.textContent; button.textContent = label || "Working…"; button.disabled = true; }
+        else { button.textContent = button.dataset.label || button.textContent; button.disabled = false; }
+      };
+      document.querySelectorAll(".tab").forEach(button => button.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(tab => tab.setAttribute("aria-selected", String(tab === button)));
+        document.querySelectorAll(".panel").forEach(panel => {
+          const active = panel.id === "panel-" + button.dataset.panel;
+          panel.classList.toggle("active", active);
+          panel.setAttribute("aria-hidden", String(!active));
+        });
+      }));
+      $("year").textContent = new Date().getFullYear();
+
+      let textHash = "";
+      $("text-generate").addEventListener("click", async () => {
+        const button = $("text-generate"); setBusy(button, true);
+        try {
+          textHash = await hashText($("text-input").value);
+          $("text-hash").textContent = textHash; $("text-copy").disabled = false;
+        } catch (error) { $("text-hash").textContent = error.message; $("text-copy").disabled = true; textHash = ""; }
+        finally { setBusy(button, false); }
+      });
+      $("text-copy").addEventListener("click", async () => { try { await copyText(textHash); $("text-copy").textContent = "Copied"; setTimeout(() => $("text-copy").textContent = "Copy hash", 1200); } catch (e) { alert(e.message); } });
+      $("text-clear").addEventListener("click", () => { $("text-input").value = ""; textHash = ""; $("text-hash").textContent = "Select Generate SHA-256 to calculate the fingerprint."; $("text-copy").disabled = true; });
+
+      let lastFileHash = "", lastFileName = "";
+      $("file-generate").addEventListener("click", async () => {
+        const button = $("file-generate"), file = $("file-input").files[0]; setBusy(button, true); clearStatus($("file-status"));
+        try {
+          lastFileHash = await hashFile(file); lastFileName = file.name;
+          $("file-hash").textContent = lastFileHash; $("file-meta").textContent = file.name + " · " + file.size.toLocaleString() + " bytes · " + file.type;
+          $("file-copy").disabled = false; $("download-sum").disabled = false;
+          setStatus($("file-status"), "Checksum generated successfully.", "ok");
+        } catch (e) { lastFileHash = ""; $("file-hash").textContent = e.message; $("file-copy").disabled = true; $("download-sum").disabled = true; setStatus($("file-status"), e.message, "bad"); }
+        finally { setBusy(button, false); }
+      });
+      $("file-copy").addEventListener("click", async () => { try { await copyText(lastFileHash); $("file-copy").textContent = "Copied"; setTimeout(() => $("file-copy").textContent = "Copy hash", 1200); } catch (e) { alert(e.message); } });
+      $("download-sum").addEventListener("click", () => {
+        if (!lastFileHash) return;
+        const blob = new Blob([lastFileHash + "  " + lastFileName + "\n"], {type:"text/plain;charset=utf-8"});
+        const url = URL.createObjectURL(blob), link = document.createElement("a");
+        link.href = url; link.download = lastFileName + ".sha256"; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+      });
+
+      $("verify-button").addEventListener("click", async () => {
+        const button = $("verify-button"), file = $("verify-file").files[0], expected = $("expected-hash").value.trim();
+        setBusy(button, true); clearStatus($("verify-status"));
+        try {
+          if (!file) throw new Error("Please choose the file you want to verify.");
+          if (!/^[a-fA-F0-9]{64}$/.test(expected)) throw new Error("Enter a valid SHA-256 hash containing exactly 64 hexadecimal characters.");
+          const actual = await hashFile(file);
+          if (actual === expected.toLowerCase()) setStatus($("verify-status"), "MATCH — the file hash matches the expected checksum. This is strong evidence that the file contents are identical to the expected version.", "ok");
+          else setStatus($("verify-status"), "NO MATCH — the calculated hash differs from the expected checksum. Check the file and the trusted reference hash.", "bad");
+        } catch (e) { setStatus($("verify-status"), e.message, "bad"); }
+        finally { setBusy(button, false); }
+      });
+
+      $("compare-button").addEventListener("click", async () => {
+        const button = $("compare-button"), a = $("compare-a").files[0], b = $("compare-b").files[0];
+        setBusy(button, true); clearStatus($("compare-status"));
+        try {
+          if (!a || !b) throw new Error("Please select both files before comparing.");
+          const [ha, hb] = await Promise.all([hashFile(a), hashFile(b)]);
+          $("compare-hash-a").textContent = a.name + ": " + ha;
+          $("compare-hash-b").textContent = b.name + ": " + hb;
+          if (ha === hb) setStatus($("compare-status"), "MATCH — both files have identical SHA-256 hashes and are overwhelmingly likely to contain identical bytes.", "ok");
+          else setStatus($("compare-status"), "DIFFERENT — the hashes do not match. The files have different contents.", "bad");
+        } catch (e) { setStatus($("compare-status"), e.message, "bad"); }
+        finally { setBusy(button, false); }
+      });
+    })();
+  </script>
+</body>
+</html>

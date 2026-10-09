@@ -123,14 +123,6 @@ export function Careers() {
         <h1 className="cx-display mt-3 max-w-3xl text-3xl sm:text-4xl">
           Careers & Job Vacancies in Ghana — Apply Now
         </h1>
-        <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
-          Reliable{" "}
-          <strong className="text-[hsl(var(--fg))]">Cleaners</strong> are needed for{" "}
-          <strong className="text-[hsl(var(--fg))]">homes, offices, churches</strong>, schools and
-          other premises. If you take pride in clean, hygienic spaces and you are available and
-          dedicated, you are invited to apply today.
-        </p>
-
         {/* Featured external vacancy inspired by the supplied ByBeth Boutique advert */}
         <article className="mt-10 overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))]">
           <div className="grid gap-0 lg:grid-cols-2">
@@ -181,6 +173,14 @@ export function Careers() {
             </div>
           </div>
         </article>
+
+        <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
+          Reliable{" "}
+          <strong className="text-[hsl(var(--fg))]">Cleaners</strong> are needed for{" "}
+          <strong className="text-[hsl(var(--fg))]">homes, offices, churches</strong>, schools and
+          other premises. If you take pride in clean, hygienic spaces and you are available and
+          dedicated, you are invited to apply today.
+        </p>
 
         {/* Featured vacancy */}
         <article

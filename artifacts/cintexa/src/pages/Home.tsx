@@ -53,6 +53,40 @@ export function Home() {
 
   return (
     <>
+      {/* Small CINTEXA favicon glides across the top in a continuous 3D motion. */}
+      <div
+        className="relative h-12 w-full overflow-hidden"
+        aria-label="CINTEXA animated brand mark"
+      >
+        <motion.div
+          className="absolute left-0 top-1/2 flex -translate-y-1/2 items-center justify-center"
+          initial={false}
+          animate={
+            allowMotion
+              ? { x: ["-8vw", "calc(100vw - 42px)"], rotateY: [0, 360], rotateZ: [0, 8, -8, 0] }
+              : { x: "calc(50vw - 18px)", rotateY: 0, rotateZ: 0 }
+          }
+          transition={
+            allowMotion
+              ? {
+                  x: { duration: 9, ease: "linear", repeat: Infinity, repeatType: "loop" },
+                  rotateY: { duration: 3.5, ease: "linear", repeat: Infinity, repeatType: "loop" },
+                  rotateZ: { duration: 2.8, ease: "easeInOut", repeat: Infinity, repeatType: "loop" },
+                }
+              : { duration: 0 }
+          }
+          style={{ perspective: 700, transformStyle: "preserve-3d" }}
+        >
+          <img
+            src="/favicon.svg"
+            alt="CINTEXA"
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-lg shadow-[0_8px_20px_rgba(245,197,24,0.3)]"
+            draggable={false}
+          />
+        </motion.div>
+      </div>
       <HeroCarousel3D className="pt-4 sm:pt-6" />
 
       <section className="relative overflow-hidden cx-section">

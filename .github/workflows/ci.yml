@@ -19,6 +19,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Install Firebase Functions dependencies
+        run: npm ci --prefix functions
+
       - name: Migrate database
         run: npm run migrate -w @cintexa/db
         env:

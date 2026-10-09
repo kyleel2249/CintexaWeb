@@ -31,7 +31,13 @@ function setRobots(noIndex: boolean) {
  */
 export function applySeo(entry: SeoPageEntry, pathname: string) {
   const url = absoluteUrl(pathname.replace(/\/$/, "") || "/");
-  const image = entry.ogImage || DEFAULT_OG_IMAGE;
+  // Prefer the first meaningful image in page content so previews reflect the leading visual/update.
+  const pageImage = document.querySelector("main img[src]") as HTMLImageElement | null;
+  const pageImageSrc = pageImage?.getAttribute("src");
+  const resolvedPageImage = pageImageSrc
+    ? new URL(pageImageSrc, window.location.origin).toString()
+    : undefined;
+  const image = resolvedPageImage || entry.ogImage || DEFAULT_OG_IMAGE;
 
   document.title = entry.metaTitle;
   setMeta("name", "description", entry.metaDescription);

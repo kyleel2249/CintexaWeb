@@ -37,32 +37,73 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// In-memory fallback so sign-up / log-in still work when localStorage is unavailable
+// (Safari private mode, blocked storage). The session then lasts until the tab closes.
+let memoryToken: string | null = null;
+let memoryUser: CintexaUser | null = null;
+
+function readToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY) ?? memoryToken;
+  } catch {
+    return memoryToken;
+  }
+}
+
 function readStoredUser(): CintexaUser | null {
   try {
     const raw = localStorage.getItem(USER_KEY);
-    if (!raw) return null;
+    if (!raw) return memoryUser;
     return JSON.parse(raw) as CintexaUser;
   } catch {
-    return null;
+    return memoryUser;
   }
 }
 
 function storeSession(token: string, user: CintexaUser) {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  memoryToken = token;
+  memoryUser = user;
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  } catch {
+    /* storage unavailable — memory fallback above keeps the session alive */
+  }
 }
 
 function clearSession() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+  memoryToken = null;
+  memoryUser = null;
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  } catch {
+    /* ignore */
+  }
 }
 
 async function postAuth<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20_000);
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (e) {
+    const aborted = e instanceof DOMException && e.name === "AbortError";
+    throw new Error(
+      aborted
+        ? "The request timed out. Check your connection and try again."
+        : "Could not reach CINTEXA. Check your connection and try again.",
+      { cause: e },
+    );
+  } finally {
+    clearTimeout(timer);
+  }
   const data = (await res.json().catch(() => ({}))) as T & { error?: string };
   if (!res.ok) {
     throw new Error((data as { error?: string }).error || `Request failed (${res.status})`);
@@ -75,35 +116,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = readToken();
     const stored = readStoredUser();
     if (!token || !stored) {
       setIsLoaded(true);
       return;
     }
     setUser(stored);
-    // Validate session in background
+    // Validate the session in the background. Never let a slow/hung request keep the
+    // page on "Loading…": abort after 8s and fall back to the cached session.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8_000);
     fetch("/api/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
     })
       .then(async (res) => {
-        if (!res.ok) {
+        // Only an explicit auth rejection ends the session. A 5xx / 429 must not log users out.
+        if (res.status === 401 || res.status === 403) {
           clearSession();
           setUser(null);
           return;
         }
+        if (!res.ok) return;
         const data = (await res.json()) as { user: CintexaUser };
         setUser(data.user);
-        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        storeSession(token, data.user);
       })
       .catch(() => {
-        /* offline — keep cached session */
+        /* offline / timeout — keep cached session */
       })
-      .finally(() => setIsLoaded(true));
+      .finally(() => {
+        clearTimeout(timer);
+        setIsLoaded(true);
+      });
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, []);
 
   const getToken = useCallback(async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = readToken();
     const u = readStoredUser();
     if (!token) return null;
     // API server accepts "userId:sessionToken" so routes receive a stable userId
@@ -146,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = readToken();
     if (token) {
       await fetch("/api/auth/logout", {
         method: "POST",

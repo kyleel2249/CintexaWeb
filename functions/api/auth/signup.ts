@@ -171,7 +171,7 @@ https://cintexa.com`;
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const headers = corsHeaders({ "Content-Type": "application/json" });
   try {
-    const body = (await context.request.json()) as {
+    let body: {
       fullName?: string;
       email?: string;
       password?: string;
@@ -179,6 +179,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       company?: string;
       role?: string;
     };
+    try {
+      body = (await context.request.json()) as typeof body;
+    } catch {
+      return Response.json({ error: "Invalid request." }, { status: 400, headers });
+    }
 
     const fullName = (body.fullName || "").trim();
     const email = (body.email || "").trim().toLowerCase();
@@ -189,6 +194,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     if (!fullName || fullName.length > 120 || !email || !EMAIL_RE.test(email)) {
       return Response.json({ error: "Valid full name and email are required." }, { status: 400, headers });
+    }
+    if (phone && !(/^\+?[\d\s().-]{7,25}$/.test(phone) && phone.replace(/\D/g, "").length >= 7 && phone.replace(/\D/g, "").length <= 15)) {
+      return Response.json({ error: "Enter a valid phone number." }, { status: 400, headers });
     }
     if (password.length < 8 || password.length > 128) {
       return Response.json({ error: "Password must be 8–128 characters." }, { status: 400, headers });

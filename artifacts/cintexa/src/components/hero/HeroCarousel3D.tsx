@@ -271,9 +271,6 @@ export function HeroCarousel3D({ className }: { className?: string }) {
             ›
           </button>
         </div>
-        <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-[hsl(var(--fg-muted))]">
-          Auto every 5s · swipe or use arrows anytime
-        </p>
       </div>
     </section>
   );

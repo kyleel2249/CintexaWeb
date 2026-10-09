@@ -70,9 +70,9 @@ export function SiteFooter() {
           ))}
         </div>
       </div>
-      <div className="cx-container mt-8 flex flex-wrap gap-x-5 gap-y-2 border-t border-[hsl(var(--border))] pt-6 text-xs text-[hsl(var(--fg-muted))]">
-        <Link href="/privacy-policy" className="hover:text-[hsl(var(--fg))]">Privacy Policy</Link><Link href="/terms" className="hover:text-[hsl(var(--fg))]">Terms</Link><Link href="/cookie-policy" className="hover:text-[hsl(var(--fg))]">Cookie Policy</Link><Link href="/disclaimer" className="hover:text-[hsl(var(--fg))]">Disclaimer</Link>
-        © {new Date().getFullYear()} CINTEXA. All rights reserved.
+      <div className="cx-container mt-8 flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-t border-[hsl(var(--border))] pt-6 text-xs text-[hsl(var(--fg-muted))]">
+        <div className="flex flex-wrap gap-x-5 gap-y-2"><Link href="/privacy-policy" className="hover:text-[hsl(var(--fg))]">Privacy Policy</Link><Link href="/terms" className="hover:text-[hsl(var(--fg))]">Terms</Link><Link href="/cookie-policy" className="hover:text-[hsl(var(--fg))]">Cookie Policy</Link><Link href="/disclaimer" className="hover:text-[hsl(var(--fg))]">Disclaimer</Link></div>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2"><span>© {new Date().getFullYear()} CINTEXA. All rights reserved.</span><a href="/checksum.html" className="font-semibold text-[hsl(var(--accent))] hover:underline">SHA-256 Checksum Generator ↗</a></div>
       </div>
     </footer>
   );

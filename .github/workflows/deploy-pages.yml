@@ -28,27 +28,19 @@ jobs:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
-      - name: Check Cloudflare deployment credentials
-        id: cloudflare
+      - name: Verify Cloudflare deployment credentials
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          if [ -n "$CF_API_TOKEN" ] && [ -n "$CF_ACCOUNT_ID" ]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "configured=false" >> "$GITHUB_OUTPUT"
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::error::Cloudflare deployment is blocked. Configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in repository Settings > Secrets and variables > Actions."
+            exit 1
           fi
 
       - name: Publish to Cloudflare Pages
-        if: steps.cloudflare.outputs.configured == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy artifacts/cintexa/dist --project-name=cintexa-growth-platform --branch=main
-
-      - name: Skip notice
-        if: steps.cloudflare.outputs.configured != 'true'
-        run: |
-          echo "::notice::Skipped Cloudflare Pages publish because CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID are not configured. The frontend build still runs. Add both secrets in repository Settings > Secrets and variables > Actions to enable this deployment workflow."

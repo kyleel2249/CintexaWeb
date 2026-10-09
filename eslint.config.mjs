@@ -25,11 +25,23 @@ export default tseslint.config(
       "lib/db/drizzle/**",
       "artifacts/cintexa/public/**",
       "**/*.d.ts",
+      // Firebase Functions tsc output (functions/lib also holds hand-written Pages helpers in .ts)
+      "functions/lib/**/*.js",
+      "functions/lib/**/*.js.map",
     ],
   },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,
+
+  // Firebase scaffold config is a legacy CommonJS file (module.exports): give it Node globals.
+  {
+    files: ["functions/.eslintrc.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: globals.node,
+    },
+  },
 
   // React web app: browser globals + hooks rules + Vite fast-refresh rule.
   // (eslint-plugin-react removed: its peer range still caps at ESLint 9.7 while

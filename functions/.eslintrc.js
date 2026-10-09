@@ -20,6 +20,8 @@ module.exports = {
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.
     "/generated/**/*", // Ignore generated files.
+    "/api/**/*", // Cloudflare Pages Functions: checked from repo root.
+    "/node_modules/**/*",
   ],
   plugins: [
     "@typescript-eslint",

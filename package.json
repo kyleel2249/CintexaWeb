@@ -18,7 +18,8 @@
     "dev:api": "npm run build -w @cintexa/db && npm run dev -w api-server",
     "build": "npm run build -w @cintexa/db && npm run build -w api-server && npm run build -w cintexa",
     "build:pages": "npm run build -w @cintexa/db && npm run build -w cintexa",
-    "typecheck": "npm run build -w @cintexa/db && npm run typecheck --workspaces --if-present && tsc --noEmit -p functions/tsconfig.json",
+    "typecheck": "npm run build -w @cintexa/db && npm run typecheck --workspaces --if-present && tsc --noEmit -p functions/tsconfig.pages.json && tsc --noEmit -p functions/tsconfig.json",
+    "install:functions": "npm ci --prefix functions",
     "test": "npm run build -w @cintexa/db && npm run test -w api-server && npm run test -w cintexa",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"

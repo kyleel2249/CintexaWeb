@@ -131,6 +131,57 @@ export function Careers() {
           dedicated, you are invited to apply today.
         </p>
 
+        {/* Featured external vacancy inspired by the supplied ByBeth Boutique advert */}
+        <article className="mt-10 overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))]">
+          <div className="grid gap-0 lg:grid-cols-2">
+            <div className="relative min-h-[320px] bg-[hsl(var(--bg))]">
+              <img
+                src="/careers/bybeth-boutique-sales-girl.svg"
+                alt="ByBeth Boutique is hiring a Sales Girl near East Legon, Madina and surrounding areas"
+                className="absolute inset-0 h-full w-full object-contain"
+                loading="lazy"
+              />
+            </div>
+            <div className="flex flex-col justify-center p-6 sm:p-8">
+              <p className="cx-eyebrow" style={{ color: "hsl(var(--accent))" }}>Featured opportunity · Retail & fashion</p>
+              <h2 className="cx-display mt-2 text-2xl sm:text-3xl">ByBeth Boutique Is Hiring a Sales Girl</h2>
+              <p className="mt-3 text-base font-medium leading-relaxed text-[hsl(var(--fg))]">
+                Love fashion? Enjoy making people feel welcome and helping them find something they’ll love? Step into an exciting retail opportunity with ByBeth Boutique! The team is looking for an upbeat, dependable people-person who can turn everyday shopping into a warm, memorable experience. If you’re ready to bring your energy, style and customer-care skills to the boutique, this could be your next move.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--fg-muted))]">
+                Do you love fashion, enjoy helping people, and believe every customer deserves a warm welcome? ByBeth Boutique is looking for a friendly, reliable and energetic Sales Girl to join its team. If you are enthusiastic about fashion, take pride in great customer service and want to help customers find products they love, this could be the opportunity for you.
+              </p>
+              <h3 className="mt-5 font-semibold text-[hsl(var(--fg))]">What you’ll do</h3>
+              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[hsl(var(--fg-muted))]">
+                <li>Welcome customers, understand their needs and provide excellent service.</li>
+                <li>Assist with sales, packing purchases and presenting products attractively.</li>
+                <li>Keep the boutique neat, organised, clean and well stocked.</li>
+                <li>Help receive stock and carry out basic inventory checks.</li>
+                <li>Represent the ByBeth brand positively and create a pleasant shopping experience.</li>
+              </ul>
+              <h3 className="mt-5 font-semibold text-[hsl(var(--fg))]">Who should apply?</h3>
+              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[hsl(var(--fg-muted))]">
+                <li>You live around East Legon, Madina or nearby communities.</li>
+                <li>Previous retail or sales experience is an advantage, but a positive attitude matters.</li>
+                <li>You communicate confidently, are honest and dependable, and work well with others.</li>
+                <li>You can work flexible hours, including weekends when needed.</li>
+              </ul>
+              <p className="mt-4 text-sm leading-relaxed text-[hsl(var(--fg-muted))]">
+                <strong className="text-[hsl(var(--fg))]">Ready to apply?</strong> Send a short WhatsApp message introducing yourself. Include where you live, any relevant sales or retail experience, and your phone number. Be sure to share why you would be a great addition to the boutique team.
+              </p>
+              <a
+                href="https://wa.me/233543692891?text=Hello%20ByBeth%20Boutique%2C%20I%20am%20interested%20in%20the%20Sales%20Girl%20vacancy.%20I%20would%20like%20to%20share%20my%20location%2C%20experience%20and%20application."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cx-btn cx-btn-primary mt-5 w-full sm:w-fit"
+              >
+                Apply via WhatsApp · 054 369 2891
+              </a>
+              <p className="mt-2 text-xs text-[hsl(var(--fg-muted))]">Applicants should live around East Legon, Madina and surrounding areas. Tap the button to open WhatsApp and send your application message.</p>
+            </div>
+          </div>
+        </article>
+
         {/* Featured vacancy */}
         <article
           className="mt-10 overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))]"
@@ -216,54 +267,6 @@ export function Careers() {
                   </a>
                 </div>
               </div>
-            </div>
-          </div>
-        </article>
-
-        {/* Featured external vacancy inspired by the supplied ByBeth Boutique advert */}
-        <article className="mt-10 overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))]">
-          <div className="grid gap-0 lg:grid-cols-2">
-            <div className="relative min-h-[320px] bg-[hsl(var(--bg))]">
-              <img
-                src="/careers/bybeth-boutique-sales-girl.svg"
-                alt="ByBeth Boutique is hiring a Sales Girl near East Legon, Madina and surrounding areas"
-                className="absolute inset-0 h-full w-full object-contain"
-                loading="lazy"
-              />
-            </div>
-            <div className="flex flex-col justify-center p-6 sm:p-8">
-              <p className="cx-eyebrow" style={{ color: "hsl(var(--accent))" }}>Featured opportunity · Retail & fashion</p>
-              <h2 className="cx-display mt-2 text-2xl sm:text-3xl">ByBeth Boutique Is Hiring a Sales Girl</h2>
-              <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--fg-muted))]">
-                Do you love fashion, enjoy helping people, and believe every customer deserves a warm welcome? ByBeth Boutique is looking for a friendly, reliable and energetic Sales Girl to join its team. If you are enthusiastic about fashion, take pride in great customer service and want to help customers find products they love, this could be the opportunity for you.
-              </p>
-              <h3 className="mt-5 font-semibold text-[hsl(var(--fg))]">What you’ll do</h3>
-              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[hsl(var(--fg-muted))]">
-                <li>Welcome customers, understand their needs and provide excellent service.</li>
-                <li>Assist with sales, packing purchases and presenting products attractively.</li>
-                <li>Keep the boutique neat, organised, clean and well stocked.</li>
-                <li>Help receive stock and carry out basic inventory checks.</li>
-                <li>Represent the ByBeth brand positively and create a pleasant shopping experience.</li>
-              </ul>
-              <h3 className="mt-5 font-semibold text-[hsl(var(--fg))]">Who should apply?</h3>
-              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[hsl(var(--fg-muted))]">
-                <li>You live around East Legon, Madina or nearby communities.</li>
-                <li>Previous retail or sales experience is an advantage, but a positive attitude matters.</li>
-                <li>You communicate confidently, are honest and dependable, and work well with others.</li>
-                <li>You can work flexible hours, including weekends when needed.</li>
-              </ul>
-              <p className="mt-4 text-sm leading-relaxed text-[hsl(var(--fg-muted))]">
-                <strong className="text-[hsl(var(--fg))]">Ready to apply?</strong> Send a short WhatsApp message introducing yourself. Include where you live, any relevant sales or retail experience, and your phone number. Be sure to share why you would be a great addition to the boutique team.
-              </p>
-              <a
-                href="https://wa.me/233543692891?text=Hello%20ByBeth%20Boutique%2C%20I%20am%20interested%20in%20the%20Sales%20Girl%20vacancy.%20I%20would%20like%20to%20share%20my%20location%2C%20experience%20and%20application."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cx-btn cx-btn-primary mt-5 w-full sm:w-fit"
-              >
-                Apply via WhatsApp · 054 369 2891
-              </a>
-              <p className="mt-2 text-xs text-[hsl(var(--fg-muted))]">Applicants should live around East Legon, Madina and surrounding areas. Tap the button to open WhatsApp and send your application message.</p>
             </div>
           </div>
         </article>
@@ -395,15 +398,7 @@ export function Careers() {
         </div>
 
         <p className="mt-10 text-xs text-[hsl(var(--fg-muted))]">
-          Cleaners job vacancy · Call{" "}
-          <a href={`tel:${PHONE_TEL}`} className="underline hover:text-[hsl(var(--fg))]">
-            {PHONE_DISPLAY}
-          </a>{" "}
-          ·{" "}
-          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-[hsl(var(--fg))]">
-            WhatsApp the same number
-          </a>{" "}
-          · General enquiries{" "}
+          General enquiries{" "}
           <a href="mailto:info@cintexa.com" className="underline hover:text-[hsl(var(--fg))]">
             info@cintexa.com
           </a>

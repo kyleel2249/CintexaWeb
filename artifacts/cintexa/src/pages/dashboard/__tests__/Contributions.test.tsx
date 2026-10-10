@@ -24,7 +24,7 @@ function renderWith(currency: string, fetchImpl: typeof fetch) {
   return render(
     <QueryClientProvider client={client}>
       <CurrencyContext.Provider
-        value={{ currency, country: null, source: "preference", preference: currency, setPreference: () => undefined, detecting: false }}
+        value={{ currency, country: null, region: null, source: "preference", preference: currency, setPreference: () => undefined, detecting: false }}
       >
         <DashboardContributions />
       </CurrencyContext.Provider>

@@ -37,15 +37,18 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const setPreference = useCallback((value: string) => setPreferenceState(writeCurrencyPreference(value)), []);
 
   const value = useMemo(() => {
-    const resolved = resolveCurrency({
-      preference,
+    const signals = {
       profileCountry,
       networkCountry: geo.data ?? null,
       locales: typeof navigator === "undefined" ? [] : (navigator.languages ?? [navigator.language]),
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    });
+    };
+    const resolved = resolveCurrency({ preference, ...signals });
+    // Holidays/greetings need the user's place even when they've picked another display currency.
+    const region = resolved.country ?? resolveCurrency(signals).country;
     return {
       ...resolved,
+      region,
       preference,
       setPreference,
       detecting: preference === "auto" && geo.isPending,

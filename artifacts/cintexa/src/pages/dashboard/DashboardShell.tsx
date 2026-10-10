@@ -7,6 +7,10 @@ import { AVATAR_OPTIONS } from "@/lib/local-profile";
 import { badgeMeta, checkInStreak, type BadgeId } from "@/lib/streak-badges";
 import { ensureAdminReferrer } from "@/lib/social-hub";
 import { DASHBOARD_TABS } from "./routes";
+import { WelcomeGreeting } from "@/components/WelcomeGreeting";
+import { useCurrency } from "@/lib/currency/context";
+import { buildGreeting } from "@/lib/greetings/greeting";
+import { sessionNonce } from "@/lib/greetings/welcome";
 
 function SignedOutPrompt() {
   const [pathname] = useLocation();
@@ -50,6 +54,19 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const avatarId = (profile.data?.profile as { avatarId?: string } | null)?.avatarId;
   const avatar = AVATAR_OPTIONS.find((a) => a.id === avatarId);
 
+  // Time-, weekday- and holiday-aware greeting by name (wording is stable for the whole session).
+  const { region } = useCurrency();
+  const greetName = user?.firstName ?? username ?? null;
+  const [greetNow] = useState(() => new Date());
+  const headerGreeting = buildGreeting({
+    name: greetName,
+    now: greetNow,
+    country: region,
+    kind: "visit",
+    seed: `${user?.id ?? ""}|${sessionNonce()}`,
+    streakDays,
+  });
+
   return (
     <>
       {!isSignedIn ? (
@@ -63,6 +80,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         ) : profile.data?.profile?.onboardingCompleted ? (
           <div className="cx-section !pt-10">
             <div className="cx-container">
+              <WelcomeGreeting name={greetName} userId={user?.id} country={region} streakDays={streakDays} />
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div
@@ -74,9 +92,10 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                   </div>
                   <div>
                     <h1 className="cx-display text-2xl sm:text-3xl">
-                      {username ? `@${username}` : `Welcome back${user?.firstName ? `, ${user.firstName}` : ""}`}
+                      {headerGreeting.headline}
                     </h1>
                     <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">
+                      {username ? <>@{username} · </> : null}
                       Daily streak: <strong>{streakDays}</strong> day{streakDays === 1 ? "" : "s"}
                       {badge ? (
                         <>
@@ -126,7 +145,12 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             </div>
           </div>
         ) : (
-          <OnboardingFlow />
+          <>
+            <div className="cx-container" style={{ paddingTop: "1.5rem" }}>
+              <WelcomeGreeting name={greetName} userId={user?.id} country={region} streakDays={streakDays} />
+            </div>
+            <OnboardingFlow />
+          </>
         )}
     </>
   );

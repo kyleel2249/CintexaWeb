@@ -5,6 +5,8 @@ export type CurrencyContextValue = {
   /** Currency amounts should be shown in. */
   currency: string;
   country: string | null;
+  /** Where the user is (profile > network > locale > time zone), ignoring any currency override. */
+  region: string | null;
   source: CurrencySource;
   /** "auto" or the explicit code chosen in Settings. */
   preference: string;
@@ -16,6 +18,7 @@ export type CurrencyContextValue = {
 export const CurrencyContext = createContext<CurrencyContextValue>({
   currency: BASE_CURRENCY,
   country: null,
+  region: null,
   source: "default",
   preference: "auto",
   setPreference: () => undefined,

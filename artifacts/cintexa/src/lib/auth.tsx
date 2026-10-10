@@ -1,3 +1,4 @@
+import { markWelcome } from "@/lib/greetings/welcome";
 import {
   createContext,
   useCallback,
@@ -176,6 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const data = await postAuth<{ token: string; user: CintexaUser }>("/api/auth/signup", input);
         storeSession(data.token, data.user);
+        markWelcome("signup");
         setUser(data.user);
         return { ok: true as const };
       } catch (e) {
@@ -192,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
       storeSession(data.token, data.user);
+      markWelcome("signin");
       setUser(data.user);
       return { ok: true as const };
     } catch (e) {

@@ -6,7 +6,6 @@ import { OnboardingFlow } from "./onboarding/OnboardingFlow";
 import { AVATAR_OPTIONS } from "@/lib/local-profile";
 import { badgeMeta, checkInStreak, type BadgeId } from "@/lib/streak-badges";
 import { ensureAdminReferrer } from "@/lib/social-hub";
-import { ADMIN_USERNAME } from "@/lib/platform-economics";
 import { DASHBOARD_TABS } from "./routes";
 
 function SignedOutPrompt() {
@@ -74,8 +73,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                     {(username ?? user?.firstName ?? "C").slice(0, 1).toUpperCase()}
                   </div>
                   <div>
-                    <p className="cx-eyebrow">Customer portal · ref @{ADMIN_USERNAME}</p>
-                    <h1 className="cx-display mt-1 text-2xl sm:text-3xl">
+                    <h1 className="cx-display text-2xl sm:text-3xl">
                       {username ? `@${username}` : `Welcome back${user?.firstName ? `, ${user.firstName}` : ""}`}
                     </h1>
                     <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">

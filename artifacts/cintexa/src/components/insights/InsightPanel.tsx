@@ -258,12 +258,9 @@ export function InsightPanel({ tab, specialistId, extraContext }: Props) {
         </div>
       )}
 
-      {!result && (
+      {!result && serverError && (
         <div className="cx-card">
-          <p className="text-sm text-[hsl(var(--fg-muted))]">
-            Generate an Insight report for this area. Findings use authorized account data only — missing sources are disclosed, never invented. Server runs are preferred when the API is available; otherwise the on-device engine is used.
-          </p>
-          {serverError && <p className="mt-2 text-xs text-[hsl(var(--fg-muted))]">{serverError}</p>}
+          <p className="text-xs text-[hsl(var(--fg-muted))]">{serverError}</p>
         </div>
       )}
 

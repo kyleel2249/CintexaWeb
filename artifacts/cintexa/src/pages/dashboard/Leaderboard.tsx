@@ -25,9 +25,6 @@ export function DashboardLeaderboard() {
   return (
     <DashboardShell>
       <h2 className="cx-display text-xl">Leaderboard</h2>
-      <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-        Rankings by referrals, creators, and platform usage. Admin account @{ADMIN_USERNAME} is never listed.
-      </p>
 
       {board.isLoading && (
         <div className="mt-8 grid gap-6 lg:grid-cols-3">

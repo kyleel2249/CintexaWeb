@@ -24,9 +24,9 @@ export function DashboardProgress() {
     [badgeId],
   );
 
-  const hasActivity = (activity.data?.activity.length ?? 0) > 0;
+  const hasActivity = (activity.data?.activity?.length ?? 0) > 0;
   const hasContribution =
-    activity.data?.activity.some((a) => a.eventType.startsWith("contribution")) ?? false;
+    activity.data?.activity?.some((a) => a.eventType?.startsWith("contribution")) ?? false;
   const plan = subscription.data?.subscription?.plan;
   const balance = loyalty.data?.balance ?? 0;
 
@@ -44,6 +44,20 @@ export function DashboardProgress() {
 
   return (
     <DashboardShell>
+      {(activity.isError || loyalty.isError || subscription.isError) && (
+        <div className="cx-card mb-4 flex flex-wrap items-center justify-between gap-3" role="alert" style={{ borderColor: "hsl(var(--danger) / .5)" }}>
+          <p className="text-sm">
+            Some account data couldn’t be loaded, so milestones that depend on it may show as not done yet.
+          </p>
+          <button
+            type="button"
+            className="cx-btn cx-btn-secondary cx-btn-sm"
+            onClick={() => [activity, loyalty, subscription].filter((q) => q.isError).forEach((q) => void q.refetch())}
+          >
+            Try again
+          </button>
+        </div>
+      )}
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="cx-card">
           <div className="flex items-center justify-between">

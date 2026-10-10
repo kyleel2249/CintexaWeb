@@ -41,10 +41,19 @@ export function DashboardLeaderboard() {
         </div>
       )}
 
+      {board.isError && (
+        <div className="cx-card mt-8 flex flex-wrap items-center justify-between gap-3" role="alert" style={{ borderColor: "hsl(var(--danger) / .5)" }}>
+          <p className="text-sm">The leaderboard couldn’t be loaded right now.</p>
+          <button type="button" className="cx-btn cx-btn-secondary cx-btn-sm" onClick={() => void board.refetch()}>
+            Try again
+          </button>
+        </div>
+      )}
+
       {board.data && (
         <div className="mt-8 grid gap-6 lg:grid-cols-3">
           {COLUMNS.map((col) => {
-            const rows = board.data[col.key];
+            const rows = board.data[col.key] ?? [];
             return (
               <div key={col.key} className="cx-card !p-0 overflow-hidden">
                 <div className="border-b border-[hsl(var(--border))] px-4 py-3">
@@ -67,7 +76,7 @@ export function DashboardLeaderboard() {
                           <p className="truncate text-sm font-medium">
                             #{r.rank} @{r.name}
                           </p>
-                          <p className="text-xs text-[hsl(var(--fg-muted))]">{r.score.toLocaleString()} pts</p>
+                          <p className="text-xs text-[hsl(var(--fg-muted))]">{(r.score ?? 0).toLocaleString(undefined)} pts</p>
                         </div>
                         {!isSelf && (
                           <button

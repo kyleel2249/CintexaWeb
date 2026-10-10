@@ -1,9 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth, useUser } from "@/lib/auth";
 import { DashboardShell } from "./DashboardShell";
 import { useDeleteMyData, useExportMyData, useMyProfile, useUpdateProfile } from "@/hooks/useApi";
 import { AVATAR_OPTIONS } from "@/lib/local-profile";
 import { InsightPanel } from "@/components/insights/InsightPanel";
+import { useCurrency } from "@/lib/currency/context";
+import { COMMON_CURRENCIES, COUNTRY_CURRENCY } from "@/lib/currency/countries";
+import { currencyName, regionName } from "@/lib/currency/format";
+import { countryFromProfile } from "@/lib/currency/geo";
+
+const SOURCE_LABEL = {
+  preference: "your choice below",
+  profile: "the country on your profile",
+  network: "your current location",
+  locale: "your browser language",
+  timezone: "your time zone",
+  default: "the platform default",
+} as const;
 
 export function DashboardSettings() {
   const { user } = useUser();
@@ -19,6 +32,20 @@ export function DashboardSettings() {
   const [leaderboardVisible, setLeaderboardVisible] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [usernameError, setUsernameError] = useState("");
+  const [country, setCountry] = useState("");
+  const { currency, country: detectedCountry, source, preference, setPreference } = useCurrency();
+  const countryOptions = useMemo(
+    () =>
+      Object.keys(COUNTRY_CURRENCY)
+        .map((cc) => ({ cc, name: regionName(cc) }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [],
+  );
+  const currencyOptions = useMemo(() => {
+    const list: string[] = [...COMMON_CURRENCIES];
+    if (preference !== "auto" && !list.includes(preference)) list.push(preference);
+    return list;
+  }, [preference]);
 
   useEffect(() => {
     const p = profile.data?.profile as
@@ -27,6 +54,7 @@ export function DashboardSettings() {
           username?: string;
           avatarId?: string;
           leaderboardVisible?: boolean;
+          country?: string | null;
         } & Record<string, unknown>)
       | null
       | undefined;
@@ -35,6 +63,7 @@ export function DashboardSettings() {
       setUsername(p.username ?? "");
       setAvatarId(p.avatarId ?? "orbit");
       setLeaderboardVisible(Boolean(p.leaderboardVisible));
+      setCountry(countryFromProfile(p.country) ?? "");
     }
   }, [profile.data]);
 
@@ -108,7 +137,7 @@ export function DashboardSettings() {
             <label className="cx-label" htmlFor="displayName">
               Display name
             </label>
-            <input id="displayName" className="cx-input" defaultValue={user?.fullName ?? ""} disabled />
+            <input id="displayName" className="cx-input" value={user?.fullName ?? ""} readOnly disabled />
             <p className="text-xs text-[hsl(var(--fg-muted))]">Managed by your account provider.</p>
           </div>
           <div className="cx-field">
@@ -142,6 +171,63 @@ export function DashboardSettings() {
         </form>
 
         <div className="flex max-w-md flex-col gap-6">
+          <section className="cx-card space-y-4" aria-labelledby="region-title">
+            <div>
+              <h2 id="region-title" className="cx-display text-lg">
+                Region &amp; currency
+              </h2>
+              <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
+                Amounts on your dashboard are shown in your own currency, converted from the currency they were
+                recorded in at today’s exchange rate. Currently showing <strong>{currency}</strong>
+                {detectedCountry && preference === "auto" ? ` (${regionName(detectedCountry)})` : ""}, based on{" "}
+                {SOURCE_LABEL[source]}.
+              </p>
+            </div>
+            <div className="cx-field">
+              <label className="cx-label" htmlFor="country">
+                Country
+              </label>
+              <select
+                id="country"
+                className="cx-input"
+                value={country}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setCountry(next);
+                  updateProfile.mutate({ country: next || null });
+                }}
+              >
+                <option value="">Not set — detect automatically</option>
+                {countryOptions.map((o) => (
+                  <option key={o.cc} value={o.cc}>
+                    {o.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="cx-field">
+              <label className="cx-label" htmlFor="display-currency">
+                Display currency
+              </label>
+              <select
+                id="display-currency"
+                className="cx-input"
+                value={preference}
+                onChange={(e) => setPreference(e.target.value)}
+              >
+                <option value="auto">Automatic (match my location)</option>
+                {currencyOptions.map((code) => (
+                  <option key={code} value={code}>
+                    {code} — {currencyName(code)}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-[hsl(var(--fg-muted))]">
+                Only how amounts are displayed changes — your recorded payments stay exactly as paid.
+              </p>
+            </div>
+          </section>
+
           <section className="cx-card space-y-3">
             <h2 className="cx-display text-lg">Session</h2>
             <p className="text-sm text-[hsl(var(--fg-muted))]">

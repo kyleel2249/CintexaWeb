@@ -261,6 +261,24 @@
   border-color: hsl(var(--accent) / 0.3);
 }
 
+.cx-badge-success {
+  background: hsl(var(--success) / 0.12);
+  color: hsl(var(--success));
+  border-color: hsl(var(--success) / 0.3);
+}
+
+.cx-badge-warning {
+  background: hsl(38 92% 60% / 0.12);
+  color: hsl(38 92% 60%);
+  border-color: hsl(38 92% 60% / 0.3);
+}
+
+.cx-badge-danger {
+  background: hsl(var(--danger) / 0.12);
+  color: hsl(var(--danger));
+  border-color: hsl(var(--danger) / 0.3);
+}
+
 /* ============ Motion utilities ============ */
 .cx-motion-safe {
   transition-property: transform, opacity;

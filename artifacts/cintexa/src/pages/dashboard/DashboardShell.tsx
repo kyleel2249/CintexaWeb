@@ -1,4 +1,4 @@
-import { Link, useRoute } from "wouter";
+import { Link, useLocation, useRoute } from "wouter";
 import { useAuth, useUser } from "@/lib/auth";
 import { useEffect, useState, type ReactNode } from "react";
 import { useMyProfile } from "@/hooks/useApi";
@@ -7,20 +7,12 @@ import { AVATAR_OPTIONS } from "@/lib/local-profile";
 import { badgeMeta, checkInStreak, type BadgeId } from "@/lib/streak-badges";
 import { ensureAdminReferrer } from "@/lib/social-hub";
 import { ADMIN_USERNAME } from "@/lib/platform-economics";
-
-const TABS = [
-  { label: "Overview", href: "/dashboard" },
-  { label: "Analytics", href: "/dashboard/analytics" },
-  { label: "Email", href: "/dashboard/email" },
-  { label: "FAQ", href: "/dashboard/faq" },
-  { label: "Progress", href: "/dashboard/progress" },
-  { label: "Contributions", href: "/dashboard/contributions" },
-  { label: "Leaderboard", href: "/dashboard/leaderboard" },
-  { label: "Careers", href: "/dashboard/careers" },
-  { label: "Settings", href: "/dashboard/settings" },
-];
+import { DASHBOARD_TABS } from "./routes";
 
 function SignedOutPrompt() {
+  const [pathname] = useLocation();
+  // Bring the visitor back to the exact dashboard page they asked for after they sign in.
+  const next = pathname.startsWith("/dashboard") ? `?next=${encodeURIComponent(pathname)}` : "";
   return (
     <div className="cx-section">
       <div className="cx-container flex flex-col items-center text-center">
@@ -29,7 +21,7 @@ function SignedOutPrompt() {
         <p className="mt-3 max-w-sm text-[hsl(var(--fg-muted))]">
           Share your details on Get Started. Your metrics, progress, leaderboard, and tools will be available once your account is active.
         </p>
-        <Link href="/get-started" className="cx-btn cx-btn-primary mt-6">
+        <Link href={`/get-started${next}`} className="cx-btn cx-btn-primary mt-6">
           Get started
         </Link>
       </div>
@@ -117,14 +109,14 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               </div>
 
               <nav
-                className="mt-8 flex flex-wrap gap-1 border-b border-[hsl(var(--border))] pb-1"
+                className="mt-8 flex gap-1 overflow-x-auto border-b border-[hsl(var(--border))] pb-1"
                 aria-label="Dashboard sections"
               >
-                {TABS.map((t) => (
+                {DASHBOARD_TABS.map((t) => (
                   <Link
                     key={t.href}
                     href={t.href}
-                    className="cx-nav-link"
+                    className="cx-nav-link shrink-0 whitespace-nowrap"
                     aria-current={activeHref === t.href ? "page" : undefined}
                   >
                     {t.label}

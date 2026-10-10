@@ -1,6 +1,6 @@
 import { Route, Switch } from "wouter";
-import { lazy, Suspense, useEffect } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense, useEffect, type ComponentType } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 
@@ -8,6 +8,9 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { Home } from "@/pages/Home";
 import { captureReferralFromUrl } from "@/lib/referral-capture";
 import { SeoManager } from "@/components/SeoManager";
+import { CurrencyProvider } from "@/lib/currency/CurrencyProvider";
+import { createQueryClient } from "@/lib/query-client";
+import { DASHBOARD_PATHS, type DashboardPath } from "@/pages/dashboard/routes";
 
 const MarketingTech = lazy(() => import("@/pages/MarketingTech").then((m) => ({ default: m.MarketingTech })));
 const SalesTech = lazy(() => import("@/pages/SalesTech").then((m) => ({ default: m.SalesTech })));
@@ -35,10 +38,26 @@ const DashboardSettings = lazy(() => import("@/pages/dashboard/Settings").then((
 const DashboardAnalytics = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardAnalytics })));
 const DashboardEmail = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardEmail })));
 const DashboardFaq = lazy(() => import("@/pages/dashboard/Modules").then((m) => ({ default: m.DashboardFaq })));
+const DashboardContributions = lazy(() => import("@/pages/dashboard/Contributions").then((m) => ({ default: m.DashboardContributions })));
+const DashboardSocial = lazy(() => import("@/pages/dashboard/Social").then((m) => ({ default: m.DashboardSocial })));
 const DashboardCareers = lazy(() => import("@/pages/dashboard/Careers").then((m) => ({ default: m.DashboardCareers })));
 const Admin = lazy(() => import("@/pages/admin/Admin").then((m) => ({ default: m.Admin })));
 
-const queryClient = new QueryClient();
+const queryClient = createQueryClient();
+
+/** Every dashboard tab must be listed here (typed against DASHBOARD_TABS, so a missing one fails to compile). */
+const DASHBOARD_PAGES: Record<DashboardPath, ComponentType> = {
+  "/dashboard": DashboardOverview,
+  "/dashboard/analytics": DashboardAnalytics,
+  "/dashboard/email": DashboardEmail,
+  "/dashboard/faq": DashboardFaq,
+  "/dashboard/progress": DashboardProgress,
+  "/dashboard/contributions": DashboardContributions,
+  "/dashboard/leaderboard": DashboardLeaderboard,
+  "/dashboard/social": DashboardSocial,
+  "/dashboard/careers": DashboardCareers,
+  "/dashboard/settings": DashboardSettings,
+};
 
 function RouteFallback() {
   return (
@@ -57,6 +76,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <CurrencyProvider>
       <MotionProvider>
         <SeoManager />
         <SiteLayout>
@@ -83,14 +103,9 @@ export default function App() {
               <Route path="/get-started" component={GetStarted} />
               <Route path="/sign-in" component={GetStarted} />
               <Route path="/sign-up" component={GetStarted} />
-              <Route path="/dashboard" component={DashboardOverview} />
-              <Route path="/dashboard/analytics" component={DashboardAnalytics} />
-              <Route path="/dashboard/email" component={DashboardEmail} />
-              <Route path="/dashboard/faq" component={DashboardFaq} />
-              <Route path="/dashboard/progress" component={DashboardProgress} />
-              <Route path="/dashboard/leaderboard" component={DashboardLeaderboard} />
-              <Route path="/dashboard/careers" component={DashboardCareers} />
-              <Route path="/dashboard/settings" component={DashboardSettings} />
+              {DASHBOARD_PATHS.map((path) => (
+                <Route key={path} path={path} component={DASHBOARD_PAGES[path]} />
+              ))}
               <Route path="/admin" component={Admin} />
               <Route component={NotFound} />
             </Switch>
@@ -98,6 +113,7 @@ export default function App() {
         </SiteLayout>
         <CookieConsent />
       </MotionProvider>
+      </CurrencyProvider>
     </QueryClientProvider>
   );
 }

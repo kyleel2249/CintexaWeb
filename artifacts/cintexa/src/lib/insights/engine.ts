@@ -85,17 +85,17 @@ const contributions: Runner = (s, ctx) => {
     summary: status === "insufficient_data" ? "No sufficient contribution data is available for this report yet."
       : `Analyzed ${rows.length} record(s): ${paid.length} verified, ${pending.length} pending.`,
     keyFindings: paid.length
-      ? [{ title: "Verified contributions", description: `${paid.length} completed contribution(s); calculated total ${sum} ${cur}.`, category: "positive", severity: "none", evidenceIds: ["c1"] }]
+      ? [{ title: "Verified contributions", description: `${paid.length} completed contribution(s); calculated total ${sum.toFixed(2)} ${cur}.`, category: "positive", severity: "none", evidenceIds: ["c1"] }]
       : [{ title: "No verified contributions", description: "No completed contribution records in the current data set.", category: "attention", severity: "low", evidenceIds: [] }],
     recommendations: paid.length
       ? [{ title: "Review milestones", description: "Check Progress Insight for targets tied to contribution activity.", priority: "medium", rationale: "Progress uses verified contribution inputs where configured.", estimatedEffort: "low", requiresApproval: false }]
       : [{ title: "Record a contribution", description: "Add a completed contribution so Contribution Insight can calculate verified totals.", priority: "high", rationale: "Verified totals require eligible completed records.", estimatedEffort: "low", requiresApproval: false }],
     metrics: [
       { name: "Verified count", value: paid.length, source: "verified" },
-      { name: "Verified total", value: paid.length ? sum : null, unit: paid.length ? cur : undefined, source: paid.length ? "calculated" : "missing" },
+      { name: "Verified total", value: paid.length ? Math.round(sum * 100) / 100 : null, unit: paid.length ? cur : undefined, source: paid.length ? "calculated" : "missing" },
       { name: "Pending", value: pending.length, source: "verified" },
     ],
-    evidence: paid.length ? [{ id: "c1", sourceType: "verified account data", sourceReference: "contributions", description: `${paid.length} completed; total ${sum} ${cur}` }] : [],
+    evidence: paid.length ? [{ id: "c1", sourceType: "verified account data", sourceReference: "contributions", description: `${paid.length} completed; total ${sum.toFixed(2)} ${cur}` }] : [],
     limitations: ["Failed, cancelled, and pending records are excluded from verified totals."],
     confidence: paid.length ? "high" : rows.length ? "medium" : "not_assessed",
     sourceTypes: ["verified account data", "deterministic calculation"],
@@ -391,7 +391,7 @@ const overview: Runner = (s, ctx) => {
         ? [{ title: "Loyalty balance present", description: `Verified loyalty balance is ${balance} points.`, category: "positive" as const, severity: "none" as const, evidenceIds: ["o1"] }]
         : [{ title: "No loyalty points yet", description: "Loyalty balance is zero or not loaded.", category: "neutral" as const, severity: "informational" as const, evidenceIds: [] }]),
       ...(rows.length
-        ? [{ title: "Contribution records found", description: `${rows.length} contribution record(s); ${paid.length} counted toward verified total ${sum}.`, category: "positive" as const, severity: "none" as const, evidenceIds: ["o2"] }]
+        ? [{ title: "Contribution records found", description: `${rows.length} contribution record(s); ${paid.length} counted toward verified total ${sum.toFixed(2)}.`, category: "positive" as const, severity: "none" as const, evidenceIds: ["o2"] }]
         : [{ title: "No contributions recorded", description: "No contribution records are available for this account yet.", category: "attention" as const, severity: "low" as const, evidenceIds: [] }]),
     ],
     recommendations: hasAny

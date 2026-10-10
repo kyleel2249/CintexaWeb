@@ -1,50 +1,64 @@
+import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { DashboardShell } from "./DashboardShell";
 import { useMyContributions } from "@/hooks/useApi";
 import { useAuth } from "@/lib/auth";
 import { InsightPanel } from "@/components/insights/InsightPanel";
 import { getSeededSchedule, getSeededTotalGhs } from "@/data/contribution-seed";
-
-function formatGhs(n: number) {
-  return `GHS ${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
+import { useMoney } from "@/lib/currency/useMoney";
+import { browserLocale, formatMoney, regionName } from "@/lib/currency/format";
+import { isSettled, statusLabel, statusTone } from "@/lib/contributions";
 
 function monthLabel(d: Date | string) {
   const dt = typeof d === "string" ? new Date(d) : d;
-  return dt.toLocaleString("en-GB", { month: "short", year: "numeric", timeZone: "UTC" });
+  return dt.toLocaleString(browserLocale(), { month: "short", year: "numeric", timeZone: "UTC" });
 }
 
 export function DashboardContributions() {
   const reduce = useReducedMotion();
   const { userId } = useAuth();
   const { data, isLoading, isError } = useMyContributions();
-  const contributions = data?.contributions ?? [];
+  const contributions = useMemo(() => data?.contributions ?? [], [data]);
 
-  const paid = contributions.filter((c) => c.status === "paid" || c.status === "completed");
-  const totalPaid = paid.reduce((sum, c) => sum + (Number(c.amount) || 0), 0);
-  const currency = paid[0]?.currency || contributions[0]?.currency || "GHS";
-  const monthly = paid.length ? totalPaid / paid.length : 0;
+  const currencies = useMemo(() => [...new Set(contributions.map((c) => c.currency || "GHS"))], [contributions]);
+  const money = useMoney(currencies.length ? currencies : ["GHS"]);
 
-  const sortedPaid = [...paid].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  // Same rule everywhere: settled rows count toward totals; every amount is shown in the user's
+  // own currency (converted with live rates) or, if no rate is available, in its recorded currency.
+  const paidRows = useMemo(() => contributions.filter(isSettled), [contributions]);
+  const paidPlan = useMemo(() => money.plan(paidRows), [money, paidRows]);
+  const allPlan = useMemo(() => money.plan(contributions), [money, contributions]);
+  const currency = paidPlan.currency;
+  const fmt = (n: number) => formatMoney(n, currency);
+
+  const sortedPaid = [...paidPlan.items].sort(
+    (a, b) => new Date(a.row.createdAt).getTime() - new Date(b.row.createdAt).getTime(),
   );
-  const series = sortedPaid.map((c, index) => ({
-    id: c.id,
-    label: monthLabel(c.createdAt),
-    amount: Number(c.amount) || 0,
-    cumulative: sortedPaid
-      .slice(0, index + 1)
-      .reduce((sum, contribution) => sum + (Number(contribution.amount) || 0), 0),
-    reference: c.reference,
-    description: c.description,
-    status: c.status,
+  const series = sortedPaid.map((it, index) => ({
+    id: it.row.id,
+    label: monthLabel(it.row.createdAt),
+    amount: it.amount,
+    cumulative: sortedPaid.slice(0, index + 1).reduce((sum, i) => sum + i.amount, 0),
+    reference: it.row.reference,
+    description: it.row.description,
+    status: it.row.status,
   }));
+  const totalPaid = sortedPaid.reduce((sum, i) => sum + i.amount, 0);
+  const monthly = series.length ? totalPaid / series.length : 0;
 
   const maxBar = Math.max(...series.map((s) => s.amount), 1);
   const seededTotal = userId ? getSeededTotalGhs(userId) : null;
   const schedule = userId ? getSeededSchedule(userId) : undefined;
-  const targetTotal = seededTotal ?? Math.max(totalPaid, 1);
-  const progressPct = Math.min(100, (totalPaid / targetTotal) * 100);
+  // Progress is measured in recorded GHS so it never depends on the exchange rate.
+  const paidGhs = paidPlan.items
+    .filter((i) => i.original.currency === "GHS")
+    .reduce((sum, i) => sum + i.original.amount, 0);
+  const hasSchedule = Boolean(schedule && seededTotal);
+  const progressPct = hasSchedule ? Math.min(100, (paidGhs / (seededTotal as number)) * 100) : 0;
+  const scheduleMonthly = schedule ? money.format(schedule.monthlyGhs, "GHS", { approx: false }).text : "";
+  const scheduleTarget = seededTotal ? money.format(seededTotal, "GHS", { approx: false }).text : "";
+  const rowItem = new Map(allPlan.items.map((i) => [i.row, i]));
+  const showFxNote = paidPlan.usedConversion || paidPlan.fellBack || paidPlan.excluded.length > 0;
 
   const container = {
     hidden: {},
@@ -71,12 +85,12 @@ export function DashboardContributions() {
         {/* Hero metrics */}
         <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Total contributed", value: isLoading ? "—" : formatGhs(totalPaid), accent: true },
-            { label: "Monthly cadence", value: isLoading ? "—" : formatGhs(monthly), accent: false },
-            { label: "Payments recorded", value: isLoading ? "—" : String(paid.length), accent: false },
+            { label: "Total contributed", value: isLoading ? "—" : fmt(totalPaid), accent: true },
+            { label: "Average payment", value: isLoading ? "—" : fmt(monthly), accent: false },
+            { label: "Payments recorded", value: isLoading ? "—" : String(paidRows.length), accent: false },
             {
               label: "Currency",
-              value: currency,
+              value: isLoading ? "—" : currency + (money.country && !paidPlan.fellBack ? ` · ${regionName(money.country)}` : ""),
               accent: false,
             },
           ].map((m) => (
@@ -108,6 +122,22 @@ export function DashboardContributions() {
         </div>
 
 
+        {showFxNote && !isLoading && (
+          <motion.p variants={item} className="mb-6 text-xs text-[hsl(var(--fg-muted))]" role="note">
+            {paidPlan.fellBack
+              ? `Live exchange rate unavailable — amounts are shown in ${currency}, the currency they were recorded in.`
+              : paidPlan.usedConversion
+                ? `Amounts are converted from the currency they were recorded in (${[
+                    ...new Set(paidPlan.items.map((i) => i.original.currency)),
+                  ].join(", ")}) to your currency, ${money.currency}, at today’s exchange rate${
+                    money.updatedAt ? ` (rates updated ${new Date(money.updatedAt).toLocaleDateString(browserLocale())})` : ""
+                  }. Exchange rates by ExchangeRate-API (open.er-api.com).`
+                : ""}
+            {paidPlan.excluded.length > 0 &&
+              ` ${paidPlan.excluded.length} payment${paidPlan.excluded.length === 1 ? "" : "s"} in another currency couldn’t be converted and ${paidPlan.excluded.length === 1 ? "is" : "are"} not included in the totals.`}
+          </motion.p>
+        )}
+
         {/* Monthly contribution summary */}
         {series.length > 0 && (
           <motion.div variants={item} className="cx-card mb-6 overflow-hidden !p-0">
@@ -116,14 +146,14 @@ export function DashboardContributions() {
                 <p className="cx-eyebrow">Monthly contribution summary</p>
                 <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
                   {schedule
-                    ? `GHS ${schedule.monthlyGhs.toFixed(2)} per month · ${series.length} months recorded`
+                    ? `${scheduleMonthly} per month · ${series.length} months recorded`
                     : `${series.length} month${series.length === 1 ? "" : "s"} with verified payments`}
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-xs text-[hsl(var(--fg-muted))]">Period total</p>
                 <p className="cx-display text-xl tabular-nums text-[hsl(var(--accent))]">
-                  {formatGhs(totalPaid)}
+                  {fmt(totalPaid)}
                 </p>
               </div>
             </div>
@@ -152,9 +182,9 @@ export function DashboardContributions() {
                       >
                         <td className="px-5 py-2.5 text-[hsl(var(--fg-muted))]">{String(i + 1).padStart(2, "0")}</td>
                         <td className="px-5 py-2.5 font-medium">{s.label}</td>
-                        <td className="px-5 py-2.5 tabular-nums">{formatGhs(s.amount)}</td>
+                        <td className="px-5 py-2.5 tabular-nums">{fmt(s.amount)}</td>
                         <td className="px-5 py-2.5 tabular-nums text-[hsl(var(--fg-muted))]">
-                          {formatGhs(s.cumulative)}
+                          {fmt(s.cumulative)}
                         </td>
                         <td className="px-5 py-2.5">
                           <div className="flex min-w-[7rem] items-center gap-2">
@@ -172,7 +202,7 @@ export function DashboardContributions() {
                           </div>
                         </td>
                         <td className="px-5 py-2.5">
-                          <span className="cx-badge cx-badge-success">{s.status}</span>
+                          <span className={`cx-badge cx-badge-${statusTone(s.status)}`}>{statusLabel(s.status)}</span>
                         </td>
                       </motion.tr>
                     );
@@ -183,8 +213,8 @@ export function DashboardContributions() {
                     <td className="px-5 py-3 font-medium" colSpan={2}>
                       Total
                     </td>
-                    <td className="px-5 py-3 font-semibold tabular-nums">{formatGhs(totalPaid)}</td>
-                    <td className="px-5 py-3 tabular-nums text-[hsl(var(--fg-muted))]">{formatGhs(totalPaid)}</td>
+                    <td className="px-5 py-3 font-semibold tabular-nums">{fmt(totalPaid)}</td>
+                    <td className="px-5 py-3 tabular-nums text-[hsl(var(--fg-muted))]">{fmt(totalPaid)}</td>
                     <td className="px-5 py-3 text-xs text-[hsl(var(--fg-muted))]">100%</td>
                     <td className="px-5 py-3 text-xs text-[hsl(var(--fg-muted))]">
                       {series.length} payment{series.length === 1 ? "" : "s"}
@@ -202,8 +232,8 @@ export function DashboardContributions() {
             <p className="cx-eyebrow">Progress to schedule</p>
             <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
               {schedule
-                ? `${schedule.months.length} months · GHS ${schedule.monthlyGhs.toFixed(2)} / month · target GHS ${targetTotal.toFixed(2)}`
-                : "Based on recorded contributions on this account"}
+                ? `${schedule.months.length} months · ${scheduleMonthly} / month · target ${scheduleTarget}`
+                : "No payment schedule is set on this account, so there is no target to measure against."}
             </p>
             <div className="relative mx-auto mt-6 flex h-44 w-44 items-center justify-center">
               <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
@@ -231,9 +261,11 @@ export function DashboardContributions() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  {Math.round(progressPct)}%
+                  {hasSchedule ? `${Math.round(progressPct)}%` : "—"}
                 </motion.p>
-                <p className="text-[10px] uppercase tracking-wider text-[hsl(var(--fg-muted))]">complete</p>
+                <p className="text-[10px] uppercase tracking-wider text-[hsl(var(--fg-muted))]">
+                  {hasSchedule ? "complete" : "no target"}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -247,7 +279,8 @@ export function DashboardContributions() {
                     <div key={i} className="flex-1 animate-pulse rounded-t bg-[hsl(var(--bg-inset))]" style={{ height: "40%" }} />
                   ))
                 : series.map((s, i) => (
-                    <div key={s.id} className="flex flex-1 flex-col items-center gap-1">
+                    <div key={s.id} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1">
+                      <div className="flex w-full flex-1 items-end">
                       <motion.div
                         className="w-full rounded-t-md"
                         style={{
@@ -262,8 +295,9 @@ export function DashboardContributions() {
                           duration: 0.55,
                           ease: [0.16, 1, 0.3, 1],
                         }}
-                        title={`${s.label}: ${formatGhs(s.amount)}`}
+                        title={`${s.label}: ${fmt(s.amount)}`}
                       />
+                      </div>
                       <span className="max-w-full truncate text-[9px] text-[hsl(var(--fg-muted))] sm:text-[10px]">
                         {s.label.split(" ")[0]}
                       </span>
@@ -357,12 +391,12 @@ export function DashboardContributions() {
                     <div className="flex items-center justify-between gap-2">
                       <p className="truncate font-medium">{s.label}</p>
                       <p className="shrink-0 tabular-nums text-sm font-semibold text-[hsl(var(--accent))]">
-                        {formatGhs(s.amount)}
+                        {fmt(s.amount)}
                       </p>
                     </div>
                     <p className="mt-0.5 truncate text-xs text-[hsl(var(--fg-muted))]">{s.description}</p>
                     <p className="mt-1 font-mono text-[10px] text-[hsl(var(--fg-muted))]">
-                      {s.reference} · running {formatGhs(s.cumulative)}
+                      {s.reference} · running {fmt(s.cumulative)}
                     </p>
                   </div>
                 </motion.div>
@@ -373,8 +407,8 @@ export function DashboardContributions() {
 
         {/* Detail table */}
         {(isLoading || contributions.length > 0) && (
-          <motion.div variants={item} className="cx-card overflow-hidden !p-0">
-            <table className="w-full text-left text-sm">
+          <motion.div variants={item} className="cx-card overflow-x-auto !p-0">
+            <table className="w-full min-w-[34rem] text-left text-sm">
               <thead>
                 <tr className="border-b border-[hsl(var(--border))] text-[hsl(var(--fg-muted))]">
                   <th className="px-5 py-3 font-medium">Reference</th>
@@ -401,10 +435,25 @@ export function DashboardContributions() {
                           <td className="px-5 py-3">{monthLabel(c.createdAt)}</td>
                           <td className="px-5 py-3">{c.description}</td>
                           <td className="px-5 py-3 tabular-nums">
-                            {c.currency} {Number(c.amount).toFixed(2)}
+                            {(() => {
+                              const it = rowItem.get(c);
+                              const recorded = formatMoney(Number(c.amount) || 0, c.currency || "GHS");
+                              return it ? (
+                                <>
+                                  {formatMoney(it.amount, allPlan.currency)}
+                                  {it.converted && (
+                                    <span className="block text-[11px] text-[hsl(var(--fg-muted))]">
+                                      Recorded {recorded}
+                                    </span>
+                                  )}
+                                </>
+                              ) : (
+                                recorded
+                              );
+                            })()}
                           </td>
                           <td className="px-5 py-3">
-                            <span className="cx-badge cx-badge-success">{c.status}</span>
+                            <span className={`cx-badge cx-badge-${statusTone(c.status)}`}>{statusLabel(c.status)}</span>
                           </td>
                         </tr>
                       ))}

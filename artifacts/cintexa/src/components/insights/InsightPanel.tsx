@@ -25,6 +25,7 @@ import {
   useMySubscription,
 } from "@/hooks/useApi";
 import { InsightVisual } from "@/components/insights/InsightVisual";
+import { useMoney } from "@/lib/currency/useMoney";
 
 function statusLabel(s: InsightResult["status"] | string) {
   switch (s) {
@@ -81,6 +82,23 @@ export function InsightPanel({ tab, specialistId, extraContext }: Props) {
     (profile.data as { accountId?: string } | undefined)?.accountId ??
     "local";
 
+  // Analyse money in the user's own currency (same conversion the rest of the dashboard uses).
+  const rawContribs = contributionsQ.data?.contributions;
+  const contribCurrencies = useMemo(
+    () => [...new Set((rawContribs ?? []).map((c) => c.currency || "GHS"))],
+    [rawContribs],
+  );
+  const money = useMoney(contribCurrencies.length ? contribCurrencies : ["GHS"]);
+  const contributionsForInsight = useMemo(() => {
+    if (!rawContribs) return undefined;
+    const plan = money.plan(rawContribs);
+    const byRow = new Map(plan.items.map((i) => [i.row, i]));
+    return rawContribs.map((r) => {
+      const it = byRow.get(r);
+      return it ? { ...r, amount: it.amount.toFixed(2), currency: plan.currency } : r;
+    });
+  }, [rawContribs, money]);
+
   const ctx = useMemo(
     () => ({
       accountId,
@@ -95,12 +113,12 @@ export function InsightPanel({ tab, specialistId, extraContext }: Props) {
           }
         : null,
       activity: activity.data?.activity as Array<{ eventType?: string; title?: string; createdAt?: string; id?: string }> | undefined,
-      contributions: contributionsQ.data?.contributions as Array<{ amount?: string | number; currency?: string; status?: string; createdAt?: string }> | undefined,
+      contributions: contributionsForInsight as Array<{ amount?: string | number; currency?: string; status?: string; createdAt?: string }> | undefined,
       loyaltyBalance: loyalty.data?.balance,
       subscriptionPlan: subscription.data?.subscription?.plan ?? null,
       ...extraContext,
     }),
-    [accountId, profile.data, activity.data, contributionsQ.data, loyalty.data, subscription.data, extraContext],
+    [accountId, profile.data, activity.data, contributionsForInsight, loyalty.data, subscription.data, extraContext],
   );
 
   useEffect(() => {

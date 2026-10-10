@@ -1,8 +1,15 @@
 /**
  * Post-build prerender for public career routes.
- * Writes static HTML under dist/ so crawlers receive titles, descriptions,
- * JobPosting JSON-LD, and visible copy in the first response — without
- * running the full React tree (Clerk / WebGL) on the server.
+ *
+ * Writes static HTML under dist/ so crawlers AND link-preview bots (WhatsApp, Facebook, X,
+ * LinkedIn, Slack…) — which do not run JavaScript — receive the right title, description,
+ * preview image, Open Graph / Twitter tags and JobPosting JSON-LD in the first response.
+ *
+ * Nothing is hard-coded per job: every page is generated from src/data/jobs.json through the same
+ * builders (src/data/careers-seo.ts) the React pages use, so adding or editing a vacancy in
+ * jobs.json updates its page, the /careers preview, JSON-LD and sitemap on the next build.
+ *
+ * Run with tsx (it imports the TypeScript data layer):  tsx scripts/prerender-careers.mjs
  *
  * Output (Cloudflare Pages outDir = artifacts/cintexa/dist):
  *   dist/careers/index.html
@@ -11,47 +18,16 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getOpenJobs, jobWhatsAppUrl, employmentLabel } from "../src/data/jobs.ts";
+import { jobSeo, careersListSeo } from "../src/data/careers-seo.ts";
+import { readImageSize } from "./image-info.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
+const publicDir = path.join(root, "public");
 
-/** Mirrors src/data/jobs.ts — keep in sync when adding roles (checked by
- *  src/data/__tests__/jobs-prerender-sync.test.ts, which fails loudly if these
- *  two ever drift). */
-export const JOBS = [
-  {
-    id: "cleaner-ghana",
-    slug: "cleaner",
-    title: "Cleaners Job Vacancy in Ghana — Apply Now",
-    role: "Cleaners",
-    employmentType: "FULL_TIME",
-    location: "Ghana",
-    requirements: ["Available and dedicated", "Punctual", "High cleaning standards"],
-    responsibilities: [
-      "Clean and maintain homes, offices, churches, schools, and other assigned premises",
-      "Daily cleaning of rooms, halls, restrooms, kitchens, and common areas",
-      "Restock cleaning and hygiene supplies",
-      "Report maintenance or safety needs promptly",
-      "Leave every space clean, safe, and welcoming",
-    ],
-    addressCountry: "GH",
-    validThrough: "2026-12-31",
-    occupationalCategory: "37-2011.00",
-    summary:
-      "Cleaners job vacancy in Ghana. Apply now — available and dedicated candidates welcome for homes, offices, churches and more. Call or WhatsApp +233 59 516 8610.",
-    description:
-      "We are recruiting Cleaners to keep homes, offices, churches, schools and other premises clean, safe and welcoming. Duties include routine cleaning of rooms, halls, restrooms, kitchens and shared areas; restocking supplies; and reporting maintenance needs. Ideal for people who are available and dedicated, punctual, and proud of high standards across residential and community settings—not only professional offices.",
-    image: "/careers/cleaner-job-vacancy.jpeg",
-    applyPhone: "+233595168610",
-    applyPhoneDisplay: "+233 59 516 8610",
-    applyWhatsApp: "233595168610",
-    datePosted: "2026-09-21",
-    status: "open",
-  },
-];
-
-function escapeHtml(s) {
+export function escapeHtml(s) {
   return String(s)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -59,130 +35,102 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
-function jsonLd(job) {
-  const canonicalUrl = `https://cintexa.com/careers/${job.slug}`;
-  const absoluteImage = `https://cintexa.com${job.image}`;
-  const posting = {
-    "@type": "JobPosting",
-    "@id": `${canonicalUrl}#jobposting`,
-    title: job.role,
-    name: job.title,
-    description: [job.summary, job.description, `Requirements: ${job.requirements.join("; ")}`].join("\n\n"),
-    identifier: { "@type": "PropertyValue", name: "CINTEXA Careers", value: job.id },
-    datePosted: job.datePosted,
-    validThrough: job.validThrough || undefined,
-    employmentType: job.employmentType,
-    hiringOrganization: { "@type": "Organization", name: "Hiring partner" },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressCountry: job.addressCountry || "GH",
-        addressRegion: job.location,
-      },
-    },
-    applicantLocationRequirements: { "@type": "Country", name: job.location },
-    url: canonicalUrl,
-    image: [absoluteImage],
-    directApply: true,
-    responsibilities: (job.responsibilities || []).join(". "),
-    qualifications: job.requirements.join(". "),
-    occupationalCategory: job.occupationalCategory || "37-2011.00",
-    industry: "Facilities services",
-  };
-  Object.keys(posting).forEach((k) => posting[k] === undefined && delete posting[k]);
-  return {
-    "@context": "https://schema.org",
-    "@graph": [
-      posting,
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: "https://cintexa.com/" },
-          { "@type": "ListItem", position: 2, name: "Careers", item: "https://cintexa.com/careers" },
-          { "@type": "ListItem", position: 3, name: job.role, item: canonicalUrl },
-        ],
-      },
-      {
-        "@type": "WebPage",
-        "@id": canonicalUrl,
-        url: canonicalUrl,
-        name: job.title,
-        description: job.summary,
-        about: { "@id": `${canonicalUrl}#jobposting` },
-        inLanguage: "en",
-      },
-    ],
-  };
+/** JSON inside <script> must not be able to close the tag. */
+function safeJson(obj) {
+  return JSON.stringify(obj).replace(/</g, "\\u003c");
 }
 
-function injectHead(template, { title, description, canonical, image, ldJson }) {
-  let html = template;
-  html = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`);
+/**
+ * Fail the build when a job's preview image is missing, not a raster, or its declared size is
+ * wrong — a wrong og:image:width/height or an SVG preview silently breaks link previews.
+ */
+export function validateJobImages(jobs, baseDir = publicDir) {
+  const problems = [];
+  for (const job of jobs) {
+    const file = path.join(baseDir, job.socialImage);
+    if (!fs.existsSync(file)) {
+      problems.push(`${job.slug}: socialImage ${job.socialImage} not found in public/`);
+      continue;
+    }
+    const info = readImageSize(fs.readFileSync(file));
+    if (!info) {
+      problems.push(`${job.slug}: socialImage ${job.socialImage} must be a JPEG, PNG, WebP or GIF (SVG is not valid for link previews)`);
+    } else if (info.width !== job.socialImageWidth || info.height !== job.socialImageHeight) {
+      problems.push(
+        `${job.slug}: socialImage is ${info.width}x${info.height} but jobs.json declares ${job.socialImageWidth}x${job.socialImageHeight}`,
+      );
+    }
+    if (!fs.existsSync(path.join(baseDir, job.image))) {
+      problems.push(`${job.slug}: image ${job.image} not found in public/`);
+    }
+  }
+  return problems;
+}
 
-  // Remove inherited homepage metadata before adding route-specific metadata.
-  // Social crawlers can choose the wrong image when multiple og:image tags exist.
+/** Replaces all inherited head metadata in the Vite shell with this page's values. */
+export function injectHead(template, seo) {
+  let html = template;
+  html = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(seo.title)}</title>`);
+
+  // Remove homepage defaults so crawlers never see two og:image tags or a wrong canonical.
   html = html
     .replace(/<meta\b(?=[^>]*\bproperty=["']og:[^"']+["'])[^>]*\/?\s*>/gi, "")
     .replace(/<meta\b(?=[^>]*\bname=["']twitter:[^"']+["'])[^>]*\/?\s*>/gi, "")
+    .replace(/<meta\b(?=[^>]*\bname=["']robots["'])[^>]*\/?\s*>/gi, "")
+    .replace(/<meta\b(?=[^>]*\bname=["']description["'])[^>]*\/?\s*>/gi, "")
     .replace(/<link\b(?=[^>]*\brel=["']canonical["'])[^>]*\/?\s*>/gi, "")
     .replace(/<script\b(?=[^>]*\btype=["']application\/ld\+json["'])[^>]*>[\s\S]*?<\/script>/gi, "");
 
-  // Replace or insert the route-specific description.
-  if (/<meta\s+name=["']description["'][^>]*>/i.test(html)) {
-    html = html.replace(
-      /<meta\s+name=["']description["'][^>]*>/i,
-      `<meta name="description" content="${escapeHtml(description)}" />`,
-    );
-  } else {
-    html = html.replace(
-      "</head>",
-      `    <meta name="description" content="${escapeHtml(description)}" />\n  </head>`,
-    );
-  }
-
-  const socialImage = escapeHtml(image);
-  const extra = [
-    `<link rel="canonical" href="${escapeHtml(canonical)}" />`,
-    '<meta property="og:type" content="website" />',
-    `<meta property="og:url" content="${escapeHtml(canonical)}" />`,
-    `<meta property="og:title" content="${escapeHtml(title)}" />`,
-    `<meta property="og:description" content="${escapeHtml(description)}" />`,
-    `<meta property="og:image" content="${socialImage}" />`,
-    `<meta property="og:image:secure_url" content="${socialImage}" />`,
-    '<meta property="og:image:width" content="1200" />',
-    '<meta property="og:image:height" content="630" />',
-    `<meta property="og:image:alt" content="${escapeHtml(title)} — vacancy image" />`,
-    '<meta name="twitter:card" content="summary_large_image" />',
-    `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
-    `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
-    `<meta name="twitter:image" content="${socialImage}" />`,
-    `<meta name="twitter:image:alt" content="${escapeHtml(title)} — vacancy image" />`,
-    `<script type="application/ld+json">${JSON.stringify(ldJson)}</script>`,
-  ].join("\n    ");
-  html = html.replace("</head>", `    ${extra}\n  </head>`);
-  return html;
+  const img = escapeHtml(seo.image);
+  const lines = [
+    `<meta name="description" content="${escapeHtml(seo.description)}" />`,
+    `<meta name="robots" content="${escapeHtml(seo.robots)}" />`,
+    `<link rel="canonical" href="${escapeHtml(seo.canonical)}" />`,
+    `<meta property="og:type" content="${seo.ogType}" />`,
+    '<meta property="og:site_name" content="CINTEXA" />',
+    `<meta property="og:url" content="${escapeHtml(seo.canonical)}" />`,
+    `<meta property="og:title" content="${escapeHtml(seo.socialTitle)}" />`,
+    `<meta property="og:description" content="${escapeHtml(seo.description)}" />`,
+    `<meta property="og:image" content="${img}" />`,
+    `<meta property="og:image:secure_url" content="${img}" />`,
+    seo.imageType ? `<meta property="og:image:type" content="${seo.imageType}" />` : "",
+    seo.imageWidth ? `<meta property="og:image:width" content="${seo.imageWidth}" />` : "",
+    seo.imageHeight ? `<meta property="og:image:height" content="${seo.imageHeight}" />` : "",
+    `<meta property="og:image:alt" content="${escapeHtml(seo.imageAlt)}" />`,
+    `<meta name="twitter:card" content="${seo.twitterCard}" />`,
+    `<meta name="twitter:title" content="${escapeHtml(seo.socialTitle)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(seo.description)}" />`,
+    `<meta name="twitter:image" content="${img}" />`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(seo.imageAlt)}" />`,
+    seo.jsonLd ? `<script type="application/ld+json" data-seo="page">${safeJson(seo.jsonLd)}</script>` : "",
+  ]
+    .filter(Boolean)
+    .join("\n    ");
+  return html.replace("</head>", `    ${lines}\n  </head>`);
 }
 
+const MAIN_STYLE =
+  "max-width:42rem;margin:2rem auto;padding:0 1.25rem;font-family:system-ui,sans-serif;color:#F7F4EE;background:#0B0F14";
+
 function jobBody(job) {
-  const wa = `https://wa.me/${job.applyWhatsApp}?text=${encodeURIComponent(
-    `Hello, I am interested in the ${job.role} job vacancy. Please share application details.`,
-  )}`;
   const reqs = job.requirements.map((r) => `<li>${escapeHtml(r)}</li>`).join("");
+  const duties = job.responsibilities.map((r) => `<li>${escapeHtml(r)}</li>`).join("");
   return `
-<main id="prerender-careers" style="max-width:42rem;margin:2rem auto;padding:0 1.25rem;font-family:system-ui,sans-serif;color:#F7F4EE;background:#0B0F14">
+<main id="prerender-careers" style="${MAIN_STYLE}">
   <p style="font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:#F5C518">Careers · Open role</p>
   <h1 style="font-size:1.85rem;line-height:1.25;margin:0.5rem 0 0">${escapeHtml(job.title)}</h1>
-  <p style="color:rgba(247,244,238,0.7);font-size:0.9rem">Title / Role: <strong style="color:#F7F4EE">${escapeHtml(job.role)}</strong> · ${escapeHtml(job.location)}</p>
-  <img src="${escapeHtml(job.image)}" alt="${escapeHtml(job.role)} job vacancy" width="1200" height="750" style="width:100%;height:auto;border-radius:1rem;margin:1.5rem 0" />
+  <p style="color:rgba(247,244,238,0.7);font-size:0.9rem">Title / Role: <strong style="color:#F7F4EE">${escapeHtml(job.role)}</strong>${job.employerName ? ` · ${escapeHtml(job.employerName)}` : ""} · ${escapeHtml(job.location)} · ${escapeHtml(employmentLabel(job))}</p>
+  <img src="${escapeHtml(job.image)}" alt="${escapeHtml(job.imageAlt || `${job.role} job vacancy`)}" width="${job.socialImageWidth}" height="${job.socialImageHeight}" style="max-width:100%;height:auto;border-radius:1rem;margin:1.5rem 0" />
   <p style="line-height:1.6">${escapeHtml(job.summary)}</p>
   <p style="line-height:1.6;color:rgba(247,244,238,0.75)">${escapeHtml(job.description)}</p>
+  <h2 style="font-size:1.15rem;margin-top:1.5rem">What you’ll do</h2>
+  <ul style="color:rgba(247,244,238,0.75)">${duties}</ul>
   <h2 style="font-size:1.15rem;margin-top:1.5rem">Requirements</h2>
   <ul style="color:rgba(247,244,238,0.75)">${reqs}</ul>
   <p style="margin-top:1.5rem"><strong>Apply now:</strong>
     <a href="tel:${escapeHtml(job.applyPhone)}" style="color:#F5C518">Call ${escapeHtml(job.applyPhoneDisplay)}</a>
     ·
-    <a href="${escapeHtml(wa)}" style="color:#F5C518">WhatsApp ${escapeHtml(job.applyPhoneDisplay)}</a>
+    <a href="${escapeHtml(jobWhatsAppUrl(job))}" style="color:#F5C518">WhatsApp ${escapeHtml(job.applyPhoneDisplay)}</a>
   </p>
   <p style="font-size:0.8rem;color:rgba(247,244,238,0.55);margin-top:2rem"><a href="/careers" style="color:inherit">All careers</a></p>
 </main>`;
@@ -194,18 +142,28 @@ function listBody(jobs) {
       (j) => `
     <article style="margin:1.25rem 0;padding:1rem;border:1px solid rgba(247,244,238,0.12);border-radius:0.75rem">
       <h2 style="font-size:1.25rem;margin:0"><a href="/careers/${escapeHtml(j.slug)}" style="color:#F7F4EE;text-decoration:none">${escapeHtml(j.title)}</a></h2>
-      <p style="color:rgba(247,244,238,0.7);font-size:0.9rem">Role: ${escapeHtml(j.role)} · ${escapeHtml(j.location)}</p>
+      <p style="color:rgba(247,244,238,0.7);font-size:0.9rem">Role: ${escapeHtml(j.role)}${j.employerName ? ` · ${escapeHtml(j.employerName)}` : ""} · ${escapeHtml(j.location)}</p>
       <p style="color:rgba(247,244,238,0.75);font-size:0.9rem">${escapeHtml(j.summary)}</p>
       <p><a href="/careers/${escapeHtml(j.slug)}" style="color:#F5C518">View role &amp; apply</a></p>
     </article>`,
     )
     .join("");
   return `
-<main id="prerender-careers" style="max-width:42rem;margin:2rem auto;padding:0 1.25rem;font-family:system-ui,sans-serif;color:#F7F4EE;background:#0B0F14">
-  <h1 style="font-size:1.85rem">Careers &amp; job vacancies</h1>
+<main id="prerender-careers" style="${MAIN_STYLE}">
+  <h1 style="font-size:1.85rem">Careers &amp; job vacancies in Ghana</h1>
   <p style="color:rgba(247,244,238,0.75)">Open roles and application details. Call or WhatsApp listed contacts to apply.</p>
   ${items}
 </main>`;
+}
+
+export function renderListPage(shell, jobs) {
+  const html = injectHead(shell, careersListSeo(jobs));
+  return html.replace(/<div id="root"><\/div>/, `<div id="root">${listBody(jobs)}</div>`);
+}
+
+export function renderJobPage(shell, job) {
+  const html = injectHead(shell, jobSeo(job));
+  return html.replace(/<div id="root"><\/div>/, `<div id="root">${jobBody(job)}</div>`);
 }
 
 function writePage(relDir, html) {
@@ -223,93 +181,22 @@ function run() {
     process.exit(1);
   }
   const shell = fs.readFileSync(shellPath, "utf8");
-  const open = JOBS.filter((j) => j.status === "open");
+  const open = getOpenJobs(); // current vacancies, newest first
 
-  // /careers list
-  let listHtml = injectHead(shell, {
-    title: "Careers & Job Vacancies in Ghana | Apply Now",
-    description:
-      "Browse open job vacancies including Cleaners roles in Ghana for homes, offices, churches and more. Apply by call or WhatsApp. Job and scholarship alerts available.",
-    canonical: "https://cintexa.com/careers",
-    // Use the newest open vacancy image so the listing preview follows new vacancy uploads.
-    image: open.slice().sort((a, b) => (b.datePosted || "").localeCompare(a.datePosted || ""))[0]?.image
-      ? `https://cintexa.com${open.slice().sort((a, b) => (b.datePosted || "").localeCompare(a.datePosted || ""))[0].image}`
-      : "https://cintexa.com/careers/cleaner-job-vacancy.jpeg",
-    ldJson: {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "CollectionPage",
-          "@id": "https://cintexa.com/careers#webpage",
-          url: "https://cintexa.com/careers",
-          name: "Careers & Job Vacancies in Ghana | Apply Now",
-          description:
-            "Browse open job vacancies including Cleaners roles in Ghana for homes, offices, churches and more. Apply by call or WhatsApp.",
-          inLanguage: "en",
-        },
-        {
-          "@type": "ItemList",
-          name: "Open job vacancies",
-          numberOfItems: open.length,
-          itemListElement: open.map((j, i) => ({
-            "@type": "ListItem",
-            position: i + 1,
-            url: `https://cintexa.com/careers/${j.slug}`,
-            name: j.title,
-            item: {
-              "@type": "JobPosting",
-              title: j.role,
-              description: j.summary,
-              datePosted: j.datePosted,
-              employmentType: j.employmentType,
-              url: `https://cintexa.com/careers/${j.slug}`,
-              hiringOrganization: { "@type": "Organization", name: "Hiring partner" },
-              jobLocation: {
-                "@type": "Place",
-                address: {
-                  "@type": "PostalAddress",
-                  addressCountry: j.addressCountry || "GH",
-                  addressRegion: j.location,
-                },
-              },
-            },
-          })),
-        },
-        {
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: "https://cintexa.com/" },
-            { "@type": "ListItem", position: 2, name: "Careers", item: "https://cintexa.com/careers" },
-          ],
-        },
-      ],
-    },
-  });
-  listHtml = listHtml.replace(
-    /<div id="root"><\/div>/,
-    `<div id="root">${listBody(open)}</div>`,
-  );
-  writePage("careers", listHtml);
-
-  for (const job of open) {
-    let page = injectHead(shell, {
-      title: job.title,
-      description: job.summary,
-      canonical: `https://cintexa.com/careers/${job.slug}`,
-      image: `https://cintexa.com${job.image}`,
-      ldJson: jsonLd(job),
-    });
-    page = page.replace(/<div id="root"><\/div>/, `<div id="root">${jobBody(job)}</div>`);
-    writePage(path.join("careers", job.slug), page);
+  const problems = validateJobImages(open);
+  if (problems.length) {
+    console.error(`prerender: preview-image problems in src/data/jobs.json:\n  - ${problems.join("\n  - ")}`);
+    process.exit(1);
   }
 
-  // SPA fallback: Cloudflare serves directory index when present
+  writePage("careers", renderListPage(shell, open));
+  for (const job of open) {
+    writePage(path.join("careers", job.slug), renderJobPage(shell, job));
+  }
   console.log(`prerender: done (${open.length} jobs + list)`);
 }
 
-// Only run when executed directly (`node scripts/prerender-careers.mjs`), not
-// when imported — e.g. by jobs-prerender-sync.test.ts, which imports JOBS above
-// to check it against the real src/data/jobs.ts without triggering a dist/ write.
+// Only run when executed directly (not when imported by tests).
 if (import.meta.url === `file://${process.argv[1]}`) {
   run();
 }

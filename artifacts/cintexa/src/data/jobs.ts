@@ -1,21 +1,53 @@
 /**
- * Public career postings — used by React routes and the prerender script.
- * Keep descriptions complete so crawlers and AI indexers receive full text.
+ * Public career postings — the ONE source of truth is `jobs.json`.
+ *
+ * Everything careers-related is derived from it: the /careers list, /careers/:slug pages, the
+ * prerendered HTML (title, description, Open Graph, Twitter card, JSON-LD), and sitemap.xml.
+ * Add or edit a vacancy in jobs.json and every surface updates on the next build — there is no
+ * second copy to keep in sync. Plain JSON keeps it readable by `node` with no install step
+ * (the daily sitemap workflow relies on that).
  */
+import jobsData from "./jobs.json";
+
+export type EmploymentType =
+  | "FULL_TIME"
+  | "PART_TIME"
+  | "CONTRACTOR"
+  | "TEMPORARY"
+  | "INTERN"
+  | "VOLUNTEER"
+  | "PER_DIEM"
+  | "OTHER";
 
 export type JobPosting = {
   id: string;
   slug: string;
   title: string;
   role: string;
-  employmentType: "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERN";
+  /** Hiring organisation shown publicly and in JSON-LD. Defaults to "Hiring partner". */
+  employerName?: string;
+  category?: string;
+  industry?: string;
+  employmentType: EmploymentType;
+  /** Human label overriding the employmentType wording (e.g. "Flexible hours"). */
+  employmentLabel?: string;
   location: string;
+  addressLocality?: string;
+  addressRegion?: string;
   addressCountry: string;
   requirements: string[];
   responsibilities: string[];
   summary: string;
   description: string;
+  applyNote?: string;
+  whatsAppMessage?: string;
+  /** Image shown on the page. */
   image: string;
+  imageAlt?: string;
+  /** Raster image (JPEG/PNG/WebP) used for og:image / twitter:image / JSON-LD. */
+  socialImage: string;
+  socialImageWidth: number;
+  socialImageHeight: number;
   applyPhone: string;
   applyPhoneDisplay: string;
   applyWhatsApp: string;
@@ -25,214 +57,44 @@ export type JobPosting = {
   status: "open" | "closed";
 };
 
-export const JOBS: JobPosting[] = [
-  {
-    id: "cleaner-ghana",
-    slug: "cleaner",
-    title: "Cleaners Job Vacancy in Ghana — Apply Now",
-    role: "Cleaners",
-    employmentType: "FULL_TIME",
-    location: "Ghana",
-    addressCountry: "GH",
-    requirements: ["Available and dedicated", "Punctual", "High cleaning standards"],
-    responsibilities: [
-      "Clean and maintain homes, offices, churches, schools, and other assigned premises",
-      "Daily cleaning of rooms, halls, restrooms, kitchens, and common areas",
-      "Restock cleaning and hygiene supplies",
-      "Report maintenance or safety needs promptly",
-      "Leave every space clean, safe, and welcoming",
-    ],
-    summary:
-      "Cleaners job vacancy in Ghana. Apply now — available and dedicated candidates welcome for homes, offices, churches and more. Call or WhatsApp +233 59 516 8610.",
-    description:
-      "We are recruiting Cleaners to keep homes, offices, churches, schools and other premises clean, safe and welcoming. Duties include routine cleaning of rooms, halls, restrooms, kitchens and shared areas; restocking supplies; and reporting maintenance needs. Ideal for people who are available and dedicated, punctual, and proud of high standards across residential and community settings—not only professional offices.",
-    image: "/careers/cleaner-job-vacancy.jpeg",
-    applyPhone: "+233595168610",
-    applyPhoneDisplay: "+233 59 516 8610",
-    applyWhatsApp: "233595168610",
-    datePosted: "2026-09-21",
-    validThrough: "2026-12-31",
-    occupationalCategory: "37-2011.00",
-    status: "open",
-  },
-];
+export const JOBS: JobPosting[] = jobsData as JobPosting[];
 
-export function getJobBySlug(slug: string): JobPosting | undefined {
-  return JOBS.find((j) => j.slug === slug && j.status === "open");
+/** Open and not past its validThrough date (a lapsed posting must not stay listed as open). */
+export function isJobCurrent(job: JobPosting, now: Date = new Date()): boolean {
+  if (job.status !== "open") return false;
+  if (!job.validThrough) return true;
+  const end = new Date(`${job.validThrough}T23:59:59Z`);
+  return Number.isNaN(end.getTime()) || end.getTime() >= now.getTime();
 }
 
-export function getOpenJobs(): JobPosting[] {
-  return JOBS.filter((j) => j.status === "open");
+/** Current vacancies, newest first (stable for equal dates). */
+export function getOpenJobs(now: Date = new Date()): JobPosting[] {
+  return JOBS.map((job, index) => ({ job, index }))
+    .filter(({ job }) => isJobCurrent(job, now))
+    .sort((a, b) => b.job.datePosted.localeCompare(a.job.datePosted) || a.index - b.index)
+    .map(({ job }) => job);
+}
+
+export function getJobBySlug(slug: string, now: Date = new Date()): JobPosting | undefined {
+  return JOBS.find((j) => j.slug === slug && isJobCurrent(j, now));
+}
+
+export function employmentLabel(job: JobPosting): string {
+  if (job.employmentLabel) return job.employmentLabel;
+  return job.employmentType
+    .toLowerCase()
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 export function jobWhatsAppUrl(job: JobPosting): string {
   const text = encodeURIComponent(
-    `Hello, I am interested in the ${job.role} job vacancy. Please share application details.`,
+    job.whatsAppMessage ??
+      `Hello, I am interested in the ${job.role} job vacancy. Please share application details.`,
   );
   return `https://wa.me/${job.applyWhatsApp}?text=${text}`;
 }
 
-/** Google JobPosting-compatible JSON-LD (+ optional graph helpers). */
-export function jobPostingJsonLd(job: JobPosting, canonicalUrl: string): Record<string, unknown> {
-  const absoluteImage = job.image.startsWith("http")
-    ? job.image
-    : `https://cintexa.com${job.image}`;
-
-  const posting: Record<string, unknown> = {
-    "@type": "JobPosting",
-    "@id": `${canonicalUrl}#jobposting`,
-    title: job.role,
-    name: job.title,
-    description: [job.summary, job.description, `Requirements: ${job.requirements.join("; ")}`]
-      .filter(Boolean)
-      .join("\n\n"),
-    identifier: {
-      "@type": "PropertyValue",
-      name: "CINTEXA Careers",
-      value: job.id,
-    },
-    datePosted: job.datePosted,
-    employmentType: job.employmentType,
-    hiringOrganization: {
-      "@type": "Organization",
-      name: "Hiring partner",
-      // Board is published on cintexa.com without naming the employer brand
-    },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressCountry: job.addressCountry,
-        addressRegion: job.location,
-      },
-    },
-    applicantLocationRequirements: {
-      "@type": "Country",
-      name: job.location,
-    },
-    jobLocationType: undefined,
-    url: canonicalUrl,
-    image: [absoluteImage],
-    directApply: true,
-    responsibilities: job.responsibilities.join(". "),
-    qualifications: job.requirements.join(". "),
-    occupationalCategory: job.occupationalCategory,
-    industry: "Facilities services",
-  };
-
-  if (job.validThrough) {
-    posting.validThrough = job.validThrough;
-  }
-
-  // Remove undefined keys
-  Object.keys(posting).forEach((k) => {
-    if (posting[k] === undefined) delete posting[k];
-  });
-
-  return {
-    "@context": "https://schema.org",
-    "@graph": [
-      posting,
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: "https://cintexa.com/",
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Careers",
-            item: "https://cintexa.com/careers",
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: job.role,
-            item: canonicalUrl,
-          },
-        ],
-      },
-      {
-        "@type": "WebPage",
-        "@id": canonicalUrl,
-        url: canonicalUrl,
-        name: job.title,
-        description: job.summary,
-        isPartOf: { "@id": "https://cintexa.com/#website" },
-        about: { "@id": `${canonicalUrl}#jobposting` },
-        inLanguage: "en",
-      },
-    ],
-  };
-}
-
-export function careersListJsonLd(jobs: JobPosting[]): Record<string, unknown> {
-  return {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "CollectionPage",
-        "@id": "https://cintexa.com/careers#webpage",
-        url: "https://cintexa.com/careers",
-        name: "Careers & Job Vacancies in Ghana | Apply Now",
-        description:
-          "Browse open job vacancies including Cleaners roles in Ghana for homes, offices, churches and more. Apply by call or WhatsApp.",
-        isPartOf: { "@id": "https://cintexa.com/#website" },
-        inLanguage: "en",
-      },
-      {
-        "@type": "ItemList",
-        "@id": "https://cintexa.com/careers#joblist",
-        name: "Open job vacancies",
-        numberOfItems: jobs.length,
-        itemListElement: jobs.map((j, i) => ({
-          "@type": "ListItem",
-          position: i + 1,
-          url: `https://cintexa.com/careers/${j.slug}`,
-          name: j.title,
-          item: {
-            "@type": "JobPosting",
-            title: j.role,
-            description: j.summary,
-            datePosted: j.datePosted,
-            employmentType: j.employmentType,
-            url: `https://cintexa.com/careers/${j.slug}`,
-            hiringOrganization: {
-              "@type": "Organization",
-              name: "Hiring partner",
-            },
-            jobLocation: {
-              "@type": "Place",
-              address: {
-                "@type": "PostalAddress",
-                addressCountry: j.addressCountry,
-                addressRegion: j.location,
-              },
-            },
-          },
-        })),
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: "https://cintexa.com/",
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Careers",
-            item: "https://cintexa.com/careers",
-          },
-        ],
-      },
-    ],
-  };
-}
+// Structured-data builders live in careers-seo.ts; re-exported so existing imports keep working.
+export { jobPostingJsonLd, careersListJsonLd } from "./careers-seo";

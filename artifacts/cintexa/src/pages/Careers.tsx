@@ -1,14 +1,11 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link } from "wouter";
 import { submitCareerAlert } from "@/lib/email-notifications";
 import { AdSenseInContent } from "@/components/ads/AdSenseSlot";
-
-const WHATSAPP_NUMBER = "233595168610";
-const PHONE_DISPLAY = "+233 59 516 8610";
-const PHONE_TEL = "+233595168610";
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Hello, I am interested in the Cleaners job vacancy. Please share application details.",
-)}`;
+import { JobCard } from "@/components/careers/JobCard";
+import { getOpenJobs } from "@/data/jobs";
+import { careersListSeo } from "@/data/careers-seo";
+import { applyPageSeo } from "@/lib/seo-dom";
 
 const INTERESTS = [
   "Full-time roles",
@@ -46,19 +43,10 @@ export function Careers() {
   const [form, setForm] = useState<FormState>(empty);
   const [status, setStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
 
-  useEffect(() => {
-    document.title =
-      "Careers & Jobs in Ghana | Job Alerts & Scholarships — CINTEXA";
-    const desc =
-      "Cleaners job vacancy in Ghana. Apply now for homes, offices, churches and more — available and dedicated candidates welcome. Call or WhatsApp +233 59 516 8610. Sign up for job and scholarship alerts.";
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.setAttribute("name", "description");
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute("content", desc);
-  }, []);
+  // Current vacancies, newest first. Title, description, preview image, Open Graph, Twitter card
+  // and JSON-LD are all derived from this list, so they change whenever the vacancies do.
+  const jobs = useMemo(() => getOpenJobs(), []);
+  useEffect(() => applyPageSeo(careersListSeo(jobs)), [jobs]);
 
   function toggleInterest(label: string) {
     setForm((f) => ({
@@ -123,158 +111,29 @@ export function Careers() {
         <h1 className="cx-display mt-3 max-w-3xl text-3xl sm:text-4xl">
           Careers & Job Vacancies in Ghana — Apply Now
         </h1>
-        {/* Featured external vacancy inspired by the supplied ByBeth Boutique advert */}
-        <article className="mt-10 overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))]">
-          <div className="grid gap-0 lg:grid-cols-2">
-            <div className="relative min-h-[320px] bg-[hsl(var(--bg))]">
-              <img
-                src="/careers/bybeth-boutique-sales-girl.svg"
-                alt="ByBeth Boutique is hiring a Sales Girl near East Legon, Madina and surrounding areas"
-                className="absolute inset-0 h-full w-full object-contain"
-                loading="lazy"
-              />
-            </div>
-            <div className="flex flex-col justify-center p-6 sm:p-8">
-              <p className="cx-eyebrow" style={{ color: "hsl(var(--accent))" }}>Featured opportunity · Retail & fashion</p>
-              <h2 className="cx-display mt-2 text-2xl sm:text-3xl">ByBeth Boutique Is Hiring a Sales Girl</h2>
-              <p className="mt-3 text-base font-medium leading-relaxed text-[hsl(var(--fg))]">
-                Love fashion? Enjoy making people feel welcome and helping them find something they’ll love? Step into an exciting retail opportunity with ByBeth Boutique! The team is looking for an upbeat, dependable people-person who can turn everyday shopping into a warm, memorable experience. If you’re ready to bring your energy, style and customer-care skills to the boutique, this could be your next move.
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--fg-muted))]">
-                Do you love fashion, enjoy helping people, and believe every customer deserves a warm welcome? ByBeth Boutique is looking for a friendly, reliable and energetic Sales Girl to join its team. If you are enthusiastic about fashion, take pride in great customer service and want to help customers find products they love, this could be the opportunity for you.
-              </p>
-              <h3 className="mt-5 font-semibold text-[hsl(var(--fg))]">What you’ll do</h3>
-              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[hsl(var(--fg-muted))]">
-                <li>Welcome customers, understand their needs and provide excellent service.</li>
-                <li>Assist with sales, packing purchases and presenting products attractively.</li>
-                <li>Keep the boutique neat, organised, clean and well stocked.</li>
-                <li>Help receive stock and carry out basic inventory checks.</li>
-                <li>Represent the ByBeth brand positively and create a pleasant shopping experience.</li>
-              </ul>
-              <h3 className="mt-5 font-semibold text-[hsl(var(--fg))]">Who should apply?</h3>
-              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[hsl(var(--fg-muted))]">
-                <li>You live around East Legon, Madina or nearby communities.</li>
-                <li>Previous retail or sales experience is an advantage, but a positive attitude matters.</li>
-                <li>You communicate confidently, are honest and dependable, and work well with others.</li>
-                <li>You can work flexible hours, including weekends when needed.</li>
-              </ul>
-              <p className="mt-4 text-sm leading-relaxed text-[hsl(var(--fg-muted))]">
-                <strong className="text-[hsl(var(--fg))]">Ready to apply?</strong> Send a short WhatsApp message introducing yourself. Include where you live, any relevant sales or retail experience, and your phone number. Be sure to share why you would be a great addition to the boutique team.
-              </p>
-              <a
-                href="https://wa.me/233543692891?text=Hello%20ByBeth%20Boutique%2C%20I%20am%20interested%20in%20the%20Sales%20Girl%20vacancy.%20I%20would%20like%20to%20share%20my%20location%2C%20experience%20and%20application."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cx-btn cx-btn-primary mt-5 w-full sm:w-fit"
-              >
-                Apply via WhatsApp · 054 369 2891
-              </a>
-              <p className="mt-2 text-xs text-[hsl(var(--fg-muted))]">Applicants should live around East Legon, Madina and surrounding areas. Tap the button to open WhatsApp and send your application message.</p>
-            </div>
-          </div>
-        </article>
+        {jobs.length === 0 && (
+          <p className="mt-10 text-[hsl(var(--fg-muted))]">
+            There are no open vacancies right now. Sign up below and we will email you when new roles are posted.
+          </p>
+        )}
+        {jobs.map((job) => (
+          <JobCard key={job.id} job={job} />
+        ))}
 
-        <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
-          Reliable{" "}
-          <strong className="text-[hsl(var(--fg))]">Cleaners</strong> are needed for{" "}
-          <strong className="text-[hsl(var(--fg))]">homes, offices, churches</strong>, schools and
-          other premises. If you take pride in clean, hygienic spaces and you are available and
-          dedicated, you are invited to apply today.
-        </p>
-
-        {/* Featured vacancy */}
-        <article
-          className="mt-10 overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))]"
-          itemScope
-          itemType="https://schema.org/JobPosting"
-        >
-          <meta itemProp="title" content="Cleaners" />
-          <meta itemProp="employmentType" content="FULL_TIME" />
-          <meta itemProp="hiringOrganization" content="Hiring partner" />
-          <div className="grid gap-0 lg:grid-cols-2">
-            <div className="relative min-h-[280px] bg-[hsl(var(--bg))]">
-              <img
-                src="/careers/cleaner-job-vacancy.jpeg"
-                alt="Cleaners job vacancy Ghana — cleaning homes, offices, churches and community spaces"
-                className="absolute inset-0 h-full w-full object-cover"
-                itemProp="image"
-              />
-            </div>
-            <div className="flex flex-col justify-center p-6 sm:p-8">
-              <p className="cx-eyebrow" style={{ color: "hsl(var(--accent))" }}>
-                Open role · Apply now
-              </p>
-              <h2 className="cx-display mt-2 text-2xl sm:text-3xl" itemProp="title">
-                <Link href="/careers/cleaner" className="hover:underline">
-                  Cleaners
-                </Link>
-              </h2>
-              <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
-                Title / Role: <strong className="text-[hsl(var(--fg))]">Cleaners</strong>
-                {" · "}
-                <Link href="/careers/cleaner" className="underline" style={{ color: "hsl(var(--accent))" }}>
-                  Full details
-                </Link>
-              </p>
-              <p className="mt-4 text-sm leading-relaxed text-[hsl(var(--fg-muted))]" itemProp="description">
-                Keep homes, offices, churches, schools and other premises clean, safe and
-                welcoming. Routine cleaning of rooms, halls, restrooms, kitchens and shared areas;
-                restocking supplies; and reporting maintenance needs. Ideal for people who are{" "}
-                <strong className="text-[hsl(var(--fg))]">available and dedicated</strong>,
-                punctual, and proud of high standards in residential, workplace and community
-                settings.
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-[hsl(var(--fg-muted))]">
-                <li>
-                  <span style={{ color: "hsl(var(--accent))" }}>→</span> Role:{" "}
-                  <strong className="text-[hsl(var(--fg))]">Cleaners</strong>
-                </li>
-                <li>
-                  <span style={{ color: "hsl(var(--accent))" }}>→</span> Scope: Homes, offices,
-                  churches, schools &amp; more
-                </li>
-                <li>
-                  <span style={{ color: "hsl(var(--accent))" }}>→</span> Requirements: Available and
-                  dedicated
-                </li>
-                <li>
-                  <span style={{ color: "hsl(var(--accent))" }}>→</span> Location: Ghana (confirm at
-                  interview)
-                </li>
-              </ul>
-
-              <div className="mt-6 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg))] p-4">
-                <p className="text-sm font-medium text-[hsl(var(--fg))]">
-                  Interested? Call or WhatsApp now
-                </p>
-                <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">
-                  Call or message for application steps, location, and start date.
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <a
-                    href={`tel:${PHONE_TEL}`}
-                    className="cx-btn cx-btn-secondary cx-btn-sm"
-                  >
-                    Call {PHONE_DISPLAY}
-                  </a>
-                  <a
-                    href={WHATSAPP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="cx-btn cx-btn-primary cx-btn-sm"
-                  >
-                    WhatsApp {PHONE_DISPLAY}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </article>
+        {jobs.some((j) => j.slug === "cleaner") && (
+          <p className="mt-4 max-w-2xl text-[hsl(var(--fg-muted))]">
+            Reliable <strong className="text-[hsl(var(--fg))]">Cleaners</strong> are needed for{" "}
+            <strong className="text-[hsl(var(--fg))]">homes, offices, churches</strong>, schools and other premises. If
+            you take pride in clean, hygienic spaces and you are available and dedicated, you are invited to apply
+            today.
+          </p>
+        )}
 
         <AdSenseInContent />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           <div className="space-y-4">
+            {jobs.some((j) => j.slug === "cleaner") && (
             <div className="cx-card">
               <p className="cx-eyebrow">Why these roles matter</p>
               <h2 className="cx-display mt-2 text-xl">Clean spaces support homes and communities</h2>
@@ -284,12 +143,13 @@ export function Careers() {
                 wherever the assignment is.
               </p>
             </div>
+            )}
             <div className="cx-card">
               <p className="cx-eyebrow">Scholarships & more jobs</p>
               <h2 className="cx-display mt-2 text-xl">Stay informed</h2>
               <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-                Sign up for alerts on new roles and scholarship programmes. For the Cleaners vacancy,
-                calling or WhatsApping is the fastest way to apply.
+                Sign up for alerts on new roles and scholarship programmes. For listed vacancies,
+                calling or WhatsApping the contact is the fastest way to apply.
               </p>
               <Link href="/dashboard/careers" className="cx-btn cx-btn-secondary cx-btn-sm mt-4">
                 View listings in dashboard
@@ -301,8 +161,8 @@ export function Careers() {
             <p className="cx-eyebrow">Job & scholarship alerts</p>
             <h2 className="cx-display mt-2 text-xl">Get emailed about new opportunities</h2>
             <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-              Leave your details for future openings. For the current Cleaners roles, prefer call or
-              WhatsApp.
+              Leave your details for future openings. For current vacancies, calling or WhatsApping the
+              listed contact is the fastest way to apply.
             </p>
 
             <form className="mt-6 space-y-4" onSubmit={onSubmit} noValidate>

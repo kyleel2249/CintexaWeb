@@ -7,13 +7,20 @@ const appRoot = path.resolve(here, "..");
 const source = fs.readFileSync(path.join(appRoot, "src/pages/Blog.tsx"), "utf8");
 const posts = [...source.matchAll(/slug:\s*"([a-z0-9-]+)"[\s\S]*?date:\s*"([0-9]{4}-[0-9]{2}-[0-9]{2})"(?:,\s*updated:\s*"([0-9]{4}-[0-9]{2}-[0-9]{2})")?/g)]
   .map((match) => ({ slug: match[1], lastmod: match[3] || match[2] }));
+// Careers pages come from the same data file as the site itself (plain JSON: no build step needed,
+// so the daily sitemap workflow keeps working with bare `node`).
+const jobs = JSON.parse(fs.readFileSync(path.join(appRoot, "src/data/jobs.json"), "utf8"))
+  .filter((j) => j.status === "open" && (!j.validThrough || new Date(`${j.validThrough}T23:59:59Z`) >= new Date()))
+  .sort((a, b) => b.datePosted.localeCompare(a.datePosted));
+const careersLastmod = jobs[0]?.datePosted;
 const routes = [
   ["/", "1.0"], ["/about", "0.8"],
   ["/solutions/marketing", "0.8"], ["/solutions/sales", "0.8"],
   ["/solutions/ads-boost", "0.7"], ["/solutions/ecommerce", "0.8"],
   ["/solutions/website-development", "0.8"], ["/solutions/software-development", "0.8"],
-  ["/blog", "0.9"], ["/case-studies", "0.8"], ["/careers", "0.9"],
-  ["/careers/cleaner", "0.8"], ["/contact", "0.7"], ["/get-started", "0.85"],
+  ["/blog", "0.9"], ["/case-studies", "0.8"], ["/careers", "0.9", careersLastmod],
+  ...jobs.map((j) => [`/careers/${j.slug}`, "0.8", j.datePosted]),
+  ["/contact", "0.7"], ["/get-started", "0.85"],
   ["/privacy-policy", "0.4"], ["/terms", "0.4"], ["/cookie-policy", "0.4"], ["/disclaimer", "0.4"],
   ...posts.map((post) => [`/blog/${post.slug}`, "0.75", post.lastmod])
 ];

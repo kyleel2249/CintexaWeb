@@ -50,7 +50,12 @@ export function applySeo(entry: SeoPageEntry, pathname: string) {
   setMeta("property", "og:title", entry.metaTitle);
   setMeta("property", "og:description", entry.metaDescription);
   setMeta("property", "og:image", image);
+  setMeta("property", "og:image:secure_url", image);
   setMeta("property", "og:image:alt", entry.imageAlt[0] || entry.metaTitle);
+  // Size/type belong to a specific image; drop stale values left by index.html or a previous page.
+  ["og:image:width", "og:image:height", "og:image:type"].forEach((key) =>
+    document.querySelector(`meta[property="${key}"]`)?.remove(),
+  );
 
   setMeta("name", "twitter:card", "summary_large_image");
   setMeta("name", "twitter:title", entry.metaTitle);
@@ -62,6 +67,8 @@ export function applySeo(entry: SeoPageEntry, pathname: string) {
 export function usePageSeo(pathname: string) {
   useEffect(() => {
     // These routes set metadata from their own editorial content; do not overwrite it with the global fallback.
+    // /careers and /careers/:slug build their own head from the live job data (see careers-seo.ts).
+    if (pathname === "/careers" || pathname.startsWith("/careers/")) return;
     if (pathname.startsWith("/blog/") || ["/about", "/case-studies", "/privacy-policy", "/terms", "/cookie-policy", "/disclaimer"].includes(pathname)) return;
     const entry = getSeoForPath(pathname);
     applySeo(entry, pathname);

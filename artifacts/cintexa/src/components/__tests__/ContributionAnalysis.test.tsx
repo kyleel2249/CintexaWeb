@@ -34,14 +34,24 @@ describe("analysis visuals — user 31463b73… (Feb–Oct, GHS 180)", () => {
     expect(within(tiles[0]!).getByText("no payment")).toBeInTheDocument();
   });
 
-  it("quarterly donut has an accessible summary and a legend with amounts and shares", () => {
+  it("quarterly donut has no visible legend, but keeps a screen-reader summary and hover tooltips", () => {
     renderAll(a);
     const svg = screen.getByRole("img", { name: /Contributions by quarter/ });
     expect(svg.getAttribute("aria-label")).toContain("Q1 GHS 40.00 (22%)");
     expect(svg.getAttribute("aria-label")).toContain("Q2 GHS 60.00 (33%)");
     expect(svg.getAttribute("aria-label")).toContain("Q4 GHS 20.00 (11%)");
-    expect(screen.getByText("Jan–Mar")).toBeInTheDocument();
-    expect(screen.getByText("Oct–Dec")).toBeInTheDocument();
+    // the old legend list (quarter names, ranges, per-quarter amounts) is gone
+    expect(screen.queryByText("Jan–Mar")).toBeNull();
+    expect(screen.queryByText("Oct–Dec")).toBeNull();
+    expect(screen.queryByText("Q1")).toBeNull();
+    // each slice still explains itself on hover
+    const tips = [...svg.querySelectorAll("title")].map((t) => t.textContent);
+    expect(tips).toEqual([
+      "Q1 Jan–Mar: GHS 40.00 (22%)",
+      "Q2 Apr–Jun: GHS 60.00 (33%)",
+      "Q3 Jul–Sep: GHS 60.00 (33%)",
+      "Q4 Oct–Dec: GHS 20.00 (11%)",
+    ]);
   });
 
   it("milestones and insights are derived from the data", () => {

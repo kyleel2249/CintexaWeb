@@ -122,8 +122,8 @@ function QuarterDonut({ analytics, fmt }: Props) {
   return (
     <div className="cx-card">
       <p className="cx-eyebrow">Quarterly breakdown</p>
-      <div className="mt-4 flex flex-col items-center gap-5 sm:flex-row sm:items-center">
-        <div className="relative h-40 w-40 shrink-0">
+      <div className="mt-4 flex justify-center">
+        <div className="relative h-44 w-44 shrink-0">
           <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90" role="img" aria-label={`Contributions by quarter: ${summary}`}>
             <circle cx="60" cy="60" r={R} fill="none" strokeWidth="14" style={{ stroke: "hsl(var(--bg-inset))" }} />
             {arcs.map(({ q, len, start }) => {
@@ -143,7 +143,9 @@ function QuarterDonut({ analytics, fmt }: Props) {
                   initial={reduce ? false : { strokeDasharray: `0 ${C}` }}
                   animate={{ strokeDasharray: `${dash} ${C - dash}` }}
                   transition={{ duration: 0.9, delay: 0.1 * q.quarter, ease: "easeOut" }}
-                />
+                >
+                  <title>{`${q.label} ${q.range}: ${fmt(q.amount)} (${pct(q.share)})`}</title>
+                </motion.circle>
               );
             })}
           </svg>
@@ -153,28 +155,6 @@ function QuarterDonut({ analytics, fmt }: Props) {
           </div>
         </div>
 
-        <ul className="w-full space-y-2.5 text-sm">
-          {analytics.quarters.map((q) => (
-            <li key={q.quarter} className="flex items-center justify-between gap-3">
-              <span className="flex min-w-0 items-center gap-2">
-                <i className="inline-block h-3 w-3 shrink-0 rounded-sm" style={{ background: QUARTER_COLORS[q.quarter - 1], opacity: q.amount > 0 ? 1 : 0.3 }} />
-                <span className="truncate">
-                  <span className="font-medium">{q.label}</span>{" "}
-                  <span className="text-[hsl(var(--fg-muted))]">{q.range}</span>
-                </span>
-              </span>
-              <span className="shrink-0 text-right tabular-nums">
-                {q.amount > 0 ? (
-                  <>
-                    {fmt(q.amount)} <span className="text-[hsl(var(--fg-muted))]">· {pct(q.share)}</span>
-                  </>
-                ) : (
-                  <span className="text-[hsl(var(--fg-muted))]">—</span>
-                )}
-              </span>
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );

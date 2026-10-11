@@ -8,6 +8,7 @@ import { useCurrency } from "@/lib/currency/context";
 import { COMMON_CURRENCIES, COUNTRY_CURRENCY } from "@/lib/currency/countries";
 import { currencyName, regionName } from "@/lib/currency/format";
 import { countryFromProfile } from "@/lib/currency/geo";
+import { MIN_AGE, MIN_DOB, formatBirthdayLabel, maxDob, validateDob } from "@/lib/birthday";
 
 const SOURCE_LABEL = {
   preference: "your choice below",
@@ -20,7 +21,35 @@ const SOURCE_LABEL = {
 
 export function DashboardSettings() {
   const { user } = useUser();
-  const { signOut } = useAuth();
+  const { signOut, updateAccount } = useAuth();
+  // Birthday: `null` means "not edited yet", so the saved value shows until the user changes it.
+  const [dobEdit, setDobEdit] = useState<string | null>(null);
+  const [wishesEdit, setWishesEdit] = useState<boolean | null>(null);
+  const [bdayState, setBdayState] = useState<{ kind: "idle" | "saving" | "ok" | "error"; msg: string }>({
+    kind: "idle",
+    msg: "",
+  });
+  const dobValue = dobEdit ?? user?.dateOfBirth ?? "";
+  const wishesValue = wishesEdit ?? user?.birthdayEmail !== false;
+
+  async function saveBirthday() {
+    if (dobValue) {
+      const checked = validateDob(dobValue);
+      if (!checked.ok) {
+        setBdayState({ kind: "error", msg: checked.error });
+        return;
+      }
+    }
+    setBdayState({ kind: "saving", msg: "" });
+    const result = await updateAccount({ dateOfBirth: dobValue || null, birthdayEmail: wishesValue });
+    if (!result.ok) {
+      setBdayState({ kind: "error", msg: result.error });
+      return;
+    }
+    setDobEdit(null);
+    setWishesEdit(null);
+    setBdayState({ kind: "ok", msg: dobValue ? "Birthday saved." : "Birthday removed." });
+  }
   const profile = useMyProfile();
   const updateProfile = useUpdateProfile();
   const exportData = useExportMyData();
@@ -226,6 +255,69 @@ export function DashboardSettings() {
                 Only how amounts are displayed changes — your recorded payments stay exactly as paid.
               </p>
             </div>
+          </section>
+
+          <section className="cx-card space-y-4" aria-labelledby="birthday-title">
+            <div>
+              <h2 id="birthday-title" className="cx-display text-lg">
+                Birthday
+              </h2>
+              <p className="mt-1 text-sm text-[hsl(var(--fg-muted))]">
+                Add your date of birth and we’ll wish you a happy birthday on your portal and by email. It’s optional,
+                and only used for that.
+                {user?.dateOfBirth ? ` Your next birthday: ${formatBirthdayLabel(user.dateOfBirth)}.` : ""}
+              </p>
+            </div>
+            <div className="cx-field">
+              <label className="cx-label" htmlFor="dob">
+                Date of birth
+              </label>
+              <input
+                id="dob"
+                type="date"
+                className="cx-input"
+                value={dobValue}
+                min={MIN_DOB}
+                max={maxDob()}
+                autoComplete="bday"
+                aria-describedby="dob-hint"
+                onChange={(e) => {
+                  setDobEdit(e.target.value);
+                  setBdayState({ kind: "idle", msg: "" });
+                }}
+              />
+              <p id="dob-hint" className="text-xs text-[hsl(var(--fg-muted))]">
+                You must be {MIN_AGE} or older. Clear the date and save to remove it.
+              </p>
+            </div>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={wishesValue}
+                onChange={(e) => {
+                  setWishesEdit(e.target.checked);
+                  setBdayState({ kind: "idle", msg: "" });
+                }}
+              />
+              <span>Email me a birthday message on my birthday</span>
+            </label>
+            {bdayState.msg && (
+              <p
+                className={`text-sm ${bdayState.kind === "error" ? "text-red-400" : "text-[hsl(var(--fg-muted))]"}`}
+                role={bdayState.kind === "error" ? "alert" : "status"}
+              >
+                {bdayState.msg}
+              </p>
+            )}
+            <button
+              type="button"
+              className="cx-btn cx-btn-primary"
+              disabled={bdayState.kind === "saving" || (dobEdit === null && wishesEdit === null)}
+              onClick={() => void saveBirthday()}
+            >
+              {bdayState.kind === "saving" ? "Saving…" : "Save birthday"}
+            </button>
           </section>
 
           <section className="cx-card space-y-3">

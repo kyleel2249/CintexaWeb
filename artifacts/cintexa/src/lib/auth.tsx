@@ -16,7 +16,21 @@ export type CintexaUser = {
   id: string;
   email: string;
   fullName: string;
+  /** "YYYY-MM-DD" — used for birthday wishes. */
+  dateOfBirth?: string | null;
+  /** false when the user switched birthday e-mails off. */
+  birthdayEmail?: boolean;
 };
+
+export type AccountPatch = { dateOfBirth?: string | null; birthdayEmail?: boolean };
+
+function browserTimeZone(): string | undefined {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 type AuthContextValue = {
   user: CintexaUser | null;
@@ -31,7 +45,9 @@ type AuthContextValue = {
     phone?: string;
     company?: string;
     role?: string;
+    dateOfBirth?: string;
   }) => Promise<{ ok: true } | { ok: false; error: string }>;
+  updateAccount: (patch: AccountPatch) => Promise<{ ok: true } | { ok: false; error: string }>;
   signIn: (email: string, password: string) => Promise<{ ok: true } | { ok: false; error: string }>;
   signOut: () => Promise<void>;
 };
@@ -83,14 +99,17 @@ function clearSession() {
   }
 }
 
-async function postAuth<T>(path: string, body: unknown): Promise<T> {
+async function postAuth<T>(path: string, body: unknown, token?: string | null): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 20_000);
   let res: Response;
   try {
     res = await fetch(path, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify(body),
       signal: controller.signal,
     });
@@ -173,9 +192,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       phone?: string;
       company?: string;
       role?: string;
+      dateOfBirth?: string;
     }) => {
       try {
-        const data = await postAuth<{ token: string; user: CintexaUser }>("/api/auth/signup", input);
+        const data = await postAuth<{ token: string; user: CintexaUser }>("/api/auth/signup", {
+          ...input,
+          timeZone: browserTimeZone(),
+        });
         storeSession(data.token, data.user);
         markWelcome("signup");
         setUser(data.user);
@@ -192,6 +215,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await postAuth<{ token: string; user: CintexaUser }>("/api/auth/login", {
         email,
         password,
+        timeZone: browserTimeZone(),
       });
       storeSession(data.token, data.user);
       markWelcome("signin");
@@ -199,6 +223,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { ok: true as const };
     } catch (e) {
       return { ok: false as const, error: e instanceof Error ? e.message : "Login failed" };
+    }
+  }, []);
+
+  /** Saves the signed-in user's own account details (date of birth, birthday e-mail preference). */
+  const updateAccount = useCallback(async (patch: AccountPatch) => {
+    const token = readToken();
+    if (!token) return { ok: false as const, error: "Please log in again." };
+    try {
+      const data = await postAuth<{ user: CintexaUser }>(
+        "/api/auth/profile",
+        { ...patch, timeZone: browserTimeZone() },
+        token,
+      );
+      storeSession(token, data.user);
+      setUser(data.user);
+      return { ok: true as const };
+    } catch (e) {
+      return { ok: false as const, error: e instanceof Error ? e.message : "Could not save your details" };
     }
   }, []);
 
@@ -223,9 +265,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       getToken,
       signUp,
       signIn,
+      updateAccount,
       signOut,
     }),
-    [user, isLoaded, getToken, signUp, signIn, signOut],
+    [user, isLoaded, getToken, signUp, signIn, updateAccount, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -293,6 +336,8 @@ export function useUser() {
           primaryEmailAddress: { emailAddress: user.email },
           fullName: user.fullName,
           firstName: user.fullName.split(" ")[0] || user.fullName,
+          dateOfBirth: user.dateOfBirth ?? null,
+          birthdayEmail: user.birthdayEmail !== false,
         }
       : null,
   };

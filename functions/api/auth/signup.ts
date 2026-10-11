@@ -3,9 +3,11 @@ import {
   corsHeaders,
   createSession,
   hashPassword,
+  publicUser,
   userKey,
   type StoredUser,
 } from "../../lib/cintexa-auth";
+import { isValidTimeZone, updateBirthdayIndex, validateDob } from "../../lib/birthday";
 
 export interface Env {
   KV: KVNamespace;
@@ -178,6 +180,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       phone?: string;
       company?: string;
       role?: string;
+      dateOfBirth?: string;
+      timeZone?: string;
     };
     try {
       body = (await context.request.json()) as typeof body;
@@ -198,6 +202,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (phone && !(/^\+?[\d\s().-]{7,25}$/.test(phone) && phone.replace(/\D/g, "").length >= 7 && phone.replace(/\D/g, "").length <= 15)) {
       return Response.json({ error: "Enter a valid phone number." }, { status: 400, headers });
     }
+    // Date of birth is optional; when given it must be a real date for someone aged 13+.
+    let dateOfBirth: string | undefined;
+    if (typeof body.dateOfBirth === "string" && body.dateOfBirth.trim()) {
+      const dob = validateDob(body.dateOfBirth);
+      if (!dob.ok) return Response.json({ error: dob.error }, { status: 400, headers });
+      dateOfBirth = dob.value;
+    }
+    const timeZone = isValidTimeZone(body.timeZone) ? body.timeZone : undefined;
     if (password.length < 8 || password.length > 128) {
       return Response.json({ error: "Password must be 8–128 characters." }, { status: 400, headers });
     }
@@ -218,6 +230,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       phone: phone || undefined,
       company: company || undefined,
       role: role || undefined,
+      dateOfBirth,
+      timeZone,
       salt,
       passwordHash: hash,
       createdAt: new Date().toISOString(),
@@ -231,6 +245,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       index.unshift(email);
       await context.env.KV.put("user:index", JSON.stringify(index.slice(0, 20_000)));
     }
+
+    if (dateOfBirth) await updateBirthdayIndex(context.env.KV, email, null, dateOfBirth);
 
     const token = await createSession(context.env.KV, user);
 
@@ -260,7 +276,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       {
         ok: true,
         token,
-        user: { id: user.id, email: user.email, fullName: user.fullName },
+        user: publicUser(user),
       },
       { status: 201, headers },
     );

@@ -10,6 +10,7 @@ import {
   safeNextPath,
   type AuthMode,
 } from "@/lib/auth-flow";
+import { MIN_AGE, MIN_DOB, maxDob, validateDob } from "@/lib/birthday";
 
 function goTo(path: string) {
   window.location.assign(path);
@@ -90,6 +91,7 @@ export function GetStarted() {
   const [email, setEmail] = useState(() => readRememberedEmail());
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [dob, setDob] = useState("");
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
   const [code, setCode] = useState("");
@@ -201,12 +203,21 @@ export function GetStarted() {
       setMessage("Enter a valid phone number, for example +233 24 000 0000.");
       return;
     }
+    if (dob) {
+      const checked = validateDob(dob);
+      if (!checked.ok) {
+        setStatus("error");
+        setMessage(checked.error);
+        return;
+      }
+    }
     setStatus("working");
     const result = await signUp({
       fullName: signupName,
       email: signupEmail,
       password: signupPassword,
       phone: phone.trim() || undefined,
+      dateOfBirth: dob || undefined,
       company: company.trim() || undefined,
       role: role.trim() || undefined,
     });
@@ -459,6 +470,24 @@ export function GetStarted() {
                 autoComplete="tel"
                 maxLength={40}
               />
+            </label>
+            <label className="flex flex-col gap-1" htmlFor="cintexa-signup-dob">
+              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Date of birth</span>
+              <input
+                id="cintexa-signup-dob"
+                name="bday"
+                type="date"
+                className="cx-input cx-input--sm"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                min={MIN_DOB}
+                max={maxDob()}
+                autoComplete="bday"
+                aria-describedby="cintexa-signup-dob-hint"
+              />
+              <span id="cintexa-signup-dob-hint" className="text-[11px] text-[hsl(var(--fg-muted))]">
+                Optional — so we can send you birthday wishes. You must be {MIN_AGE} or older.
+              </span>
             </label>
             <div className="grid grid-cols-1 gap-2 min-[380px]:grid-cols-2">
               <label className="flex flex-col gap-1" htmlFor="cintexa-signup-company">

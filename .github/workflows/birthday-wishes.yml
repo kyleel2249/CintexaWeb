@@ -1,0 +1,43 @@
+name: Birthday wishes
+
+# Cloudflare Pages has no cron, so this hourly job calls the secured endpoint that e-mails everyone whose
+# birthday it is in their own time zone (from 06:00 local, once per year). See artifacts/cintexa/BIRTHDAYS.md.
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List who would receive an e-mail without sending anything"
+        type: boolean
+        default: true
+
+permissions: {}
+
+concurrency:
+  group: birthday-wishes
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run birthday job
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::warning::CRON_SECRET repository secret is not set — birthday job skipped."
+            exit 0
+          fi
+          url="${SITE_URL:-https://cintexa.com}/api/cron/birthdays"
+          if [ "$DRY_RUN" = "true" ]; then url="$url?dryRun=1"; fi
+          code=$(curl -sS -o response.json -w "%{http_code}" -X POST -H "Authorization: Bearer $CRON_SECRET" "$url")
+          cat response.json; echo
+          if [ "$code" != "200" ]; then
+            echo "::error::Birthday endpoint answered HTTP $code"
+            exit 1
+          fi

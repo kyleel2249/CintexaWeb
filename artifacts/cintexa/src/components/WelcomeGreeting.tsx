@@ -12,11 +12,13 @@ export function WelcomeGreeting({
   userId,
   country,
   streakDays,
+  birthday,
 }: {
   name?: string | null;
   userId?: string | null;
   country?: string | null;
   streakDays?: number;
+  birthday?: boolean;
 }) {
   const [welcome, setWelcome] = useState<Welcome | null>(() => takeWelcome());
   const [now] = useState(() => new Date());
@@ -40,9 +42,10 @@ export function WelcomeGreeting({
             kind: welcome.kind,
             seed: `${userId ?? ""}|${welcome.nonce}`,
             streakDays,
+            birthday,
           })
         : null,
-    [welcome, name, now, country, userId, streakDays],
+    [welcome, name, now, country, userId, streakDays, birthday],
   );
 
   if (!welcome || !greeting) return null;

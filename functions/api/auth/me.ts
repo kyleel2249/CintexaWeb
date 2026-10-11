@@ -1,4 +1,4 @@
-import { bearerToken, corsHeaders, readSession } from "../../lib/cintexa-auth";
+import { bearerToken, corsHeaders, publicUser, readSession, userKey, type StoredUser } from "../../lib/cintexa-auth";
 
 export interface Env {
   KV: KVNamespace;
@@ -13,14 +13,16 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   if (!session) {
     return Response.json({ error: "Unauthorized" }, { status: 401, headers });
   }
+  const raw = await context.env.KV.get(userKey(session.email));
+  if (raw) {
+    try {
+      return Response.json({ user: publicUser(JSON.parse(raw) as StoredUser) }, { headers });
+    } catch {
+      /* fall through to the session snapshot */
+    }
+  }
   return Response.json(
-    {
-      user: {
-        id: session.userId,
-        email: session.email,
-        fullName: session.fullName,
-      },
-    },
+    { user: { id: session.userId, email: session.email, fullName: session.fullName, dateOfBirth: null, birthdayEmail: true } },
     { headers },
   );
 };

@@ -2,10 +2,12 @@ import { escapeHtml, sendEmail } from "../../lib/email";
 import {
   corsHeaders,
   createSession,
+  publicUser,
   userKey,
   verifyPassword,
   type StoredUser,
 } from "../../lib/cintexa-auth";
+import { isValidTimeZone } from "../../lib/birthday";
 
 export interface Env {
   KV: KVNamespace;
@@ -28,9 +30,9 @@ export const onRequestOptions: PagesFunction<Env> = async () =>
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const headers = corsHeaders({ "Content-Type": "application/json" });
   try {
-    let body: { email?: string; password?: string };
+    let body: { email?: string; password?: string; timeZone?: string };
     try {
-      body = (await context.request.json()) as { email?: string; password?: string };
+      body = (await context.request.json()) as { email?: string; password?: string; timeZone?: string };
     } catch {
       return Response.json({ error: "Invalid request." }, { status: 400, headers });
     }
@@ -67,6 +69,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return Response.json({ error: "Invalid email or password." }, { status: 401, headers });
     }
     await context.env.KV.delete(failKey(email)).catch(() => undefined);
+
+    // Keep the user's time zone current so birthday wishes arrive on their own morning.
+    if (isValidTimeZone(body.timeZone) && body.timeZone !== user.timeZone) {
+      user.timeZone = body.timeZone;
+      await context.env.KV.put(userKey(email), JSON.stringify(user)).catch(() => undefined);
+    }
 
     const token = await createSession(context.env.KV, user);
 
@@ -115,7 +123,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       {
         ok: true,
         token,
-        user: { id: user.id, email: user.email, fullName: user.fullName },
+        user: publicUser(user),
       },
       { headers },
     );

@@ -8,6 +8,8 @@ import { badgeMeta, checkInStreak, type BadgeId } from "@/lib/streak-badges";
 import { ensureAdminReferrer } from "@/lib/social-hub";
 import { DASHBOARD_TABS } from "./routes";
 import { WelcomeGreeting } from "@/components/WelcomeGreeting";
+import { BirthdaySplash } from "@/components/BirthdaySplash";
+import { isBirthdayToday } from "@/lib/birthday";
 import { useCurrency } from "@/lib/currency/context";
 import { buildGreeting } from "@/lib/greetings/greeting";
 import { sessionNonce } from "@/lib/greetings/welcome";
@@ -65,10 +67,12 @@ export function DashboardShell({ children }: { children: ReactNode }) {
     kind: "visit",
     seed: `${user?.id ?? ""}|${sessionNonce()}`,
     streakDays,
+    birthday: isBirthdayToday(user?.dateOfBirth, greetNow),
   });
 
   return (
     <>
+      {isSignedIn && <BirthdaySplash userId={user?.id} name={greetName} dateOfBirth={user?.dateOfBirth} />}
       {!isSignedIn ? (
         <SignedOutPrompt />
       ) : profile.isLoading ? (
@@ -80,7 +84,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         ) : profile.data?.profile?.onboardingCompleted ? (
           <div className="cx-section !pt-10">
             <div className="cx-container">
-              <WelcomeGreeting name={greetName} userId={user?.id} country={region} streakDays={streakDays} />
+              <WelcomeGreeting name={greetName} userId={user?.id} country={region} streakDays={streakDays} birthday={isBirthdayToday(user?.dateOfBirth, greetNow)} />
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div
@@ -147,7 +151,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         ) : (
           <>
             <div className="cx-container" style={{ paddingTop: "1.5rem" }}>
-              <WelcomeGreeting name={greetName} userId={user?.id} country={region} streakDays={streakDays} />
+              <WelcomeGreeting name={greetName} userId={user?.id} country={region} streakDays={streakDays} birthday={isBirthdayToday(user?.dateOfBirth, greetNow)} />
             </div>
             <OnboardingFlow />
           </>

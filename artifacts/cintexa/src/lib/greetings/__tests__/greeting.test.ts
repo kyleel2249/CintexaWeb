@@ -138,3 +138,27 @@ describe("robustness", () => {
     }
   });
 });
+
+describe("birthday", () => {
+  it("outranks a public holiday and a streak, and greets by name", () => {
+    const g = buildGreeting({
+      name: "Kyle",
+      now: new Date("2026-03-06T10:00:00Z"), // Ghana's Independence Day
+      timeZone: "UTC",
+      country: "GH",
+      kind: "signin",
+      streakDays: 9,
+      birthday: true,
+      seed: "b",
+    });
+    expect(g.occasion).toBe("birthday");
+    expect(g.headline).toBe("Happy Birthday, Kyle!");
+    expect(g.emoji).toBe("🎂");
+    expect(g.holidayId).toBeUndefined();
+  });
+  it("still welcomes a brand-new account, and works without a name", () => {
+    const g = buildGreeting({ name: null, now: new Date("2026-10-10T10:00:00Z"), timeZone: "UTC", kind: "signup", birthday: true });
+    expect(g.headline).toBe("Happy Birthday!");
+    expect(g.message).toContain("Welcome to CINTEXA");
+  });
+});

@@ -9,6 +9,12 @@ export type StoredUser = {
   phone?: string;
   company?: string;
   role?: string;
+  /** "YYYY-MM-DD". Optional; used for birthday wishes. */
+  dateOfBirth?: string;
+  /** IANA time zone, so a wish is sent on the user's own birthday morning. */
+  timeZone?: string;
+  /** false = the user turned birthday e-mails off. */
+  birthdayEmail?: boolean;
   salt: string;
   passwordHash: string;
   createdAt: string;
@@ -56,6 +62,17 @@ export async function verifyPassword(password: string, salt: string, expectedHas
   let ok = 0;
   for (let i = 0; i < hash.length; i++) ok |= hash.charCodeAt(i) ^ expectedHash.charCodeAt(i);
   return ok === 0;
+}
+
+/** What the browser may know about a user (never the password hash or salt). */
+export function publicUser(user: StoredUser) {
+  return {
+    id: user.id,
+    email: user.email,
+    fullName: user.fullName,
+    dateOfBirth: user.dateOfBirth ?? null,
+    birthdayEmail: user.birthdayEmail !== false,
+  };
 }
 
 export function userKey(email: string): string {

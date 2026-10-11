@@ -1,7 +1,7 @@
 import { holidaysOn, isChristmasCountry, type CalendarDate } from "./holidays";
 
 export type Period = "morning" | "afternoon" | "evening" | "night";
-export type Occasion = "holiday" | "signup" | "new-year" | "festive" | "new-month" | "time";
+export type Occasion = "birthday" | "holiday" | "signup" | "new-year" | "festive" | "new-month" | "time";
 export type GreetingKind = "signin" | "signup" | "visit";
 
 export type GreetingInput = {
@@ -17,6 +17,8 @@ export type GreetingInput = {
   kind?: GreetingKind;
   /** Current daily-streak length, if known. */
   streakDays?: number;
+  /** True when it is the user's birthday (in their time zone) — outranks every holiday. */
+  birthday?: boolean;
 };
 
 export type Greeting = {
@@ -132,6 +134,13 @@ const LOCAL: Record<string, { morning: string; afternoon: string; evening: strin
   ZA: { morning: "Sawubona", afternoon: "Sawubona", evening: "Sawubona", welcome: "Sawubona" },
 };
 
+const BIRTHDAY_MESSAGE = [
+  "Wishing you a wonderful day and a great year ahead.",
+  "Today is yours — enjoy every moment of it.",
+  "Here’s to another year of growth and good things.",
+  "May your day be filled with joy and good people.",
+];
+
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export function buildGreeting(input: GreetingInput = {}): Greeting {
@@ -145,6 +154,18 @@ export function buildGreeting(input: GreetingInput = {}): Greeting {
 
   const periodWord = { morning: "morning", afternoon: "afternoon", evening: "evening", night: "evening" }[period];
   const streak = input.streakDays ?? 0;
+
+  // 0. Their birthday beats everything — even a public holiday.
+  if (input.birthday) {
+    const extra = kind === "signup" ? " Welcome to CINTEXA — your account is ready." : "";
+    return {
+      headline: fill("Happy Birthday, {name}!", name),
+      message: `${pick(BIRTHDAY_MESSAGE, `${seed}|bd`)}${extra}`,
+      period,
+      occasion: "birthday",
+      emoji: "🎂",
+    };
+  }
 
   // 1. A holiday for the user's country beats everything else.
   const holiday = holidaysOn(country, p)[0];

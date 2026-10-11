@@ -1,4 +1,4 @@
-/** FAQ entries tailored to onboarding interests / role. */
+/** FAQ entries tailored to the interests / role on a profile. */
 
 const BY_INTEREST: Record<string, { q: string; a: string }[]> = {
   "Content & media": [
@@ -18,7 +18,7 @@ const BY_INTEREST: Record<string, { q: string; a: string }[]> = {
     { q: "Can I track conversions?", a: "Yes — pair Pixels with Analytics for funnel views from impression to sale." },
   ],
   "Analytics & BI": [
-    { q: "What does Analytics show?", a: "Traffic, conversion, and revenue snapshots tailored to the interests you selected at onboarding." },
+    { q: "What does Analytics show?", a: "Traffic, conversion, and revenue snapshots tailored to your interests." },
   ],
   default: [
     { q: "How do I change my username or avatar?", a: "Go to Dashboard → Settings. Username binds to your account on this device and syncs when the API is available." },

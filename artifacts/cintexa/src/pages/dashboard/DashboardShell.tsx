@@ -1,8 +1,8 @@
 import { Link, useLocation, useRoute } from "wouter";
 import { useAuth, useUser } from "@/lib/auth";
-import { useEffect, useState, type ReactNode } from "react";
-import { useMyProfile } from "@/hooks/useApi";
-import { OnboardingFlow } from "./onboarding/OnboardingFlow";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useMyProfile, useUpdateProfile } from "@/hooks/useApi";
+import { clearPendingReferral, readPendingReferral } from "@/lib/referral-capture";
 import { AVATAR_OPTIONS } from "@/lib/local-profile";
 import { badgeMeta, checkInStreak, type BadgeId } from "@/lib/streak-badges";
 import { ensureAdminReferrer } from "@/lib/social-hub";
@@ -40,6 +40,26 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { isSignedIn, signOut } = useAuth();
   const profile = useMyProfile();
+  const { mutate: saveProfile } = useUpdateProfile();
+
+  // New accounts go straight to the dashboard — there is no sign-up questionnaire. The account is
+  // marked set up in the background, and a referral link the visitor arrived through is attached to
+  // it now (the old onboarding step used to do that).
+  const setupDone = useRef(false);
+  useEffect(() => {
+    if (!isSignedIn || profile.isLoading || setupDone.current) return;
+    if (profile.data?.profile?.onboardingCompleted) return;
+    setupDone.current = true;
+    const pendingReferral = readPendingReferral();
+    saveProfile(
+      { onboardingCompleted: true, ...(pendingReferral ? { referredByUserId: pendingReferral } : {}) },
+      {
+        onSuccess: () => {
+          if (pendingReferral) clearPendingReferral();
+        },
+      },
+    );
+  }, [isSignedIn, profile.isLoading, profile.data, saveProfile]);
 
   const [streakDays, setStreakDays] = useState(0);
   const [badgeId, setBadgeId] = useState<BadgeId>(null);
@@ -81,7 +101,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               <p className="text-sm text-[hsl(var(--fg-muted))]">Loading your portal…</p>
             </div>
           </div>
-        ) : profile.data?.profile?.onboardingCompleted ? (
+        ) : (
           <div className="cx-section !pt-10">
             <div className="cx-container">
               <WelcomeGreeting name={greetName} userId={user?.id} country={region} streakDays={streakDays} birthday={isBirthdayToday(user?.dateOfBirth, greetNow)} />
@@ -148,13 +168,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               <div className="mt-8">{children}</div>
             </div>
           </div>
-        ) : (
-          <>
-            <div className="cx-container" style={{ paddingTop: "1.5rem" }}>
-              <WelcomeGreeting name={greetName} userId={user?.id} country={region} streakDays={streakDays} birthday={isBirthdayToday(user?.dateOfBirth, greetNow)} />
-            </div>
-            <OnboardingFlow />
-          </>
         )}
     </>
   );

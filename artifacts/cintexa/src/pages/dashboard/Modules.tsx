@@ -358,7 +358,7 @@ export function DashboardFaq() {
     <DashboardShell>
       <h2 className="cx-display text-xl">FAQ for you</h2>
       <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">
-        Answers matched to your onboarding interests{interests.length ? `: ${interests.join(", ")}` : ""}.
+        {interests.length ? `Answers matched to your interests: ${interests.join(", ")}.` : "Frequently asked questions."}
       </p>
       <div className="mt-6 space-y-3">
         {items.map((item) => (

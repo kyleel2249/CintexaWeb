@@ -24,7 +24,7 @@ interface Recommendation {
   href: string;
 }
 
-/** Maps a single onboarding interest answer to a concrete page on the site — this is
+/** Maps a single profile interest to a concrete page on the site — this is
  * what makes the dashboard genuinely tailored rather than just labeled with a role. */
 const INTEREST_RECOMMENDATIONS: Record<string, Recommendation> = {
   "Content & media": { title: "Marketing technology", description: "Plan and schedule content across channels.", href: "/solutions/marketing" },

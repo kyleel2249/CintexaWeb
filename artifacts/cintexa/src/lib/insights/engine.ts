@@ -229,8 +229,8 @@ const faq: Runner = (s, ctx) => {
     status: items.length ? "ready" : "partial",
     dataAsOf: iso(),
     summary: items.length
-      ? `FAQ Insight matched ${items.length} article(s) to your onboarding interests.`
-      : "No interest-based FAQ matches yet. Complete onboarding interests for tailored articles.",
+      ? `FAQ Insight matched ${items.length} article(s) to your interests.`
+      : "No interest-based FAQ matches yet.",
     keyFindings: [
       { title: "FAQ coverage", description: `${items.length} matched FAQ item(s) available.`, category: items.length ? "positive" : "neutral", severity: "none", evidenceIds: items.length ? ["f1"] : [] },
     ],

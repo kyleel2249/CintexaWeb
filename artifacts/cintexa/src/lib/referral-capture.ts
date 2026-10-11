@@ -1,6 +1,6 @@
 /**
  * Captures ?ref=<username> from the URL on first visit and remembers it
- * until onboarding completes, so a real referral link (from the Affiliate
+ * until the new account is set up, so a real referral link (from the Affiliate
  * tab) actually attributes the new signup to the person who shared it —
  * not just the FREE2026 admin default.
  */

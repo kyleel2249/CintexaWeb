@@ -36,49 +36,54 @@ const renderPage = () =>
     </CurrencyContext.Provider>,
   );
 
-describe("Settings → Birthday", () => {
+describe("Settings → Date of Birth", () => {
   beforeEach(() => {
     updateAccount.mockReset();
     updateAccount.mockResolvedValue({ ok: true });
     currentUser = { id: "u1", fullName: "Kyle Test", firstName: "Kyle", dateOfBirth: null, birthdayEmail: true };
   });
 
-  it("adds a date of birth and keeps the email preference", async () => {
+  it("is called “Date of Birth” and shows no explanations or extra controls", () => {
     renderPage();
-    const save = screen.getByRole("button", { name: "Save birthday" });
-    expect(save).toBeDisabled(); // nothing changed yet
-    fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "1990-10-10" } });
-    expect(save).toBeEnabled();
-    fireEvent.click(save);
-    await waitFor(() => expect(updateAccount).toHaveBeenCalledWith({ dateOfBirth: "1990-10-10", birthdayEmail: true }));
-    expect(await screen.findByText("Birthday saved.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Date of Birth" })).toBeInTheDocument();
+    expect(screen.queryByText(/birthday/i)).toBeNull();
+    expect(screen.queryByText(/wish you a happy birthday|only used for that|optional/i)).toBeNull();
+    expect(screen.queryByLabelText(/Email me a birthday message/i)).toBeNull();
+    expect(screen.queryByRole("checkbox", { name: /birthday/i })).toBeNull();
+    expect(document.getElementById("dob")!.getAttribute("aria-describedby")).toBeNull();
   });
 
-  it("shows the saved date, lets the user switch the email off, and remove the date", async () => {
+  it("adds a date of birth", async () => {
+    renderPage();
+    const save = screen.getByRole("button", { name: "Save" });
+    expect(save).toBeDisabled(); // nothing changed yet
+    fireEvent.change(screen.getByLabelText("Date of Birth"), { target: { value: "1990-10-10" } });
+    expect(save).toBeEnabled();
+    fireEvent.click(save);
+    await waitFor(() => expect(updateAccount).toHaveBeenCalledWith({ dateOfBirth: "1990-10-10" }));
+    expect(await screen.findByText("Date of birth saved.")).toBeInTheDocument();
+  });
+
+  it("shows the saved date and lets the user remove it", async () => {
     currentUser = { ...currentUser!, dateOfBirth: "1990-10-10" };
     renderPage();
-    expect((screen.getByLabelText("Date of birth") as HTMLInputElement).value).toBe("1990-10-10");
-    expect(screen.getByText(/Your next birthday: (10 October|October 10)/i)).toBeInTheDocument();
-
-    fireEvent.click(screen.getByLabelText("Email me a birthday message on my birthday"));
-    fireEvent.click(screen.getByRole("button", { name: "Save birthday" }));
-    await waitFor(() => expect(updateAccount).toHaveBeenLastCalledWith({ dateOfBirth: "1990-10-10", birthdayEmail: false }));
-
-    fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save birthday" }));
-    await waitFor(() => expect(updateAccount).toHaveBeenLastCalledWith({ dateOfBirth: null, birthdayEmail: true }));
+    expect((screen.getByLabelText("Date of Birth") as HTMLInputElement).value).toBe("1990-10-10");
+    fireEvent.change(screen.getByLabelText("Date of Birth"), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(updateAccount).toHaveBeenLastCalledWith({ dateOfBirth: null }));
+    expect(await screen.findByText("Date of birth removed.")).toBeInTheDocument();
   });
 
   it("rejects a bad date before calling the server, and reports server errors", async () => {
     renderPage();
-    fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "2999-01-01" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save birthday" }));
+    fireEvent.change(screen.getByLabelText("Date of Birth"), { target: { value: "2999-01-01" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/future/i);
     expect(updateAccount).not.toHaveBeenCalled();
 
     updateAccount.mockResolvedValueOnce({ ok: false, error: "Could not save your details" });
-    fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "1990-10-10" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save birthday" }));
+    fireEvent.change(screen.getByLabelText("Date of Birth"), { target: { value: "1990-10-10" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Could not save your details");
   });
 });

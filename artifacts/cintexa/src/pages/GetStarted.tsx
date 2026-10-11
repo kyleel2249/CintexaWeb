@@ -10,7 +10,7 @@ import {
   safeNextPath,
   type AuthMode,
 } from "@/lib/auth-flow";
-import { MIN_AGE, MIN_DOB, maxDob, validateDob } from "@/lib/birthday";
+import { MIN_DOB, maxDob, validateDob } from "@/lib/birthday";
 
 function goTo(path: string) {
   window.location.assign(path);
@@ -472,7 +472,7 @@ export function GetStarted() {
               />
             </label>
             <label className="flex flex-col gap-1" htmlFor="cintexa-signup-dob">
-              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Date of birth</span>
+              <span className="text-[11px] text-[hsl(var(--fg-muted))]">Date of Birth</span>
               <input
                 id="cintexa-signup-dob"
                 name="bday"
@@ -483,11 +483,7 @@ export function GetStarted() {
                 min={MIN_DOB}
                 max={maxDob()}
                 autoComplete="bday"
-                aria-describedby="cintexa-signup-dob-hint"
               />
-              <span id="cintexa-signup-dob-hint" className="text-[11px] text-[hsl(var(--fg-muted))]">
-                Optional — so we can send you birthday wishes. You must be {MIN_AGE} or older.
-              </span>
             </label>
             <div className="grid grid-cols-1 gap-2 min-[380px]:grid-cols-2">
               <label className="flex flex-col gap-1" htmlFor="cintexa-signup-company">

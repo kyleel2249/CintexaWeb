@@ -323,6 +323,6 @@ describe("birthday e-mail job", () => {
     expect(c.html).not.toContain("<b>Kyle</b>");
     expect(c.html).toContain("&lt;b&gt;Kyle&lt;/b&gt;");
     expect(c.html).toContain("/dashboard/settings");
-    expect(c.text).toContain("Turn them off");
+    expect(c.text).toContain("To stop these emails");
   });
 });

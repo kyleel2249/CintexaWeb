@@ -26,15 +26,16 @@ describe("Sign-up date of birth", () => {
     window.history.pushState({}, "", "/sign-up");
   });
 
-  it("offers an optional, labelled date field that explains why we ask", () => {
+  it("offers an optional, labelled date field with no explanatory text", () => {
     render(<GetStarted />);
     const input = document.getElementById("cintexa-signup-dob") as HTMLInputElement;
     expect(input.type).toBe("date");
     expect(input.required).toBe(false);
     expect(input.autocomplete).toBe("bday");
     expect(input.max).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    expect(screen.getByText("Date of birth")).toBeInTheDocument();
-    expect(screen.getByText(/birthday wishes/i)).toBeInTheDocument();
+    expect(screen.getByText("Date of Birth")).toBeInTheDocument();
+    expect(input.getAttribute("aria-describedby")).toBeNull();
+    expect(screen.queryByText(/birthday wishes|13 or older|optional —/i)).toBeNull();
   });
 
   it("sends the date with the sign-up", async () => {

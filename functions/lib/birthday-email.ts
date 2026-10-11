@@ -39,7 +39,7 @@ export function birthdayEmailContent(user: { id: string; fullName: string }, yea
     <p style="margin-top:28px">With warm wishes,<br/><strong>The CINTEXA Team</strong></p>
     <p style="margin-top:32px;font-size:12px;color:#777">
       You’re receiving this because you added your date of birth to your CINTEXA account.
-      Prefer not to get birthday emails? Turn them off any time in
+      To stop these emails, remove your date of birth in
       <a href="${settingsUrl}" style="color:#777">Settings</a>.
     </p>
   </div>`;
@@ -56,7 +56,7 @@ With warm wishes,
 The CINTEXA Team
 
 You’re receiving this because you added your date of birth to your CINTEXA account.
-Prefer not to get birthday emails? Turn them off any time in Settings: ${settingsUrl}`;
+To stop these emails, remove your date of birth in Settings: ${settingsUrl}`;
 
   return { subject, html, text };
 }

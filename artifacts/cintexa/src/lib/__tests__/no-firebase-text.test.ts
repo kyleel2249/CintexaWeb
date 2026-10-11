@@ -33,3 +33,20 @@ describe("visitor-facing text", () => {
     expect(legal).toContain('title="5. Hosting, Database and Google service"');
   });
 });
+
+describe("policy wording", () => {
+  const legal = fs.readFileSync(path.join(SRC, "pages/LegalPages.tsx"), "utf8");
+  const trust = fs.readFileSync(path.join(SRC, "pages/TrustPages.tsx"), "utf8");
+
+  it("uses the requested date-of-birth sentence", () => {
+    expect(legal).toContain("If you choose to add your date of birth, we use it only to improve your experience with us.");
+    expect(legal).not.toMatch(/send you birthday wishes/);
+    expect(trust).not.toMatch(/birthday wishes/);
+  });
+
+  it("refers to “Children or minors”", () => {
+    expect(legal).toContain('title="13. Children or minors and third-party websites"');
+    expect(legal).toContain("children or minors");
+    expect(trust).toContain('title="Children or minors, updates and contact"');
+  });
+});

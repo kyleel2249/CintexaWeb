@@ -49,6 +49,20 @@ const SCHEDULES: Schedule[] = [
     months: [2, 3, 4, 5, 6, 7],
     monthlyGhs: 20,
   },
+  {
+    // Feb–Oct 2026 · GHS 20 × 9 = 180
+    userId: "31463b73-eb4a-4a76-8358-07e7aaad145c",
+    year: 2026,
+    months: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    monthlyGhs: 20,
+  },
+  {
+    // Feb–Apr 2026 · GHS 20 × 3 = 60
+    userId: "47c44d24-45eb-4c25-8382-49976ebd5a2c",
+    year: 2026,
+    months: [2, 3, 4],
+    monthlyGhs: 20,
+  },
 ];
 
 /** @deprecated Prefer getSeededSchedule — kept for older imports */

@@ -8,6 +8,8 @@ import { getSeededSchedule, getSeededTotalGhs } from "@/data/contribution-seed";
 import { useMoney } from "@/lib/currency/useMoney";
 import { browserLocale, formatMoney, regionName } from "@/lib/currency/format";
 import { isSettled, statusLabel, statusTone } from "@/lib/contributions";
+import { analyzeContributions } from "@/lib/contribution-analytics";
+import { ContributionBreakdown, ContributionYearStrip } from "@/components/contributions/ContributionAnalysis";
 
 function monthLabel(d: Date | string) {
   const dt = typeof d === "string" ? new Date(d) : d;
@@ -57,6 +59,10 @@ export function DashboardContributions() {
   const progressPct = hasSchedule ? Math.min(100, (paidGhs / (seededTotal as number)) * 100) : 0;
   const scheduleMonthly = schedule ? money.format(schedule.monthlyGhs, "GHS", { approx: false }).text : "";
   const scheduleTarget = seededTotal ? money.format(seededTotal, "GHS", { approx: false }).text : "";
+  const analytics = useMemo(
+    () => analyzeContributions(paidPlan.items.map((i) => ({ date: i.row.createdAt, amount: i.amount }))),
+    [paidPlan.items],
+  );
   const rowItem = new Map(allPlan.items.map((i) => [i.row, i]));
   const showFxNote = paidPlan.usedConversion || paidPlan.fellBack || paidPlan.excluded.length > 0;
 
@@ -136,6 +142,12 @@ export function DashboardContributions() {
             {paidPlan.excluded.length > 0 &&
               ` ${paidPlan.excluded.length} payment${paidPlan.excluded.length === 1 ? "" : "s"} in another currency couldn’t be converted and ${paidPlan.excluded.length === 1 ? "is" : "are"} not included in the totals.`}
           </motion.p>
+        )}
+
+        {!isLoading && analytics.count > 0 && (
+          <motion.div variants={item}>
+            <ContributionYearStrip analytics={analytics} fmt={fmt} currency={currency} />
+          </motion.div>
         )}
 
         {/* Monthly contribution summary */}
@@ -364,6 +376,12 @@ export function DashboardContributions() {
               No contributions yet. Completed payments will appear here with charts and totals.
             </p>
           </div>
+        )}
+
+        {!isLoading && analytics.count > 0 && (
+          <motion.div variants={item}>
+            <ContributionBreakdown analytics={analytics} fmt={fmt} currency={currency} />
+          </motion.div>
         )}
 
         {/* Timeline cards */}

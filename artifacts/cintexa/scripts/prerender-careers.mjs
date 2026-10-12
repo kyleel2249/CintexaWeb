@@ -13,13 +13,15 @@
  *
  * Output (Cloudflare Pages outDir = artifacts/cintexa/dist):
  *   dist/careers/index.html
- *   dist/careers/<slug>/index.html
+ *   dist/careers/<slug>/index.html      (one page — and one URL — per vacancy)
+ *   dist/careers/feed.xml               (RSS 2.0 of open vacancies)
+ *   dist/careers/jobs.json              (the same, as public JSON)
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getOpenJobs, jobWhatsAppUrl, employmentLabel } from "../src/data/jobs.ts";
-import { jobSeo, careersListSeo } from "../src/data/careers-seo.ts";
+import { jobSeo, careersListSeo, jobCanonical, absoluteUrl, SITE_URL } from "../src/data/careers-seo.ts";
 import { readImageSize } from "./image-info.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -68,7 +70,7 @@ export function validateJobImages(jobs, baseDir = publicDir) {
 }
 
 /** Replaces all inherited head metadata in the Vite shell with this page's values. */
-export function injectHead(template, seo) {
+export function injectHead(template, seo, extraHead = "") {
   let html = template;
   html = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(seo.title)}</title>`);
 
@@ -103,6 +105,7 @@ export function injectHead(template, seo) {
     `<meta name="twitter:image" content="${img}" />`,
     `<meta name="twitter:image:alt" content="${escapeHtml(seo.imageAlt)}" />`,
     seo.jsonLd ? `<script type="application/ld+json" data-seo="page">${safeJson(seo.jsonLd)}</script>` : "",
+    extraHead,
   ]
     .filter(Boolean)
     .join("\n    ");
@@ -156,14 +159,74 @@ function listBody(jobs) {
 </main>`;
 }
 
+const FEED_LINK = '<link rel="alternate" type="application/rss+xml" title="CINTEXA job vacancies" href="/careers/feed.xml" />';
+
 export function renderListPage(shell, jobs) {
-  const html = injectHead(shell, careersListSeo(jobs));
+  const html = injectHead(shell, careersListSeo(jobs), FEED_LINK);
   return html.replace(/<div id="root"><\/div>/, `<div id="root">${listBody(jobs)}</div>`);
 }
 
 export function renderJobPage(shell, job) {
   const html = injectHead(shell, jobSeo(job));
   return html.replace(/<div id="root"><\/div>/, `<div id="root">${jobBody(job)}</div>`);
+}
+
+const xmlEscape = (v) =>
+  String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+
+const postedAt = (job) => new Date(`${job.datePosted}T09:00:00Z`);
+
+/** RSS 2.0 feed of open vacancies. Deterministic: dates come from the data, not the build clock. */
+export function buildFeedXml(jobs) {
+  const newest = jobs.length ? postedAt(jobs[0]) : new Date(0);
+  const items = jobs
+    .map((j) => {
+      const url = jobCanonical(j);
+      return `    <item>
+      <title>${xmlEscape(j.title)}</title>
+      <link>${xmlEscape(url)}</link>
+      <guid isPermaLink="true">${xmlEscape(url)}</guid>
+      <pubDate>${postedAt(j).toUTCString()}</pubDate>${j.category ? `\n      <category>${xmlEscape(j.category)}</category>` : ""}
+      <description>${xmlEscape(j.summary)}</description>
+    </item>`;
+    })
+    .join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CINTEXA Careers — job vacancies in Ghana</title>
+    <link>${SITE_URL}/careers</link>
+    <description>Open job vacancies posted on CINTEXA Careers.</description>
+    <language>en</language>
+    <lastBuildDate>${newest.toUTCString()}</lastBuildDate>
+    <atom:link href="${SITE_URL}/careers/feed.xml" rel="self" type="application/rss+xml" />
+${items}
+  </channel>
+</rss>
+`;
+}
+
+/** The same vacancies as plain JSON for aggregators and partners. */
+export function buildJobsJson(jobs) {
+  return {
+    site: SITE_URL,
+    count: jobs.length,
+    jobs: jobs.map((j) => ({
+      id: j.id,
+      slug: j.slug,
+      url: jobCanonical(j),
+      title: j.title,
+      role: j.role,
+      employer: j.employerName ?? null,
+      category: j.category ?? null,
+      location: j.location,
+      employmentType: j.employmentType,
+      datePosted: j.datePosted,
+      validThrough: j.validThrough ?? null,
+      summary: j.summary,
+      image: absoluteUrl(j.socialImage),
+    })),
+  };
 }
 
 function writePage(relDir, html) {
@@ -193,6 +256,9 @@ function run() {
   for (const job of open) {
     writePage(path.join("careers", job.slug), renderJobPage(shell, job));
   }
+  fs.writeFileSync(path.join(dist, "careers", "feed.xml"), buildFeedXml(open));
+  fs.writeFileSync(path.join(dist, "careers", "jobs.json"), `${JSON.stringify(buildJobsJson(open), null, 2)}\n`);
+  console.log("prerender: careers/feed.xml, careers/jobs.json");
   console.log(`prerender: done (${open.length} jobs + list)`);
 }
 

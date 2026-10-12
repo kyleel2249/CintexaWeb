@@ -11,6 +11,8 @@ export type CareerAlertPayload = {
   interests?: string[];
   message?: string;
   source?: string;
+  /** Honeypot — real people never fill this in. */
+  website?: string;
 };
 
 export type SignupPayload = {

@@ -1,4 +1,5 @@
 import { careerAlertAdminHtml, careerAlertSubscriberHtml, sendEmail } from "../../lib/email";
+import { clientIp, rateLimit } from "../../lib/ratelimit";
 
 export interface Env {
   KV: KVNamespace;
@@ -16,6 +17,8 @@ type Body = {
   interests?: string[];
   message?: string;
   source?: string;
+  /** Honeypot — real people never fill this in. */
+  website?: string;
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,17 +31,45 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   };
 
   try {
-    const body = (await context.request.json()) as Body;
+    let body: Body;
+    try {
+      body = (await context.request.json()) as Body;
+    } catch {
+      return Response.json({ error: "Invalid request." }, { status: 400, headers: cors });
+    }
+
+    // Bots fill hidden fields. Pretend it worked, store nothing, send nothing.
+    if (typeof body.website === "string" && body.website.trim()) {
+      return Response.json({ ok: true, id: crypto.randomUUID() }, { headers: cors });
+    }
+
+    // This endpoint sends an email to whatever address is typed, so it must not be usable to spam people.
+    const byIp = await rateLimit(context.env.KV, `rl:alert:ip:${clientIp(context.request)}`, 6, 3600);
+    if (!byIp.ok) {
+      return Response.json(
+        { error: "Too many signups from this connection. Please try again later." },
+        { status: 429, headers: { ...cors, "Retry-After": String(byIp.retryAfter) } },
+      );
+    }
+
     const fullName = (body.fullName || "").trim();
     const email = (body.email || "").trim().toLowerCase();
     const interests = Array.isArray(body.interests)
-      ? body.interests.map(String).slice(0, 20)
+      ? body.interests.filter((x): x is string => typeof x === "string").map((x) => x.trim().slice(0, 80)).filter(Boolean).slice(0, 20)
       : [];
 
     if (!fullName || fullName.length > 120 || !email || !EMAIL_RE.test(email)) {
       return Response.json(
         { error: "Valid fullName and email are required." },
         { status: 400, headers: cors },
+      );
+    }
+
+    const byEmail = await rateLimit(context.env.KV, `rl:alert:email:${email}`, 3, 86_400);
+    if (!byEmail.ok) {
+      return Response.json(
+        { error: "This email address has already signed up recently." },
+        { status: 429, headers: { ...cors, "Retry-After": String(byEmail.retryAfter) } },
       );
     }
 

@@ -381,3 +381,26 @@
     display: none !important;
   }
 }
+
+/* ============ Print (vacancy pages etc.) ============ */
+@media print {
+  header,
+  footer,
+  nav,
+  .cx-no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .cx-card,
+  article {
+    box-shadow: none !important;
+    border-color: #ccc !important;
+  }
+  a {
+    color: inherit !important;
+    text-decoration: underline;
+  }
+}

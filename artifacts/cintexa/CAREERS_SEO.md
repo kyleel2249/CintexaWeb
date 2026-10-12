@@ -42,3 +42,27 @@ size/type tags and replaces (never duplicates) the page JSON-LD, which is remove
 - SPA `_redirects` fallback still applies when no static file exists.
 - Cloudflare's cache and social platforms cache previews: after changing an image, re-scrape with
   the Facebook Sharing Debugger / X Card validator, or the old image may show for a while.
+
+## One URL per vacancy
+Every vacancy in `jobs.json` is its own page at `/careers/<slug>` (prerendered, in the sitemap, with its
+own title, description, preview image and JobPosting data). On `/careers` each card links to it three
+ways (title, image, "View role & apply") and can copy/share that exact link. Slugs are unique and
+URL-safe (a test enforces it). The dashboard Careers tab links to the same pages.
+
+## Features
+- **Search, filter, sort** on `/careers` (role/employer/location text, category, type, newest / closing
+  soonest / A–Z). The state lives in the URL (`?q=…&category=…&sort=…&saved=1`) so a view can be shared.
+- **Saved jobs**: bookmark vacancies (stored in this browser only — just the slugs), a "Saved" filter, and a
+  "Saved jobs" list in the dashboard.
+- **Badges**: New (< 7 days), Closing soon (≤ 14 days), "Posted 3 days ago", "Closes in 12 days".
+- **Share**: copy link, device share sheet, WhatsApp, LinkedIn, X, Facebook, email — all use the vacancy's URL.
+- **Apply online** on each vacancy page → `POST /api/careers/apply`. The API only accepts open vacancies
+  (it reads the same `jobs.json`), validates, drops bots (honeypot), rate-limits (8/hour per connection),
+  refuses duplicates (same person + vacancy for 7 days), stores the application in KV for 180 days, and
+  e-mails the team (`NOTIFY_ADMIN_EMAIL`, default `info@cintexa.com`) and the applicant. Applicant text
+  is HTML-escaped. Call/WhatsApp stays available. No file uploads.
+- **Related vacancies** and **previous / next** links, breadcrumb, **Print** layout.
+- **Feeds**: `/careers/feed.xml` (RSS) and `/careers/jobs.json`, generated at build, advertised in the
+  `/careers` head.
+- **Job alerts** form: validates input, never claims success on failure, keeps nothing about the visitor in
+  the browser; the endpoint rate-limits (6/hour per connection, 3/day per address) and has a honeypot.

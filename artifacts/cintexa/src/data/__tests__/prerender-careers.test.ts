@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getOpenJobs } from "../jobs";
 // @ts-expect-error - plain build script (no types); guarded so importing it does not run the build.
-import { renderJobPage, renderListPage } from "../../../scripts/prerender-careers.mjs";
+import { buildFeedXml, buildJobsJson, renderJobPage, renderListPage } from "../../../scripts/prerender-careers.mjs";
 
 const SHELL = `<!doctype html><html><head>
 <link rel="canonical" href="https://cintexa.com/" />
@@ -54,5 +54,45 @@ describe("prerendered careers HTML (what link-preview bots read)", () => {
     expect(html).toContain('<meta property="og:title" content="Totally New Title" />');
     expect(html).toContain('<meta property="og:image" content="https://cintexa.com/careers/new.png" />');
     expect(html).toContain('<meta name="twitter:card" content="summary_large_image" />');
+  });
+});
+
+describe("vacancy feed (RSS + JSON)", () => {
+  const jobs = getOpenJobs(new Date("2026-10-10"));
+
+  it("RSS lists every vacancy under its own URL", () => {
+    const xml = buildFeedXml(jobs) as string;
+    expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
+    expect(xml).toContain('<atom:link href="https://cintexa.com/careers/feed.xml" rel="self"');
+    for (const job of jobs) {
+      expect(xml).toContain(`<link>https://cintexa.com/careers/${job.slug}</link>`);
+      expect(xml).toContain(`<guid isPermaLink="true">https://cintexa.com/careers/${job.slug}</guid>`);
+    }
+    expect(count(xml, /<item>/g)).toBe(jobs.length);
+  });
+  it("escapes XML special characters and is deterministic", () => {
+    const tricky = { ...jobs[0]!, title: 'Sales & "Support" <Lead>', category: "R&D" };
+    const xml = buildFeedXml([tricky]) as string;
+    expect(xml).toContain("Sales &amp; &quot;Support&quot; &lt;Lead&gt;");
+    expect(xml).toContain("<category>R&amp;D</category>");
+    expect(buildFeedXml(jobs)).toBe(buildFeedXml(jobs)); // no build-clock dates
+  });
+  it("handles no vacancies", () => {
+    const xml = buildFeedXml([]) as string;
+    expect(count(xml, /<item>/g)).toBe(0);
+    expect(xml).toContain("</channel>");
+  });
+  it("JSON mirrors the data with absolute URLs", () => {
+    const data = buildJobsJson(jobs) as { count: number; jobs: { url: string; slug: string; image: string; employer: string | null }[] };
+    expect(data.count).toBe(jobs.length);
+    expect(data.jobs.map((j) => j.url)).toEqual(jobs.map((j) => `https://cintexa.com/careers/${j.slug}`));
+    expect(data.jobs.every((j) => j.image.startsWith("https://cintexa.com/careers/"))).toBe(true);
+    expect(data.jobs.find((j) => j.slug === "cleaner")!.employer).toBeNull();
+  });
+  it("the /careers page advertises the feed; vacancy pages don't need to", () => {
+    const list = renderListPage(SHELL, jobs) as string;
+    expect(list).toContain('<link rel="alternate" type="application/rss+xml" title="CINTEXA job vacancies" href="/careers/feed.xml" />');
+    expect(count(list, /rel="alternate"/g)).toBe(1);
+    expect(renderJobPage(SHELL, jobs[0]!) as string).not.toContain('rel="alternate"');
   });
 });

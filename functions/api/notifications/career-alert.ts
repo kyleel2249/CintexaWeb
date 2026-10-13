@@ -1,5 +1,6 @@
 import { careerAlertAdminHtml, careerAlertSubscriberHtml, sendEmail } from "../../lib/email";
 import { clientIp, rateLimit } from "../../lib/ratelimit";
+import { recordEvent, requestMeta, userIdForEmail } from "../../lib/events";
 
 export interface Env {
   KV: KVNamespace;
@@ -72,6 +73,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         { status: 429, headers: { ...cors, "Retry-After": String(byEmail.retryAfter) } },
       );
     }
+
+    await recordEvent(context.env, { type: "alert_signup", userId: await userIdForEmail(context.env.KV, email), email, ...requestMeta(context.request) });
 
     const record = {
       id: crypto.randomUUID(),

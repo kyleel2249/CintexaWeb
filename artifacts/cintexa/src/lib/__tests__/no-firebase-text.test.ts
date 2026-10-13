@@ -50,3 +50,19 @@ describe("policy wording", () => {
     expect(trust).toContain('title="Children or minors, updates and contact"');
   });
 });
+
+describe("security disclosure", () => {
+  const legal = fs.readFileSync(path.join(SRC, "pages/LegalPages.tsx"), "utf8");
+  const trust = fs.readFileSync(path.join(SRC, "pages/TrustPages.tsx"), "utf8");
+
+  it("the policy says what sign-in data is recorded, for how long, and that passwords are never stored readable", () => {
+    for (const text of [legal, trust]) {
+      expect(text).toMatch(/IP address/);
+      expect(text).toMatch(/approximate location/);
+      expect(text).toMatch(/13 months/);
+      expect(text).toMatch(/never store (your )?passwords? in readable form/);
+      expect(text).toMatch(/salted, one-way hash/);
+    }
+  });
+});
+

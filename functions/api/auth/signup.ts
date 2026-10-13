@@ -8,6 +8,7 @@ import {
   type StoredUser,
 } from "../../lib/cintexa-auth";
 import { isValidTimeZone, updateBirthdayIndex, validateDob } from "../../lib/birthday";
+import { recordEvent, requestMeta } from "../../lib/events";
 
 export interface Env {
   KV: KVNamespace;
@@ -223,6 +224,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const { salt, hash } = await hashPassword(password);
+    // Capture where the sign-up came from. Only the salted hash of the password is stored — never the password.
+    const meta = requestMeta(context.request);
+    const nowIso = new Date().toISOString();
     const user: StoredUser = {
       id: crypto.randomUUID(),
       email,
@@ -234,7 +238,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       timeZone,
       salt,
       passwordHash: hash,
-      createdAt: new Date().toISOString(),
+      createdAt: nowIso,
+      signup: { at: nowIso, ...meta },
+      lastLoginAt: nowIso,
+      lastLoginIp: meta.ip,
+      lastLoginCountry: meta.country,
+      lastLoginCity: meta.city,
+      loginCount: 1,
     };
 
     await context.env.KV.put(userKey(email), JSON.stringify(user));
@@ -247,6 +257,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     if (dateOfBirth) await updateBirthdayIndex(context.env.KV, email, null, dateOfBirth);
+    await recordEvent(context.env, { type: "signup", userId: user.id, email, ...meta });
 
     const token = await createSession(context.env.KV, user);
 

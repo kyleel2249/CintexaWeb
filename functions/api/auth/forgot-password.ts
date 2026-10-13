@@ -1,6 +1,7 @@
 import { escapeHtml, resolveResendConfigAsync, sendEmail } from "../../lib/email";
 import { sendSms } from "../../lib/sms";
 import { corsHeaders, userKey, type StoredUser } from "../../lib/cintexa-auth";
+import { recordEvent, requestMeta } from "../../lib/events";
 
 export interface Env {
   KV: KVNamespace;
@@ -82,6 +83,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     // Unknown account — do not send mail; same success shape (no enumeration of existence via email)
     if (!raw) {
       await context.env.KV.put(rateKey(email), "1", { expirationTtl: RATE_TTL_SEC });
+      await recordEvent(context.env, { type: "password_reset_requested", email, ...requestMeta(context.request), detail: "unknown account" });
       return Response.json(
         {
           ok: true,
@@ -95,6 +97,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const user = JSON.parse(raw) as StoredUser;
+    await recordEvent(context.env, { type: "password_reset_requested", userId: user.id, email, ...requestMeta(context.request) });
     const code = sixDigitCode();
     const codeHash = await hashCode(code);
 

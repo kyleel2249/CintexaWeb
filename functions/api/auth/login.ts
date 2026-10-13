@@ -8,6 +8,7 @@ import {
   type StoredUser,
 } from "../../lib/cintexa-auth";
 import { isValidTimeZone } from "../../lib/birthday";
+import { recordEvent, requestMeta } from "../../lib/events";
 
 export interface Env {
   KV: KVNamespace;
@@ -43,9 +44,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return Response.json({ error: "Email and password are required." }, { status: 400, headers });
     }
 
+    const meta = requestMeta(context.request);
+
     // Soft brute-force protection: too many failures for this email in the window.
     const failures = Number((await context.env.KV.get(failKey(email))) || "0");
     if (failures >= MAX_FAILED_LOGINS) {
+      await recordEvent(context.env, { type: "login_failed", email, ...meta, detail: "locked out" });
       return Response.json(
         { error: "Too many failed attempts. Wait 15 minutes or reset your password." },
         { status: 429, headers: { ...headers, "Retry-After": String(FAIL_WINDOW_SEC) } },
@@ -59,6 +63,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const raw = await context.env.KV.get(userKey(email));
     if (!raw) {
       await recordFailure();
+      await recordEvent(context.env, { type: "login_failed", email, ...meta, detail: "unknown account" });
       return Response.json({ error: "Invalid email or password." }, { status: 401, headers });
     }
 
@@ -66,15 +71,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const ok = await verifyPassword(password, user.salt, user.passwordHash);
     if (!ok) {
       await recordFailure();
+      await recordEvent(context.env, { type: "login_failed", userId: user.id, email, ...meta, detail: "wrong password" });
       return Response.json({ error: "Invalid email or password." }, { status: 401, headers });
     }
     await context.env.KV.delete(failKey(email)).catch(() => undefined);
 
     // Keep the user's time zone current so birthday wishes arrive on their own morning.
-    if (isValidTimeZone(body.timeZone) && body.timeZone !== user.timeZone) {
-      user.timeZone = body.timeZone;
-      await context.env.KV.put(userKey(email), JSON.stringify(user)).catch(() => undefined);
-    }
+    if (isValidTimeZone(body.timeZone) && body.timeZone !== user.timeZone) user.timeZone = body.timeZone;
+
+    // Remember this sign-in (when, from where) on the account, and in the event log.
+    user.lastLoginAt = new Date().toISOString();
+    user.lastLoginIp = meta.ip;
+    user.lastLoginCountry = meta.country;
+    user.lastLoginCity = meta.city;
+    user.loginCount = (user.loginCount ?? 0) + 1;
+    await context.env.KV.put(userKey(email), JSON.stringify(user)).catch(() => undefined);
+    await recordEvent(context.env, { type: "login_success", userId: user.id, email, ...meta });
 
     const token = await createSession(context.env.KV, user);
 

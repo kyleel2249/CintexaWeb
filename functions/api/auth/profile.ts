@@ -11,6 +11,7 @@ import {
   type StoredUser,
 } from "../../lib/cintexa-auth";
 import { isValidTimeZone, updateBirthdayIndex, validateDob } from "../../lib/birthday";
+import { recordEvent, requestMeta } from "../../lib/events";
 
 export interface Env {
   KV: KVNamespace;
@@ -51,6 +52,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     await context.env.KV.put(userKey(user.email), JSON.stringify(user));
     await updateBirthdayIndex(context.env.KV, user.email, previousDob, user.dateOfBirth);
+    const changed = ["dateOfBirth", "birthdayEmail", "timeZone"].filter((k) => k in body);
+    await recordEvent(context.env, { type: "profile_update", userId: user.id, email: user.email, ...requestMeta(context.request), detail: `changed: ${changed.join(", ")}` });
 
     return Response.json({ ok: true, user: publicUser(user) }, { headers });
   } catch (err) {

@@ -6,6 +6,7 @@ import { corsHeaders } from "../../lib/cintexa-auth";
 import { applicationAdminEmail, applicationConfirmationEmail } from "../../lib/application-email";
 import { findOpenJob } from "../../lib/jobs";
 import { clientIp, rateLimit } from "../../lib/ratelimit";
+import { recordEvent, requestMeta, userIdForEmail } from "../../lib/events";
 import { sendEmail } from "../../lib/email";
 
 export interface Env {
@@ -98,6 +99,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     await env.KV.put(`application:${record.id}`, JSON.stringify(record), { expirationTtl: 60 * 60 * 24 * 180 });
     await env.KV.put(dedupeKey, record.id, { expirationTtl: 60 * 60 * 24 * 7 });
+
+    await recordEvent(env, { type: "application", userId: await userIdForEmail(env.KV, email), email: email || undefined, ...requestMeta(request), detail: job.slug });
 
     // Emails are best-effort: the application is already safely stored.
     const adminTo = env.NOTIFY_ADMIN_EMAIL || "info@cintexa.com";

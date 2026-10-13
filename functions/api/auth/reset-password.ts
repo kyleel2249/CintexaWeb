@@ -1,4 +1,5 @@
 import { corsHeaders, hashPassword, userKey, type StoredUser } from "../../lib/cintexa-auth";
+import { recordEvent, requestMeta } from "../../lib/events";
 
 export interface Env {
   KV: KVNamespace;
@@ -89,6 +90,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     user.passwordHash = hash;
     await context.env.KV.put(userKey(email), JSON.stringify(user));
     await context.env.KV.delete(resetKey(email));
+    await recordEvent(context.env, { type: "password_reset", userId: user.id, email, ...requestMeta(context.request) });
 
     return Response.json(
       { ok: true, message: "Password updated. You can log in with your new password." },

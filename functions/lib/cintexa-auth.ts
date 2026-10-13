@@ -15,6 +15,21 @@ export type StoredUser = {
   timeZone?: string;
   /** false = the user turned birthday e-mails off. */
   birthdayEmail?: boolean;
+  /** Where the account was created from (captured at sign-up). */
+  signup?: {
+    at: string;
+    ip?: string;
+    country?: string;
+    region?: string;
+    city?: string;
+    userAgent?: string;
+    language?: string;
+  };
+  lastLoginAt?: string;
+  lastLoginIp?: string;
+  lastLoginCountry?: string;
+  lastLoginCity?: string;
+  loginCount?: number;
   salt: string;
   passwordHash: string;
   createdAt: string;

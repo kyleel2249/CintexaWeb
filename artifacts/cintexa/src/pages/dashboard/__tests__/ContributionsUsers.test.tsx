@@ -71,6 +71,25 @@ describe("Contributions dashboard for 47c44d24… (February–April, GHS 60)", (
   });
 });
 
+describe("Contributions dashboard for bc8f8c02… (February–June, GHS 100)", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("shows the data with the breakdown and analysis", () => {
+    renderFor("bc8f8c02-2ec7-48e3-a8ee-9ed33cf03c3f");
+    expect(stat("Total contributed")).toMatch(/100\.00/);
+    expect(stat("Payments recorded")).toBe("5");
+    expect(stat("Average payment")).toMatch(/20\.00/);
+    expect(screen.getByRole("heading", { name: "5 of 12 months covered" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Contributions by quarter/ })).toBeInTheDocument();
+    expect(screen.getByText("Milestones")).toBeInTheDocument();
+    expect(screen.getByText("5 months in a row")).toBeInTheDocument();
+    expect(screen.getByText("complete").previousSibling?.textContent).toBe("100%");
+    expect(screen.getAllByText(/Feb(ruary)? 2026/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Jun(e)? 2026/).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Jul(y)? 2026/)).toBeNull();
+  });
+});
+
 describe("an account with no contributions", () => {
   it("shows no analysis section", () => {
     renderFor("nobody");

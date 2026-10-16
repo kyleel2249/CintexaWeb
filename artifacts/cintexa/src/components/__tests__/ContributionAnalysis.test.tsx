@@ -83,6 +83,23 @@ describe("analysis visuals — user 47c44d24… (Feb–Apr, GHS 60)", () => {
   });
 });
 
+describe("analysis visuals — user bc8f8c02… (Feb–Jun, GHS 100)", () => {
+  const a = analyticsFor("bc8f8c02-2ec7-48e3-a8ee-9ed33cf03c3f");
+
+  it("shows 5 of 12 months, two quarters, and a finished 5-month streak", () => {
+    renderAll(a);
+    expect(screen.getByRole("heading", { name: "5 of 12 months covered" })).toBeInTheDocument();
+    const label = screen.getByRole("img", { name: /Contributions by quarter/ }).getAttribute("aria-label")!;
+    expect(label).toContain("Q1 GHS 40.00 (40%)");
+    expect(label).toContain("Q2 GHS 60.00 (60%)");
+    expect(label).not.toContain("Q3");
+    expect(screen.getByText("5 months in a row")).toBeInTheDocument();
+    expect(screen.queryByText(/still running/)).toBeNull();
+    expect(screen.getByText("Every payment was GHS 20.00")).toBeInTheDocument();
+    for (const m of ["Mar 2026", "Apr 2026", "May 2026", "Jun 2026"]) expect(screen.getAllByText(m).length).toBeGreaterThan(0);
+  });
+});
+
 describe("empty state", () => {
   it("renders nothing without contributions", () => {
     const { container } = renderAll(analyzeContributions([], NOW));

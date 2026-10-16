@@ -6,6 +6,7 @@ const NOW = new Date("2026-10-11T12:00:00Z");
 const rowsFor = (id: string) => getSeededContributions(id).map((c) => ({ date: c.createdAt, amount: Number(c.amount) }));
 const A = analyzeContributions(rowsFor("31463b73-eb4a-4a76-8358-07e7aaad145c"), NOW);
 const B = analyzeContributions(rowsFor("47c44d24-45eb-4c25-8382-49976ebd5a2c"), NOW);
+const C = analyzeContributions(rowsFor("bc8f8c02-2ec7-48e3-a8ee-9ed33cf03c3f"), NOW);
 
 describe("user 31463b73… — February to October, GHS 180", () => {
   it("headline numbers", () => {
@@ -70,6 +71,34 @@ describe("user 47c44d24… — February to April, GHS 60", () => {
     expect(B.months.filter((m) => m.upcoming).map((m) => m.label)).toEqual(["Nov", "Dec"]);
     expect(B.months.filter((m) => m.paid).map((m) => m.label)).toEqual(["Feb", "Mar", "Apr"]);
     expect(B.months.find((m) => m.current)?.label).toBe("Oct");
+  });
+});
+
+describe("user bc8f8c02… — February to June, GHS 100", () => {
+  it("headline numbers", () => {
+    expect(C).toMatchObject({ year: 2026, total: 100, count: 5, average: 20, median: 20, uniform: true, monthsPaid: 5, longestStreak: 5, gaps: 0 });
+    expect(C.first).toEqual({ label: "Feb 2026", amount: 20 });
+    expect(C.last).toEqual({ label: "Jun 2026", amount: 20 });
+    expect(C.streakActive).toBe(false); // last payment was June; it is October
+  });
+  it("quarters: Feb–Mar in Q1, Apr–Jun in Q2", () => {
+    expect(C.quarters.map((q) => q.amount)).toEqual([40, 60, 0, 0]);
+    expect(C.quarters.map((q) => q.count)).toEqual([2, 3, 0, 0]);
+    expect(C.quarters[0]!.share).toBeCloseTo(0.4);
+    expect(C.quarters[1]!.share).toBeCloseTo(0.6);
+  });
+  it("milestones", () => {
+    expect(C.milestones.map((m) => [m.pct, m.reachedOn, m.amountAtReach])).toEqual([
+      [25, "Mar 2026", 40],
+      [50, "Apr 2026", 60],
+      [75, "May 2026", 80],
+      [100, "Jun 2026", 100],
+    ]);
+  });
+  it("tiles: Feb–Jun paid, the rest of the past unpaid, October current, Nov–Dec ahead", () => {
+    expect(C.months.filter((m) => m.paid).map((m) => m.label)).toEqual(["Feb", "Mar", "Apr", "May", "Jun"]);
+    expect(C.months.filter((m) => m.upcoming).map((m) => m.label)).toEqual(["Nov", "Dec"]);
+    expect(C.months.find((m) => m.current)?.label).toBe("Oct");
   });
 });
 

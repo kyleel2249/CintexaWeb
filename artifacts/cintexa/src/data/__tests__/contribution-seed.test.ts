@@ -3,12 +3,14 @@ import { getSeededContributions, getSeededSchedule, getSeededTotalGhs, mergeCont
 
 const USER_A = "31463b73-eb4a-4a76-8358-07e7aaad145c"; // February–October, GHS 180
 const USER_B = "47c44d24-45eb-4c25-8382-49976ebd5a2c"; // February–April, GHS 60
+const USER_C = "bc8f8c02-2ec7-48e3-a8ee-9ed33cf03c3f"; // February–June, GHS 100
 
 const sum = (rows: { amount: string }[]) => rows.reduce((s, r) => s + Number(r.amount), 0);
 
 describe.each([
   { name: "31463b73…", id: USER_A, months: [2, 3, 4, 5, 6, 7, 8, 9, 10], total: 180 },
   { name: "47c44d24…", id: USER_B, months: [2, 3, 4], total: 60 },
+  { name: "bc8f8c02…", id: USER_C, months: [2, 3, 4, 5, 6], total: 100 },
 ])("seeded contributions for $name", ({ id, months, total }) => {
   const rows = getSeededContributions(id);
 

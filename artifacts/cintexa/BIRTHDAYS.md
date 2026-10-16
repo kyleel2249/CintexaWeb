@@ -43,4 +43,4 @@ us"). Age is never shown or emailed.
 ## Contribution data
 Verified schedules live in `src/data/contribution-seed.ts` (month list + monthly amount per user id).
 `31463b73-eb4a-4a76-8358-07e7aaad145c`: Feb–Oct 2026 (GHS 180). `47c44d24-45eb-4c25-8382-49976ebd5a2c`:
-Feb–Apr 2026 (GHS 60). The Contributions page derives every chart and insight from these rows.
+Feb–Apr 2026 (GHS 60). `bc8f8c02-2ec7-48e3-a8ee-9ed33cf03c3f`: Feb–Jun 2026 (GHS 100). The Contributions page derives every chart and insight from these rows.

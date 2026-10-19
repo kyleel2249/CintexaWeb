@@ -1,0 +1,137 @@
+[
+  {
+    "slug": "business-website-enquiry-workflow",
+    "title": "Business website and enquiry workflow",
+    "status": "illustrative",
+    "service": "Website development",
+    "serviceHref": "/solutions/website-development",
+    "industry": "Professional services",
+    "summary": "How a service business can turn scattered enquiries into one tracked, mobile-friendly workflow — and how the outcome would be measured.",
+    "problem": "A service business receives enquiries through multiple channels and has no consistent record of follow-up.",
+    "assessment": "Map enquiry sources, response ownership, required information and the points where prospective customers are lost.",
+    "solution": "A responsive service website, structured contact form, clear service pages and a documented lead follow-up workflow.",
+    "implementation": "Define the content and form fields, validate submissions, route enquiries to a responsible contact, and test mobile accessibility and confirmation messages.",
+    "results": "No client result is claimed. A real engagement would report measured response time, qualified enquiries and conversion against a recorded baseline.",
+    "technology": "Responsive web development, form validation, analytics configured with consent, and CRM integration where selected.",
+    "technologyTags": [
+      "Responsive web development",
+      "Form validation",
+      "Consent-based analytics",
+      "CRM integration (optional)"
+    ],
+    "metrics": [
+      {
+        "name": "Enquiry response time",
+        "why": "Shows whether prospective customers are followed up promptly.",
+        "how": "Time from an enquiry being received to the first reply, taken from timestamps in the enquiry record."
+      },
+      {
+        "name": "Qualified enquiries",
+        "why": "Separates useful leads from noise.",
+        "how": "Monthly count of enquiries that meet criteria agreed with the business before launch."
+      },
+      {
+        "name": "Conversion rate",
+        "why": "Shows whether the website turns visits into enquiries.",
+        "how": "Visitors-to-enquiries from consent-based analytics, compared with a baseline recorded before launch."
+      },
+      {
+        "name": "Form completion rate",
+        "why": "Reveals form fields or steps that put people off.",
+        "how": "Started versus submitted forms, reviewed alongside mobile and desktop usage."
+      }
+    ],
+    "datePublished": "2026-10-14",
+    "dateUpdated": "2026-10-14"
+  },
+  {
+    "slug": "small-business-ecommerce-foundation",
+    "title": "Small-business e-commerce foundation",
+    "status": "illustrative",
+    "service": "E-commerce",
+    "serviceHref": "/solutions/ecommerce",
+    "industry": "Retail",
+    "summary": "A planning view of taking a small retailer online: catalogue, payments, delivery and returns defined as one process before launch.",
+    "problem": "A retailer wants to sell online but product information, stock updates, payments and delivery steps are not documented in one process.",
+    "assessment": "Review catalogue quality, inventory ownership, payment settlement, delivery coverage, returns and customer support.",
+    "solution": "A mobile-friendly product catalogue and checkout connected to a defined order fulfilment process.",
+    "implementation": "Prepare product data, configure a suitable payment provider, test successful and failed payments, and document fulfilment and refund handling.",
+    "results": "No sales uplift or conversion figure is asserted. Performance should be measured after launch using order completion, fulfilment time, cancellation and support data.",
+    "technology": "E-commerce storefront, payment-provider integration, order records and analytics.",
+    "technologyTags": [
+      "E-commerce storefront",
+      "Payment-provider integration",
+      "Order records",
+      "Analytics"
+    ],
+    "metrics": [
+      {
+        "name": "Order completion rate",
+        "why": "Shows how many started checkouts end in a paid order.",
+        "how": "Completed orders divided by checkouts started, including failed-payment reasons."
+      },
+      {
+        "name": "Fulfilment time",
+        "why": "Shows whether the delivery promise is being kept.",
+        "how": "Time from payment confirmation to dispatch and to delivery, from order records."
+      },
+      {
+        "name": "Cancellations and returns",
+        "why": "Points to product-information or delivery problems.",
+        "how": "Cancelled and returned orders as a share of all orders, with the stated reason."
+      },
+      {
+        "name": "Support contacts per order",
+        "why": "Shows where customers are confused or unsure.",
+        "how": "Questions received per order, grouped by topic."
+      }
+    ],
+    "datePublished": "2026-10-14",
+    "dateUpdated": "2026-10-14"
+  },
+  {
+    "slug": "administrative-workflow-automation",
+    "title": "Administrative workflow automation",
+    "status": "illustrative",
+    "service": "Software development",
+    "serviceHref": "/solutions/software-development",
+    "industry": "Operations & administration",
+    "summary": "A walk-through of replacing repeated copy-and-paste between forms, spreadsheets and email with one validated, trackable workflow.",
+    "problem": "Staff repeatedly copy information between forms, spreadsheets and email, making hand-offs difficult to track.",
+    "assessment": "Document the current process, data owners, approval steps, exceptions and baseline time per task.",
+    "solution": "A validated intake form, centralised records, task notifications and a reviewable status workflow.",
+    "implementation": "Pilot one workflow, test permissions and exception handling, train users and keep a manual fallback during rollout.",
+    "results": "No time-saving percentage is claimed. Compare task duration, error rate and overdue work before and after deployment.",
+    "technology": "Web forms, workflow automation, database records and role-based access.",
+    "technologyTags": [
+      "Web forms",
+      "Workflow automation",
+      "Database records",
+      "Role-based access"
+    ],
+    "metrics": [
+      {
+        "name": "Task duration",
+        "why": "Shows whether the workflow really saves staff time.",
+        "how": "Average time per task from the start of a request to completion, before and after rollout."
+      },
+      {
+        "name": "Error rate",
+        "why": "Shows whether validation removes re-keying mistakes.",
+        "how": "Records needing correction as a share of all records, from a sampled review."
+      },
+      {
+        "name": "Overdue work",
+        "why": "Shows whether hand-offs are visible and acted on.",
+        "how": "Count of tasks past their due date, taken from the status workflow."
+      },
+      {
+        "name": "Manual fallback use",
+        "why": "Shows whether people trust the new process.",
+        "how": "How often the manual fallback is used during and after the pilot."
+      }
+    ],
+    "datePublished": "2026-10-14",
+    "dateUpdated": "2026-10-14"
+  }
+]

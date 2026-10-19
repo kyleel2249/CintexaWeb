@@ -7,10 +7,8 @@ export function jobShareText(job: JobPosting): string {
   return job.employerName ? `${job.title} — ${job.employerName}` : job.title;
 }
 
-/** Share-intent URLs for one vacancy, always pointing at its own canonical page. */
-export function jobShareLinks(job: JobPosting): ShareLinks {
-  const url = jobCanonical(job);
-  const text = jobShareText(job);
+/** Share-intent URLs for any page. */
+export function buildShareLinks(url: string, text: string): ShareLinks {
   const enc = encodeURIComponent;
   return {
     whatsapp: `https://wa.me/?text=${enc(`${text} ${url}`)}`,
@@ -19,6 +17,11 @@ export function jobShareLinks(job: JobPosting): ShareLinks {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`,
     email: `mailto:?subject=${enc(text)}&body=${enc(`${text}\n${url}`)}`,
   };
+}
+
+/** Share-intent URLs for one vacancy, always pointing at its own canonical page. */
+export function jobShareLinks(job: JobPosting): ShareLinks {
+  return buildShareLinks(jobCanonical(job), jobShareText(job));
 }
 
 /** Copies text; falls back to a hidden textarea where the async clipboard isn't available. */
@@ -57,3 +60,15 @@ export async function nativeShare(job: JobPosting): Promise<boolean> {
     return false;
   }
 }
+
+/** Device share sheet for any page. False when unavailable or cancelled. */
+export async function nativeSharePage(data: { title: string; text: string; url: string }): Promise<boolean> {
+  if (typeof navigator === "undefined" || typeof navigator.share !== "function") return false;
+  try {
+    await navigator.share(data);
+    return true;
+  } catch {
+    return false;
+  }
+}
+

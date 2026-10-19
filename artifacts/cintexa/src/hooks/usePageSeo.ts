@@ -69,7 +69,7 @@ export function usePageSeo(pathname: string) {
     // These routes set metadata from their own editorial content; do not overwrite it with the global fallback.
     // /careers and /careers/:slug build their own head from the live job data (see careers-seo.ts).
     if (pathname === "/careers" || pathname.startsWith("/careers/")) return;
-    if (pathname.startsWith("/blog/") || ["/about", "/case-studies", "/privacy-policy", "/terms", "/cookie-policy", "/disclaimer"].includes(pathname)) return;
+    if (pathname.startsWith("/blog/") || pathname.startsWith("/case-studies/") || ["/about", "/case-studies", "/privacy-policy", "/terms", "/cookie-policy", "/disclaimer"].includes(pathname)) return;
     const entry = getSeoForPath(pathname);
     applySeo(entry, pathname);
   }, [pathname]);

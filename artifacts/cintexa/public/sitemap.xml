@@ -47,8 +47,27 @@
   </url>
   <url>
     <loc>https://cintexa.com/case-studies</loc>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/case-studies/business-website-enquiry-workflow</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/case-studies/small-business-ecommerce-foundation</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cintexa.com/case-studies/administrative-workflow-automation</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://cintexa.com/careers</loc>

@@ -24,7 +24,8 @@ const JobDetail = lazy(() => import("@/pages/JobDetail").then((m) => ({ default:
 const Blog = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.Blog })));
 const BlogArticle = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.BlogArticle })));
 const About = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.About })));
-const CaseStudies = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.CaseStudies })));
+const CaseStudies = lazy(() => import("@/pages/CaseStudies").then((m) => ({ default: m.CaseStudies })));
+const CaseStudyDetail = lazy(() => import("@/pages/CaseStudyDetail").then((m) => ({ default: m.CaseStudyDetail })));
 const PrivacyPolicy = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.PrivacyPolicy })));
 const Terms = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.Terms })));
 const CookiePolicy = lazy(() => import("@/pages/LegalPages").then((m) => ({ default: m.CookiePolicy })));
@@ -91,6 +92,7 @@ export default function App() {
               <Route path="/solutions/software-development" component={SoftwareDev} />
               <Route path="/about" component={About} />
               <Route path="/case-studies" component={CaseStudies} />
+              <Route path="/case-studies/:slug" component={CaseStudyDetail} />
               <Route path="/privacy-policy" component={PrivacyPolicy} />
               <Route path="/terms" component={Terms} />
               <Route path="/cookie-policy" component={CookiePolicy} />

@@ -13,12 +13,15 @@ const jobs = JSON.parse(fs.readFileSync(path.join(appRoot, "src/data/jobs.json")
   .filter((j) => j.status === "open" && (!j.validThrough || new Date(`${j.validThrough}T23:59:59Z`) >= new Date()))
   .sort((a, b) => b.datePosted.localeCompare(a.datePosted));
 const careersLastmod = jobs[0]?.datePosted;
+// Case studies come from the same data file as the site (plain JSON, so bare `node` works).
+const cases = JSON.parse(fs.readFileSync(path.join(appRoot, "src/data/case-studies.json"), "utf8")).sort((a, b) => b.dateUpdated.localeCompare(a.dateUpdated));
 const routes = [
   ["/", "1.0"], ["/about", "0.8"],
   ["/solutions/marketing", "0.8"], ["/solutions/sales", "0.8"],
   ["/solutions/ads-boost", "0.7"], ["/solutions/ecommerce", "0.8"],
   ["/solutions/website-development", "0.8"], ["/solutions/software-development", "0.8"],
-  ["/blog", "0.9"], ["/case-studies", "0.8"], ["/careers", "0.9", careersLastmod],
+  ["/blog", "0.9"], ["/case-studies", "0.8", cases[0]?.dateUpdated],
+  ...cases.map((c) => [`/case-studies/${c.slug}`, "0.7", c.dateUpdated]), ["/careers", "0.9", careersLastmod],
   ...jobs.map((j) => [`/careers/${j.slug}`, "0.8", j.datePosted]),
   ["/contact", "0.7"], ["/get-started", "0.85"],
   ["/privacy-policy", "0.4"], ["/terms", "0.4"], ["/cookie-policy", "0.4"], ["/disclaimer", "0.4"],

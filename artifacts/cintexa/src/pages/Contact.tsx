@@ -5,7 +5,18 @@ const PHONE_DISPLAY = "+233 24 248 3082";
 const PHONE_TEL = "+233242483082";
 const WHATSAPP = "https://wa.me/233242483082";
 
+/** Subject/message can be pre-filled from the link (?subject=…&message=…), e.g. from a case study. */
+function readPrefill(): { subject: string; message: string } {
+  if (typeof window === "undefined") return { subject: "CINTEXA project enquiry", message: "" };
+  const p = new URLSearchParams(window.location.search);
+  return {
+    subject: (p.get("subject") ?? "").trim().slice(0, 180) || "CINTEXA project enquiry",
+    message: (p.get("message") ?? "").slice(0, 5000),
+  };
+}
+
 export function Contact() {
+  const [prefill] = useState(readPrefill);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -60,8 +71,8 @@ export function Contact() {
             <label className="cx-label">Your name<input className="cx-input mt-2 w-full" name="name" required autoComplete="name" maxLength={120} /></label>
             <label className="cx-label">Email address<input className="cx-input mt-2 w-full" type="email" name="email" required autoComplete="email" maxLength={254} /></label>
             <label className="cx-label">Business / organisation (optional)<input className="cx-input mt-2 w-full" name="business" autoComplete="organization" maxLength={160} /></label>
-            <label className="cx-label">Subject<input className="cx-input mt-2 w-full" name="subject" required defaultValue="CINTEXA project enquiry" maxLength={180} /></label>
-            <label className="cx-label">How can we help?<textarea className="cx-input mt-2 min-h-32 w-full" name="message" required minLength={10} maxLength={5000} /></label>
+            <label className="cx-label">Subject<input className="cx-input mt-2 w-full" name="subject" required defaultValue={prefill.subject} maxLength={180} /></label>
+            <label className="cx-label">How can we help?<textarea className="cx-input mt-2 min-h-32 w-full" name="message" required minLength={10} maxLength={5000} defaultValue={prefill.message} /></label>
             <div aria-hidden="true" className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden"><label>Leave this field empty<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
             <button type="submit" disabled={status === "sending"} className="cx-btn cx-btn-primary w-full justify-center disabled:cursor-not-allowed disabled:opacity-60">{status === "sending" ? "Sending…" : "Send enquiry"}</button>
             {status === "sent" && <p role="status" aria-live="polite" className="text-sm text-green-700">Your enquiry has been sent successfully. Thank you for contacting CINTEXA.</p>}

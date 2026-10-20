@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "wouter";
 
 const KEY = "cintexa.cookie.consent";
-const CONSENT_EVENT = "cintexa:consent-updated";
+export const CONSENT_EVENT = "cintexa:consent-updated";
 
 export type ConsentState = {
   necessary: true;
@@ -99,7 +99,7 @@ export function CookieConsent() {
                 <input type="checkbox" checked={analytics} onChange={(event) => setAnalytics(event.target.checked)} className="mt-1 h-4 w-4" />
               </label>
               <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-[hsl(var(--border))] p-4">
-                <span><span className="font-semibold">Advertising &amp; marketing</span><span className="mt-1 block text-sm leading-5 text-[hsl(var(--fg-muted))]">Allows advertising tags and marketing pixels to run where configured, including technologies that may personalise or measure ads.</span></span>
+                <span><span className="font-semibold">Advertising &amp; marketing</span><span className="mt-1 block text-sm leading-5 text-[hsl(var(--fg-muted))]">Allows advertising tags and marketing pixels — such as the Meta (Facebook/Instagram) pixel, LinkedIn Insight Tag and Google advertising tags — to run where configured, including technologies that may personalise or measure ads.</span></span>
                 <input type="checkbox" checked={marketing} onChange={(event) => setMarketing(event.target.checked)} className="mt-1 h-4 w-4" />
               </label>
             </div>

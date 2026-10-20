@@ -326,6 +326,41 @@ describe("admin password reset", () => {
   });
 });
 
+describe("customer password reset answers", () => {
+  const MSG = "If this accounts exists a password reset link has been sent.";
+
+  it("gives the identical generic answer for a known account, an unknown one, and a throttled repeat", async () => {
+    await signup("ama@example.com");
+    mail = [];
+    const known = await call("api/auth/forgot-password.ts", "POST", { body: { email: "ama@example.com" } });
+    const unknown = await call("api/auth/forgot-password.ts", "POST", { body: { email: "ghost@example.com" } });
+    const repeat = await call("api/auth/forgot-password.ts", "POST", { body: { email: "ama@example.com" } });
+    for (const r of [known, unknown, repeat]) expect(r.status).toBe(200);
+    const [a, b, c] = [await json(known), await json(unknown), await json(repeat)];
+    expect(a).toEqual(b);
+    expect(a).toEqual(c);
+    expect(a.message).toBe(MSG);
+    expect(Object.keys(a).sort()).toEqual(["expiresInSeconds", "message", "ok"]);
+    expect(mail).toHaveLength(1); // only the real account got a code, and only once
+    expect(mail[0]!.to).toBe("ama@example.com");
+  });
+
+  it("does not reveal an account when the mail provider fails", async () => {
+    await signup("ama@example.com");
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("boom", { status: 500 })));
+    const known = await call("api/auth/forgot-password.ts", "POST", { body: { email: "ama@example.com" } });
+    const unknown = await call("api/auth/forgot-password.ts", "POST", { body: { email: "ghost@example.com" } });
+    expect(known.status).toBe(200);
+    expect(await json(known)).toEqual(await json(unknown));
+  });
+
+  it("admin reset uses the same wording and no longer names the security inbox", async () => {
+    await adminSession();
+    const r = await json(await call("api/admin/reset-request.ts", "POST", { body: { username: "kyle.admin" } }));
+    expect(r).toEqual({ ok: true, message: MSG });
+  });
+});
+
 describe("the admin API is locked", () => {
   const endpoints: [string, "GET"][] = [
     ["api/admin/overview.ts", "GET"],

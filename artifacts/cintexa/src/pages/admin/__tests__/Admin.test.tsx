@@ -143,13 +143,13 @@ describe("signing in", () => {
   });
 
   it("forgot password needs a username, then asks for a reset link", async () => {
-    routes = { ...signedOut(false), "POST /api/admin/reset-request": () => ({ body: { ok: true, message: "If that admin exists, a reset link was sent to info@cintexa.com." } }) };
+    routes = { ...signedOut(false), "POST /api/admin/reset-request": () => ({ body: { ok: true, message: "If this accounts exists a password reset link has been sent." } }) };
     mountAdmin();
     fireEvent.click(await screen.findByRole("button", { name: "Forgot password?" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Enter your username first.");
     fireEvent.change(screen.getByLabelText("Username"), { target: { value: "kyle.admin" } });
     fireEvent.click(screen.getByRole("button", { name: "Forgot password?" }));
-    expect(await screen.findByRole("status")).toHaveTextContent("reset link was sent to info@cintexa.com");
+    expect(await screen.findByRole("status")).toHaveTextContent("If this accounts exists a password reset link has been sent.");
     expect(calls.some((c) => c.key === "POST /api/admin/reset-request")).toBe(true);
   });
 });

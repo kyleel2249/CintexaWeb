@@ -5,6 +5,7 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 
 import { CookieConsent } from "@/components/CookieConsent";
+import { TrackingManager } from "@/components/TrackingManager";
 import { Home } from "@/pages/Home";
 import { captureReferralFromUrl } from "@/lib/referral-capture";
 import { SeoManager } from "@/components/SeoManager";
@@ -114,6 +115,7 @@ export default function App() {
           </Suspense>
         </SiteLayout>
         <CookieConsent />
+        <TrackingManager />
       </MotionProvider>
       </CurrencyProvider>
     </QueryClientProvider>

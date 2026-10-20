@@ -3,12 +3,14 @@ import App from "@/App";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AuthProvider } from "@/lib/auth";
 import { initFirebase } from "@/lib/firebase";
+import { registerBuiltInAnalyticsId } from "@/lib/tracking";
 
 import "./index.css";
 import "./styles/design-system.css";
 
 // Initialize Firebase as early as possible so Analytics / other services are active
 initFirebase();
+registerBuiltInAnalyticsId(import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string | undefined);
 
 const rootEl = document.getElementById("root");
 if (!rootEl) {

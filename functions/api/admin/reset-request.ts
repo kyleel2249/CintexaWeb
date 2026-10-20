@@ -7,6 +7,9 @@ import { TOKEN_TTL_MIN, adminJson, getAdmin, issueOneTimeToken, normalizeUsernam
 import { sendEmail } from "../../lib/email";
 import { clientIp, rateLimit } from "../../lib/ratelimit";
 
+/** Same wording as customer password resets — and the same answer whether or not the admin exists. */
+const GENERIC_RESET_MESSAGE = "If this accounts exists a password reset link has been sent.";
+
 export const onRequestPost: PagesFunction<AdminEnv> = async ({ request, env }) => {
   let body: { username?: unknown };
   try {
@@ -26,7 +29,8 @@ export const onRequestPost: PagesFunction<AdminEnv> = async ({ request, env }) =
     const token = await issueOneTimeToken(env.KV, { type: "reset", username: admin.username });
     const link = `${new URL(request.url).origin}/admin?reset=${token}`;
     const sent = await sendEmail(env, { to: securityEmail(env), ...adminResetLinkEmail(admin.username, link, TOKEN_TTL_MIN), tags: [{ name: "category", value: "admin_reset" }] }, { allowDryRun: false });
-    if (!sent.ok) return adminJson({ error: "E-mail isn't configured on the server, so the reset link couldn't be sent." }, 503);
+    // A delivery failure is logged for operators; telling the visitor would reveal that the admin exists.
+    if (!sent.ok) console.error(JSON.stringify({ msg: "admin_reset_email_failed", error: sent.error, status: sent.status }));
   }
-  return adminJson({ ok: true, message: `If that admin exists, a reset link was sent to ${securityEmail(env)}.` });
+  return adminJson({ ok: true, message: GENERIC_RESET_MESSAGE });
 };

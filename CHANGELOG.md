@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased — consent-gated pixels, API-wide rate limits, generic reset answers
+
+- **Pixels:** Meta Pixel, LinkedIn Insight Tag and Google tag (`src/lib/tracking.ts`, `TrackingManager`). Configured by
+  `VITE_META_PIXEL_ID`, `VITE_LINKEDIN_PARTNER_ID`, `VITE_GOOGLE_TAG_ID`. Nothing loads until the visitor opts in via the
+  cookie banner; each tag needs its own category (analytics / advertising & marketing); only page paths are reported and
+  `/admin` never is; withdrawing consent removes the scripts and clears their cookies. Banner and Cookie Policy name them.
+- **Rate limits:** every Pages Function route now passes `functions/api/_middleware.ts` (budgets in
+  `functions/lib/rate-policy.ts`); the Express API has a global ceiling, per-area tiers, `/health` and `/webhooks` buckets
+  and `TRUST_PROXY` support.
+- **Password reset:** customer and admin reset requests answer with one generic message (same status and shape whether or
+  not the account exists, whether the mail was sent, or whether the caller is throttled).
+
+
 ## Platform build
 - Frontend shell: Vite/React 19/Tailwind 4 scaffold, design-system CSS tokens,
   `MotionProvider` (respects reduced motion, low-power devices, save-data),

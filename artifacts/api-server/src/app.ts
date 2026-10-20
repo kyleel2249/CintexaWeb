@@ -18,8 +18,24 @@ import { adminRouter } from "./routes/admin.js";
 import { agentsRouter } from "./routes/agents.js";
 import { notificationsRouter } from "./routes/notifications.js";
 
+/** Same JSON shape as every other API error. */
+function limiter(opts: { windowMs: number; limit: number; message?: string }) {
+  return rateLimit({
+    windowMs: opts.windowMs,
+    limit: opts.limit,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: opts.message ?? "Too many requests. Please try again later." },
+  });
+}
+
 export function createApp() {
   const app = express();
+
+  // Behind Cloudflare / a load balancer the real client IP is in X-Forwarded-For; without this every
+  // visitor would share one bucket. Set TRUST_PROXY=0 when the API is exposed directly.
+  const trustProxy = process.env.TRUST_PROXY ?? "1";
+  app.set("trust proxy", /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy === "true");
 
   app.use(
     pinoHttp({
@@ -38,13 +54,25 @@ export function createApp() {
     }),
   );
 
-  const apiLimiter = rateLimit({
-    windowMs: 60_000,
-    max: 120,
-    standardHeaders: true,
-    legacyHeaders: false,
-  });
+  // Every request — whichever route it is headed for, including unknown paths — passes this ceiling.
+  // Health probes come from a handful of fixed IPs, so they get their own generous bucket instead.
+  const healthLimiter = limiter({ windowMs: 60_000, limit: 600 });
+  const globalLimiter = limiter({ windowMs: 60_000, limit: 300 });
+  app.use((req, res, next) =>
+    req.path === "/health" || req.path.startsWith("/health/") ? healthLimiter(req, res, next) : globalLimiter(req, res, next),
+  );
+
+  // Tiered budgets per area (all per client IP). Routers may add stricter limits of their own.
+  const apiLimiter = limiter({ windowMs: 60_000, limit: 120 });
+  const adminLimiter = limiter({ windowMs: 60_000, limit: 60 });
+  const notificationsLimiter = limiter({ windowMs: 60 * 60_000, limit: 30 });
+  // Webhooks come from a provider's fixed addresses and are signature-checked; allow bursts but not floods.
+  const webhookLimiter = limiter({ windowMs: 60_000, limit: 300 });
+
   app.use("/api", apiLimiter);
+  app.use("/api/admin", adminLimiter);
+  app.use("/api/notifications", notificationsLimiter);
+  app.use("/webhooks", webhookLimiter);
 
   app.use(
     "/webhooks",

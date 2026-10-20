@@ -16,6 +16,20 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CODE_TTL_SEC = 15 * 60;
 const RATE_TTL_SEC = 60;
 
+/**
+ * The ONE answer a password-reset request gets once the address is well formed, whether or not an account
+ * exists, whether the mail went out, or whether the visitor is being throttled. Identical status, shape
+ * and wording means the endpoint can't be used to discover which email addresses are registered.
+ */
+export const GENERIC_RESET_MESSAGE = "If this accounts exists a password reset link has been sent.";
+
+function genericResetResponse(headers: Record<string, string>): Response {
+  return Response.json(
+    { ok: true, message: GENERIC_RESET_MESSAGE, expiresInSeconds: CODE_TTL_SEC },
+    { status: 200, headers },
+  );
+}
+
 function resetKey(email: string) {
   return `reset:${email.trim().toLowerCase()}`;
 }
@@ -68,15 +82,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       );
     }
 
+    // Throttled addresses get the same answer as everyone else (no second mail is sent).
     const rate = await context.env.KV.get(rateKey(email));
-    if (rate) {
-      return Response.json(
-        {
-          error: "Please wait about a minute before requesting another recovery code.",
-        },
-        { status: 429, headers },
-      );
-    }
+    if (rate) return genericResetResponse(headers);
 
     const raw = await context.env.KV.get(userKey(email));
 
@@ -84,16 +92,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (!raw) {
       await context.env.KV.put(rateKey(email), "1", { expirationTtl: RATE_TTL_SEC });
       await recordEvent(context.env, { type: "password_reset_requested", email, ...requestMeta(context.request), detail: "unknown account" });
-      return Response.json(
-        {
-          ok: true,
-          message:
-            "If an account exists for that email, a recovery code has been sent. Check your inbox and spam folder.",
-          channels: { email: true, sms: false },
-          expiresInSeconds: CODE_TTL_SEC,
-        },
-        { status: 200, headers },
-      );
+      return genericResetResponse(headers);
     }
 
     const user = JSON.parse(raw) as StoredUser;
@@ -113,12 +112,18 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       { expirationTtl: CODE_TTL_SEC },
     );
 
-    const emailResult = await sendEmail(
-      context.env,
-      {
-      to: user.email,
-      subject: "Your CINTEXA password recovery code",
-      html: `<div style="font-family:system-ui,sans-serif;max-width:480px;color:#0B0F14">
+    // Rate-limit as soon as a code is issued, so the response never depends on whether delivery succeeds.
+    await context.env.KV.put(rateKey(email), "1", { expirationTtl: RATE_TTL_SEC });
+
+    // Deliver in the background: an existing account must not take measurably longer to answer than an
+    // unknown one, and a delivery failure must not change what the visitor is told.
+    const deliver = (async () => {
+      const emailResult = await sendEmail(
+        context.env,
+        {
+          to: user.email,
+          subject: "Your CINTEXA password recovery code",
+          html: `<div style="font-family:system-ui,sans-serif;max-width:480px;color:#0B0F14">
         <p style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#B8860B;margin:0 0 8px">CINTEXA · Security</p>
         <h2 style="margin:0 0 12px;font-size:22px">Password recovery</h2>
         <p style="margin:0 0 12px">Hi ${escapeHtml(user.fullName)},</p>
@@ -128,59 +133,38 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         <p style="color:#555;margin:0">If you did not request a password reset, you can ignore this email.</p>
         <p style="margin-top:28px;font-size:13px;color:#777">— CINTEXA · <a href="https://cintexa.com/get-started">cintexa.com</a></p>
       </div>`,
-      text: `CINTEXA password recovery code: ${code}\n\nThis code expires in 15 minutes.\nIf you did not request this, ignore this email.\n\n— CINTEXA`,
-      tags: [
-        { name: "type", value: "password_reset" },
-        { name: "category", value: "transactional" },
-      ],
-      },
-      { allowDryRun: false },
-    );
-
-    if (!emailResult.ok) {
-      // Allow retry — do not rate-limit on failure
-      await context.env.KV.delete(resetKey(email));
-      console.error(
-        JSON.stringify({
-          msg: "forgot_password_email_failed",
-          error: emailResult.error,
-          status: emailResult.status,
-          to: user.email,
-        }),
-      );
-      return Response.json(
-        {
-          error: `Could not send the recovery email (${emailResult.error}). Check the address and try again, or contact info@cintexa.com.`,
+          text: `CINTEXA password recovery code: ${code}\n\nThis code expires in 15 minutes.\nIf you did not request this, ignore this email.\n\n— CINTEXA`,
+          tags: [
+            { name: "type", value: "password_reset" },
+            { name: "category", value: "transactional" },
+          ],
         },
-        { status: 502, headers },
+        { allowDryRun: false },
       );
-    }
 
-    // Rate-limit only after a real send
-    await context.env.KV.put(rateKey(email), "1", { expirationTtl: RATE_TTL_SEC });
+      if (!emailResult.ok) {
+        // Logged for operators only; the visitor is never told (that would reveal the account exists).
+        await context.env.KV.delete(resetKey(email));
+        await context.env.KV.delete(rateKey(email));
+        console.error(
+          JSON.stringify({ msg: "forgot_password_email_failed", error: emailResult.error, status: emailResult.status }),
+        );
+        return;
+      }
 
-    const channels = { email: true, sms: false };
-    if (user.phone) {
-      const smsResult = await sendSms(
-        context.env,
-        user.phone,
-        `CINTEXA recovery code: ${code}. Expires in 15 minutes. Do not share this code.`,
-      );
-      channels.sms = Boolean(smsResult.ok);
-    }
+      if (user.phone) {
+        await sendSms(
+          context.env,
+          user.phone,
+          `CINTEXA recovery code: ${code}. Expires in 15 minutes. Do not share this code.`,
+        );
+      }
+    })().catch((err) => console.error("auth/forgot-password delivery", err));
 
-    return Response.json(
-      {
-        ok: true,
-        message:
-          "A recovery code was sent to your email. Check your inbox and spam folder. The code expires in 15 minutes.",
-        channels,
-        expiresInSeconds: CODE_TTL_SEC,
-        hasPhoneOnFile: Boolean(user.phone),
-        emailId: emailResult.id,
-      },
-      { status: 200, headers },
-    );
+    if (typeof context.waitUntil === "function") context.waitUntil(deliver);
+    else await deliver;
+
+    return genericResetResponse(headers);
   } catch (err) {
     console.error("auth/forgot-password", err);
     return Response.json(

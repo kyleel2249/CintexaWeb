@@ -59,7 +59,12 @@ export function AdminSignIn({ setupNeeded, onSignedIn, initialNotice = "" }: { s
         body: kind === "reset-request" ? { username } : {},
         auth: false,
       });
-      setNotice(res.message ?? `A one-time link was sent to ${res.sentTo ?? "info@cintexa.com"}.`);
+      setNotice(
+        res.message ??
+          (kind === "reset-request"
+            ? "If this accounts exists a password reset link has been sent."
+            : `A one-time link was sent to ${res.sentTo ?? "info@cintexa.com"}.`),
+      );
     } catch (err) {
       setError(message(err));
     } finally {

@@ -9,6 +9,8 @@ import { JobBadges } from "@/components/careers/JobBadges";
 import { JobNav, RelatedJobs } from "@/components/careers/RelatedJobs";
 import { JobShare } from "@/components/careers/JobShare";
 import { SaveJobButton } from "@/components/careers/SaveJobButton";
+import { FlyerViewer } from "@/components/careers/FlyerViewer";
+import { trackEvent } from "@/lib/tracking";
 
 export function JobDetail() {
   const params = useParams<{ id: string }>();
@@ -74,9 +76,29 @@ export function JobDetail() {
           {employmentLabel(job)}
         </p>
 
+        {job.headline && <p className="mt-3 text-base font-medium text-[hsl(var(--fg))]">{job.headline}</p>}
+
+        {job.facts && job.facts.length > 0 && (
+          <dl className="mt-4 grid gap-3 rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))] p-4 sm:grid-cols-2">
+            {job.facts.map((f) => (
+              <div key={f.label}>
+                <dt className="text-xs uppercase tracking-wide text-[hsl(var(--fg-muted))]">{f.label}</dt>
+                <dd className="mt-0.5 text-sm font-medium text-[hsl(var(--fg))]">{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
         <div className="cx-no-print mt-4 flex flex-wrap items-center gap-2">
-          <a href="#apply" className="cx-btn cx-btn-primary cx-btn-sm">
-            Apply now
+          <a
+            href={`tel:${job.applyPhone}`}
+            className="cx-btn cx-btn-primary cx-btn-sm"
+            onClick={() => trackEvent("job_apply_call", { job_slug: job.slug, placement: "hero" })}
+          >
+            Call to Apply · {job.applyPhoneDisplay}
+          </a>
+          <a href="#apply" className="cx-btn cx-btn-secondary cx-btn-sm">
+            Apply online
           </a>
           <SaveJobButton job={job} />
           <button type="button" className="cx-btn cx-btn-secondary cx-btn-sm" onClick={() => window.print()}>
@@ -87,23 +109,23 @@ export function JobDetail() {
           <JobShare job={job} />
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg))]">
-          <img
-            src={job.image}
-            alt={job.imageAlt ?? `${job.role} job vacancy — ${job.location}`}
-            width={job.socialImageWidth}
-            height={job.socialImageHeight}
-            className={
-              job.socialImageHeight > job.socialImageWidth * 1.1
-                ? "mx-auto max-h-[720px] w-full object-contain"
-                : "aspect-[16/10] w-full object-cover"
-            }
-          />
+        <div className="mt-8">
+          <FlyerViewer job={job} />
         </div>
 
         <div className="prose-invert mt-8 space-y-4 text-[hsl(var(--fg-muted))]">
           <p className="text-base leading-relaxed text-[hsl(var(--fg))]">{job.summary}</p>
           <p className="text-sm leading-relaxed">{job.description}</p>
+          {job.benefits && job.benefits.length > 0 && (
+            <>
+              <h2 className="cx-display text-lg text-[hsl(var(--fg))]">Why consider this opportunity?</h2>
+              <ul className="list-disc space-y-1 pl-5 text-sm">
+                {job.benefits.map((b) => (
+                  <li key={b}>{b}</li>
+                ))}
+              </ul>
+            </>
+          )}
           <h2 className="cx-display text-lg text-[hsl(var(--fg))]">What you’ll do</h2>
           <ul className="list-disc space-y-1 pl-5 text-sm">
             {job.responsibilities.map((r) => (
@@ -119,15 +141,22 @@ export function JobDetail() {
         </div>
 
         <div className="mt-8 rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-raised))] p-6">
-          <p className="text-sm font-medium text-[hsl(var(--fg))]">Prefer to call or WhatsApp?</p>
+          {job.closing && <p className="mb-4 text-sm leading-relaxed text-[hsl(var(--fg))]">{job.closing}</p>}
+          <p className="text-sm font-medium text-[hsl(var(--fg))]">{wa ? "Prefer to call or WhatsApp?" : "How to apply by phone"}</p>
           {job.applyNote && <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">{job.applyNote}</p>}
           <div className="mt-4 flex flex-wrap gap-2">
-            <a href={`tel:${job.applyPhone}`} className="cx-btn cx-btn-secondary cx-btn-sm">
+            <a
+              href={`tel:${job.applyPhone}`}
+              className="cx-btn cx-btn-secondary cx-btn-sm"
+              onClick={() => trackEvent("job_apply_call", { job_slug: job.slug, placement: "apply_box" })}
+            >
               Call {job.applyPhoneDisplay}
             </a>
-            <a href={wa} target="_blank" rel="noopener noreferrer" className="cx-btn cx-btn-secondary cx-btn-sm">
-              WhatsApp {job.applyPhoneDisplay}
-            </a>
+            {wa && (
+              <a href={wa} target="_blank" rel="noopener noreferrer" className="cx-btn cx-btn-secondary cx-btn-sm">
+                WhatsApp {job.applyPhoneDisplay}
+              </a>
+            )}
           </div>
         </div>
 

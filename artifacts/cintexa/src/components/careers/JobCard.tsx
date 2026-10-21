@@ -8,6 +8,7 @@ import { SaveJobButton } from "./SaveJobButton";
 export function JobCard({ job, now }: { job: JobPosting; now: Date }) {
   const href = `/careers/${job.slug}`;
   const portrait = job.socialImageHeight > job.socialImageWidth * 1.1;
+  const wa = jobWhatsAppUrl(job);
   return (
     <article
       id={job.slug}
@@ -70,15 +71,17 @@ export function JobCard({ job, now }: { job: JobPosting; now: Date }) {
           <JobShare job={job} compact />
 
           <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg))] p-4">
-            <p className="text-sm font-medium text-[hsl(var(--fg))]">Interested? Call or WhatsApp now</p>
+            <p className="text-sm font-medium text-[hsl(var(--fg))]">{wa ? "Interested? Call or WhatsApp now" : "Interested? Call now"}</p>
             {job.applyNote && <p className="mt-1 text-xs text-[hsl(var(--fg-muted))]">{job.applyNote}</p>}
             <div className="mt-3 flex flex-wrap gap-2">
               <a href={`tel:${job.applyPhone}`} className="cx-btn cx-btn-secondary cx-btn-sm">
                 Call {job.applyPhoneDisplay}
               </a>
-              <a href={jobWhatsAppUrl(job)} target="_blank" rel="noopener noreferrer" className="cx-btn cx-btn-secondary cx-btn-sm">
-                WhatsApp {job.applyPhoneDisplay}
-              </a>
+              {wa && (
+                <a href={wa} target="_blank" rel="noopener noreferrer" className="cx-btn cx-btn-secondary cx-btn-sm">
+                  WhatsApp {job.applyPhoneDisplay}
+                </a>
+              )}
             </div>
           </div>
         </div>

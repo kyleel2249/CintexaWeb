@@ -210,6 +210,17 @@ export function trackPageView(rawPath: string): void {
   }
 }
 
+/**
+ * Reports a named interaction (e.g. a call-to-apply tap) to the tags that are currently active — which means
+ * only after the visitor opted in. Params must be non-personal (slugs, labels); nothing is sent otherwise.
+ */
+export function trackEvent(name: string, params: Record<string, string | number> = {}): void {
+  if (typeof window === "undefined") return;
+  const w = win();
+  if (active.google) w.gtag?.("event", name, params);
+  if (active.meta) w.fbq?.("trackCustom", name, params);
+}
+
 /** Test helper: forget what was loaded in a previous test. */
 export function __resetTrackingForTests(): void {
   builtInAnalyticsId = undefined;

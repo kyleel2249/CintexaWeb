@@ -22,6 +22,8 @@ export type EmploymentType =
 export type JobPosting = {
   id: string;
   slug: string;
+  /** Optional employer/internal reference (e.g. PSW-SA-2026-001); used as the JSON-LD identifier. */
+  reference?: string;
   title: string;
   role: string;
   /** Hiring organisation shown publicly and in JSON-LD. Defaults to "Hiring partner". */
@@ -39,6 +41,14 @@ export type JobPosting = {
   responsibilities: string[];
   summary: string;
   description: string;
+  /** Optional attention-grabbing line shown under the title. */
+  headline?: string;
+  /** Optional at-a-glance facts (work days, hours, pay…) shown in the page hero. */
+  facts?: { label: string; value: string }[];
+  /** Optional benefits explicitly stated by the employer ("Why consider this opportunity?"). */
+  benefits?: string[];
+  /** Optional closing paragraph shown before the apply section. */
+  closing?: string;
   applyNote?: string;
   whatsAppMessage?: string;
   /** Image shown on the page. */
@@ -50,7 +60,8 @@ export type JobPosting = {
   socialImageHeight: number;
   applyPhone: string;
   applyPhoneDisplay: string;
-  applyWhatsApp: string;
+  /** Only set when the employer actually accepts WhatsApp applications. */
+  applyWhatsApp?: string;
   datePosted: string;
   validThrough?: string;
   occupationalCategory?: string;
@@ -88,7 +99,9 @@ export function employmentLabel(job: JobPosting): string {
     .join(" ");
 }
 
-export function jobWhatsAppUrl(job: JobPosting): string {
+/** WhatsApp apply link, or undefined when the vacancy has no WhatsApp number (phone-only vacancies). */
+export function jobWhatsAppUrl(job: JobPosting): string | undefined {
+  if (!job.applyWhatsApp) return undefined;
   const text = encodeURIComponent(
     job.whatsAppMessage ??
       `Hello, I am interested in the ${job.role} job vacancy. Please share application details.`,

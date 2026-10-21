@@ -132,8 +132,8 @@ function jobBody(job) {
   <ul style="color:rgba(247,244,238,0.75)">${reqs}</ul>
   <p style="margin-top:1.5rem"><strong>Apply now:</strong>
     <a href="tel:${escapeHtml(job.applyPhone)}" style="color:#F5C518">Call ${escapeHtml(job.applyPhoneDisplay)}</a>
-    ·
-    <a href="${escapeHtml(jobWhatsAppUrl(job))}" style="color:#F5C518">WhatsApp ${escapeHtml(job.applyPhoneDisplay)}</a>
+    ${jobWhatsAppUrl(job) ? `·
+    <a href="${escapeHtml(jobWhatsAppUrl(job))}" style="color:#F5C518">WhatsApp ${escapeHtml(job.applyPhoneDisplay)}</a>` : ""}
   </p>
   <p style="font-size:0.8rem;color:rgba(247,244,238,0.55);margin-top:2rem"><a href="/careers" style="color:inherit">All careers</a></p>
 </main>`;

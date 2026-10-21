@@ -41,7 +41,7 @@ describe("/careers list", () => {
     expect(document.getElementById(first!.slug)).toBeTruthy();
     expect(document.getElementById(second!.slug)).toBeNull();
     expect(window.location.search).toBe(`?${new URLSearchParams({ q: first!.role.toLowerCase() })}`);
-    expect(screen.getByText(/Showing 1 of 2 vacancies/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`Showing 1 of ${jobs.length} vacancies`))).toBeInTheDocument();
   });
 
   it("opens a filtered view straight from a shared link", () => {

@@ -96,7 +96,7 @@ export function jobPostingJsonLd(job: JobPosting, canonicalUrl: string = jobCano
     description: [job.summary, job.description, `Requirements: ${job.requirements.join("; ")}`]
       .filter(Boolean)
       .join("\n\n"),
-    identifier: { "@type": "PropertyValue", name: "CINTEXA Careers", value: job.id },
+    identifier: { "@type": "PropertyValue", name: "CINTEXA Careers", value: job.reference ?? job.id },
     datePosted: job.datePosted,
     validThrough: job.validThrough,
     employmentType: job.employmentType,

@@ -1,5 +1,83 @@
 [
   {
+    "id": "premium-shapewear-sales-assistant",
+    "slug": "premium-shapewear-sales-assistant",
+    "reference": "PSW-SA-2026-001",
+    "title": "Sales Assistant Job at Premium Shapewear",
+    "role": "Sales Assistant",
+    "employerName": "Premium Shapewear",
+    "category": "Retail & fashion",
+    "industry": "Retail & fashion",
+    "employmentType": "OTHER",
+    "employmentLabel": "Flexible work schedule",
+    "location": "Ashiyie, Amanfro, Adenta, Oyarifa & nearby areas, Accra",
+    "addressLocality": "Adenta",
+    "addressRegion": "Greater Accra",
+    "addressCountry": "GH",
+    "headline": "Love sales, creating content and connecting with people? Your next opportunity could be here!",
+    "facts": [
+      {
+        "label": "Employer",
+        "value": "Premium Shapewear"
+      },
+      {
+        "label": "Stay around",
+        "value": "Ashiyie, Amanfro, Adenta, Oyarifa & nearby areas"
+      },
+      {
+        "label": "Work days",
+        "value": "Tuesday – Saturday"
+      },
+      {
+        "label": "Hours",
+        "value": "6 hours a day"
+      },
+      {
+        "label": "Pay",
+        "value": "Salary + commission"
+      },
+      {
+        "label": "Schedule",
+        "value": "Flexible work schedule"
+      }
+    ],
+    "benefits": [
+      "Salary plus commission.",
+      "Flexible work schedule.",
+      "Six-hour working days, Tuesday to Saturday.",
+      "Hands-on experience in live sales, content creation and customer engagement.",
+      "A chance to help grow the Premium Shapewear brand."
+    ],
+    "requirements": [
+      "Eloquent and fluent in English and Twi.",
+      "Confident and outgoing.",
+      "Not camera shy — comfortable appearing on camera.",
+      "Sales driven.",
+      "You stay around Ashiyie, Amanfro, Adenta, Oyarifa or nearby areas."
+    ],
+    "responsibilities": [
+      "Handle live sales.",
+      "Create content.",
+      "Do inventory taking.",
+      "Receive customer calls (sometimes).",
+      "Arrange deliveries."
+    ],
+    "summary": "Premium Shapewear is hiring a confident, sales-driven Sales Assistant fluent in English and Twi. Tuesday–Saturday, 6 hours a day, salary plus commission. Call 024 240 2472.",
+    "description": "Premium Shapewear is looking for a vibrant, confident and sales-driven person to help grow its brand. In this role you will handle live sales, create content, take inventory, receive customer calls when needed and arrange deliveries. If you speak fluent English and Twi, are outgoing and comfortable on camera, and enjoy turning conversations into sales, this could be a great fit.",
+    "applyNote": "Call 024 240 2472 to express your interest and find out how to proceed.",
+    "closing": "If you communicate confidently, enjoy interacting with people and have the energy to turn conversations into sales, this could be the opportunity you have been looking for. Think this sounds like you? Take the first step today and call 024 240 2472.",
+    "image": "/careers/premium-shapewear-sales-assistant-recruitment.jpg",
+    "imageAlt": "Premium Shapewear recruitment flyer: we are hiring a Sales Assistant — live sales, content creation, inventory and deliveries. Stay around Ashiyie, Amanfro, Adenta or Oyarifa. Tuesday to Saturday, 6 hours a day, salary plus commission. Call 024 240 2472.",
+    "socialImage": "/careers/premium-shapewear-sales-assistant-recruitment.jpg",
+    "socialImageWidth": 720,
+    "socialImageHeight": 1080,
+    "applyPhone": "+233242402472",
+    "applyPhoneDisplay": "024 240 2472",
+    "datePosted": "2026-10-21",
+    "occupationalCategory": "41-2031.00",
+    "status": "open"
+  },
+  {
     "id": "bybeth-boutique-sales-girl",
     "slug": "bybeth-boutique-sales-girl",
     "title": "ByBeth Boutique Is Hiring a Sales Girl",
@@ -52,7 +130,11 @@
     "employmentType": "FULL_TIME",
     "location": "Ghana",
     "addressCountry": "GH",
-    "requirements": ["Available and dedicated", "Punctual", "High cleaning standards"],
+    "requirements": [
+      "Available and dedicated",
+      "Punctual",
+      "High cleaning standards"
+    ],
     "responsibilities": [
       "Clean and maintain homes, offices, churches, schools, and other assigned premises",
       "Daily cleaning of rooms, halls, restrooms, kitchens, and common areas",

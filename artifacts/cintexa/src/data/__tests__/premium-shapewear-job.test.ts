@@ -29,8 +29,9 @@ describe("Premium Shapewear — Sales Assistant vacancy", () => {
       expect(text, needle).toContain(needle);
     }
     expect(job.validThrough).toBeUndefined(); // the flyer states no deadline
-    expect(job.applyWhatsApp).toBeUndefined(); // the flyer says call — no WhatsApp channel is invented
-    expect(jobWhatsAppUrl(job)).toBeUndefined();
+    // WhatsApp was added at the owner's request, on the same number as the flyer's phone line
+    expect(job.applyWhatsApp).toBe("233242402472");
+    expect(jobWhatsAppUrl(job)).toMatch(/^https:\/\/wa\.me\/233242402472\?text=/);
   });
 
   it("ships the real flyer at the declared size", () => {
@@ -42,7 +43,7 @@ describe("Premium Shapewear — Sales Assistant vacancy", () => {
     expect([job.socialImageWidth, job.socialImageHeight]).toEqual([720, 1080]);
   });
 
-  it("emits JobPosting data without invented salary, deadline or WhatsApp", () => {
+  it("emits JobPosting data without invented salary or deadline", () => {
     const graph = (jobPostingJsonLd(job) as { "@graph": Record<string, unknown>[] })["@graph"];
     const posting = graph.find((n) => n["@type"] === "JobPosting")!;
     expect((posting.identifier as { value: string }).value).toBe("PSW-SA-2026-001");

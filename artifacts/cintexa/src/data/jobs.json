@@ -159,5 +159,67 @@
     "validThrough": "2026-12-31",
     "occupationalCategory": "37-2011.00",
     "status": "open"
+  },
+  {
+    "id": "massage-therapist-kwabenya-accra",
+    "slug": "massage-therapist-kwabenya-accra",
+    "title": "Massage Therapist Job in Kwabenya, Accra",
+    "role": "Massage Therapist",
+    "category": "Health & wellness",
+    "industry": "Health & wellness",
+    "employmentType": "OTHER",
+    "employmentLabel": "Employment type to be confirmed",
+    "location": "Kwabenya, Accra, Ghana",
+    "addressLocality": "Kwabenya",
+    "addressRegion": "Greater Accra",
+    "addressCountry": "GH",
+    "headline": "WE'RE HIRING: MASSAGE THERAPIST — Your Next Career Opportunity Starts Here",
+    "facts": [
+      {
+        "label": "Salary range",
+        "value": "GH₵ 4,000–5,000 per month"
+      },
+      {
+        "label": "Location",
+        "value": "Kwabenya, Accra, Ghana"
+      },
+      {
+        "label": "Employer",
+        "value": "Not named in the advertisement — confirm when you enquire"
+      },
+      {
+        "label": "How to apply",
+        "value": "WhatsApp or call +233 24 836 8941"
+      }
+    ],
+    "salary": {
+      "currency": "GHS",
+      "min": 4000,
+      "max": 5000,
+      "unit": "MONTH"
+    },
+    "requirements": [
+      "Relevant certification in massage therapy.",
+      "Practical experience in massage treatments.",
+      "Strong client care and communication skills."
+    ],
+    "responsibilities": [],
+    "summary": "Explore a Massage Therapist opportunity in Kwabenya, Accra, offering GH₵ 4,000–5,000 per month. View the requirements and enquire via WhatsApp or call +233 24 836 8941.",
+    "description": "Are you a skilled and passionate Massage Therapist looking for your next professional opportunity? A recruitment opportunity is available in Kwabenya, Accra, for a qualified professional with practical massage therapy experience, excellent client care, and strong communication skills.",
+    "applyNote": "The advertised salary range is GH₵ 4,000–5,000 per month; confirm the exact terms that apply to you with the recruiter. Use WhatsApp or call +233 24 836 8941 to enquire and find out the next steps.",
+    "closing": "If you have relevant massage therapy certification, practical treatment experience, and a strong commitment to client care, reach out to enquire about this opportunity.",
+    "image": "/careers/massage-therapist-job-kwabenya-accra.jpg",
+    "imageAlt": "Massage Therapist recruitment poster advertising a monthly salary of GH₵ 4,000–5,000 in Kwabenya, Accra, with applications by WhatsApp or phone.",
+    "socialImage": "/careers/massage-therapist-job-kwabenya-accra.jpg",
+    "socialImageWidth": 853,
+    "socialImageHeight": 1280,
+    "applyPhone": "+233248368941",
+    "applyPhoneDisplay": "+233 24 836 8941",
+    "applyWhatsApp": "233248368941",
+    "whatsAppMessage": "Hello, I am interested in the Massage Therapist vacancy in Kwabenya, Accra. Please provide information about the application process and the next steps. Thank you.",
+    "phoneOnly": true,
+    "datePosted": "2026-10-23",
+    "occupationalCategory": "31-9011.00",
+    "status": "open"
   }
 ]

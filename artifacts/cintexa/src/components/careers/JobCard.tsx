@@ -45,6 +45,7 @@ export function JobCard({ job, now }: { job: JobPosting; now: Date }) {
           <p className="text-base font-medium leading-relaxed text-[hsl(var(--fg))]">{job.summary}</p>
           <p className="text-sm leading-relaxed text-[hsl(var(--fg-muted))]">{job.description}</p>
 
+          {job.responsibilities.length > 0 && (
           <div>
             <h3 className="font-semibold text-[hsl(var(--fg))]">What you’ll do</h3>
             <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[hsl(var(--fg-muted))]">
@@ -53,6 +54,7 @@ export function JobCard({ job, now }: { job: JobPosting; now: Date }) {
               ))}
             </ul>
           </div>
+          )}
           <div>
             <h3 className="font-semibold text-[hsl(var(--fg))]">Who should apply?</h3>
             <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[hsl(var(--fg-muted))]">

@@ -38,6 +38,7 @@ export type JobPosting = {
   addressRegion?: string;
   addressCountry: string;
   requirements: string[];
+  /** May be empty when the advertisement lists none (nothing is invented). */
   responsibilities: string[];
   summary: string;
   description: string;
@@ -49,6 +50,10 @@ export type JobPosting = {
   benefits?: string[];
   /** Optional closing paragraph shown before the apply section. */
   closing?: string;
+  /** Advertised pay, when the employer states it (feeds JobPosting baseSalary). */
+  salary?: { currency: string; min: number; max: number; unit: "HOUR" | "DAY" | "WEEK" | "MONTH" | "YEAR" };
+  /** Vacancies applied for only by phone/WhatsApp hide the online application form. */
+  phoneOnly?: boolean;
   applyNote?: string;
   whatsAppMessage?: string;
   /** Image shown on the page. */

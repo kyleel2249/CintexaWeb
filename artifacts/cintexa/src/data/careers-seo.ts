@@ -114,7 +114,19 @@ export function jobPostingJsonLd(job: JobPosting, canonicalUrl: string = jobCano
     url: canonicalUrl,
     image: [absoluteUrl(job.socialImage)],
     directApply: true,
-    responsibilities: job.responsibilities.join(". "),
+    responsibilities: job.responsibilities.length ? job.responsibilities.join(". ") : undefined,
+    baseSalary: job.salary
+      ? {
+          "@type": "MonetaryAmount",
+          currency: job.salary.currency,
+          value: {
+            "@type": "QuantitativeValue",
+            minValue: job.salary.min,
+            maxValue: job.salary.max,
+            unitText: job.salary.unit,
+          },
+        }
+      : undefined,
     qualifications: job.requirements.join(". "),
     occupationalCategory: job.occupationalCategory,
     industry: job.industry,

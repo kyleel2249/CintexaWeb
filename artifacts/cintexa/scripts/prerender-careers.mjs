@@ -129,8 +129,7 @@ function jobBody(job) {
   <img src="${escapeHtml(job.image)}" alt="${escapeHtml(job.imageAlt || `${job.role} job vacancy`)}" width="${job.socialImageWidth}" height="${job.socialImageHeight}" style="max-width:100%;height:auto;border-radius:1rem;margin:1.5rem 0" />
   <p style="line-height:1.6">${escapeHtml(job.summary)}</p>
   <p style="line-height:1.6;color:rgba(247,244,238,0.75)">${escapeHtml(job.description)}</p>
-  <h2 style="font-size:1.15rem;margin-top:1.5rem">What you’ll do</h2>
-  <ul style="color:rgba(247,244,238,0.75)">${duties}</ul>
+  ${duties ? `<h2 style="font-size:1.15rem;margin-top:1.5rem">What you’ll do</h2>\n  <ul style="color:rgba(247,244,238,0.75)">${duties}</ul>` : ""}
   <h2 style="font-size:1.15rem;margin-top:1.5rem">Requirements</h2>
   <ul style="color:rgba(247,244,238,0.75)">${reqs}</ul>
   <p style="margin-top:1.5rem"><strong>Apply now:</strong>

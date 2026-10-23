@@ -102,12 +102,14 @@ function renderDetail(slug: string) {
 }
 
 describe("/careers/:slug — one page per vacancy", () => {
-  it.each(jobs.map((j) => [j.slug, j.title] as const))("%s has its own page, heading, breadcrumb and apply form", (slug, title) => {
+  it.each(jobs.map((j) => [j.slug, j.title, !!j.phoneOnly] as const))("%s has its own page, heading, breadcrumb and apply route", (slug, title, phoneOnly) => {
     renderDetail(slug);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(title);
     const crumbs = screen.getByRole("navigation", { name: "Breadcrumb" });
     expect(within(crumbs).getByRole("link", { name: "Careers" })).toHaveAttribute("href", "/careers");
-    expect(screen.getByRole("heading", { name: "Apply online" })).toBeInTheDocument();
+    // Phone/WhatsApp-only vacancies deliberately have no online form.
+    if (phoneOnly) expect(screen.queryByRole("heading", { name: "Apply online" })).toBeNull();
+    else expect(screen.getByRole("heading", { name: "Apply online" })).toBeInTheDocument();
     expect(meta("og:url", "property")).toBe(`https://cintexa.com/careers/${slug}`);
     expect(document.head.querySelector('link[rel="canonical"]')).toHaveAttribute("href", `https://cintexa.com/careers/${slug}`);
   });

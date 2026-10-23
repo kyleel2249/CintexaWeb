@@ -97,9 +97,22 @@ export function JobDetail() {
           >
             Call to Apply · {job.applyPhoneDisplay}
           </a>
-          <a href="#apply" className="cx-btn cx-btn-secondary cx-btn-sm">
-            Apply online
-          </a>
+          {wa && job.phoneOnly && (
+            <a
+              href={wa}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cx-btn cx-btn-primary cx-btn-sm"
+              onClick={() => trackEvent("job_apply_whatsapp", { job_slug: job.slug, placement: "hero" })}
+            >
+              Apply via WhatsApp
+            </a>
+          )}
+          {!job.phoneOnly && (
+            <a href="#apply" className="cx-btn cx-btn-secondary cx-btn-sm">
+              Apply online
+            </a>
+          )}
           <SaveJobButton job={job} />
           <button type="button" className="cx-btn cx-btn-secondary cx-btn-sm" onClick={() => window.print()}>
             Print
@@ -126,12 +139,16 @@ export function JobDetail() {
               </ul>
             </>
           )}
+          {job.responsibilities.length > 0 && (
+            <>
           <h2 className="cx-display text-lg text-[hsl(var(--fg))]">What you’ll do</h2>
-          <ul className="list-disc space-y-1 pl-5 text-sm">
-            {job.responsibilities.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ul>
+            <ul className="list-disc space-y-1 pl-5 text-sm">
+              {job.responsibilities.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+            </>
+          )}
           <h2 className="cx-display text-lg text-[hsl(var(--fg))]">Requirements</h2>
           <ul className="list-disc space-y-1 pl-5 text-sm">
             {job.requirements.map((r) => (
@@ -150,19 +167,21 @@ export function JobDetail() {
               className="cx-btn cx-btn-secondary cx-btn-sm"
               onClick={() => trackEvent("job_apply_call", { job_slug: job.slug, placement: "apply_box" })}
             >
-              Call {job.applyPhoneDisplay}
+              {job.phoneOnly ? "Call to Apply" : "Call"} {job.applyPhoneDisplay}
             </a>
             {wa && (
               <a href={wa} target="_blank" rel="noopener noreferrer" className="cx-btn cx-btn-secondary cx-btn-sm">
-                WhatsApp {job.applyPhoneDisplay}
+                {job.phoneOnly ? "Apply via WhatsApp" : "WhatsApp"} {job.applyPhoneDisplay}
               </a>
             )}
           </div>
         </div>
 
-        <div className="cx-no-print mt-8">
-          <ApplyForm job={job} />
-        </div>
+        {!job.phoneOnly && (
+          <div className="cx-no-print mt-8">
+            <ApplyForm job={job} />
+          </div>
+        )}
 
         <div className="cx-no-print">
           <RelatedJobs job={job} jobs={openJobs} now={now} />

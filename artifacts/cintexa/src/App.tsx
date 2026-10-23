@@ -21,7 +21,7 @@ const WebsiteDev = lazy(() => import("@/pages/WebsiteDev").then((m) => ({ defaul
 const SoftwareDev = lazy(() => import("@/pages/SoftwareDev").then((m) => ({ default: m.SoftwareDev })));
 const Contact = lazy(() => import("@/pages/Contact").then((m) => ({ default: m.Contact })));
 const Careers = lazy(() => import("@/pages/Careers").then((m) => ({ default: m.Careers })));
-const JobDetail = lazy(() => import("@/pages/JobDetail").then((m) => ({ default: m.JobDetail })));
+const CareersRoute = lazy(() => import("@/pages/CareersRoute").then((m) => ({ default: m.CareersRoute })));
 const Blog = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.Blog })));
 const BlogArticle = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.BlogArticle })));
 const About = lazy(() => import("@/pages/TrustPages").then((m) => ({ default: m.About })));
@@ -101,7 +101,7 @@ export default function App() {
               <Route path="/contact" component={Contact} />
               <Route path="/blog/:slug" component={BlogArticle} />
               <Route path="/blog" component={Blog} />
-              <Route path="/careers/:id" component={JobDetail} />
+              <Route path="/careers/:id" component={CareersRoute} />
               <Route path="/careers" component={Careers} />
               <Route path="/get-started" component={GetStarted} />
               <Route path="/sign-in" component={GetStarted} />

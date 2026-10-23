@@ -1,0 +1,33 @@
+[
+  {
+    "id": "tobinco-pharmaceuticals-job-alert-october-2026",
+    "slug": "tobinco-pharmaceuticals-limited-job-alert-october-2026",
+    "employerName": "Tobinco Pharmaceuticals Limited",
+    "employerUrl": "https://tobincopharma.com/",
+    "badge": "JOB ALERT",
+    "headline": "Your Next Career Opportunity Starts Here",
+    "subheadline": "Join Tobinco Pharmaceuticals Limited",
+    "pageTitle": "Tobinco Pharmaceuticals Limited Jobs — October 2026 | Careers",
+    "socialTitle": "Tobinco Pharmaceuticals Limited Job Alert — 5 Career Opportunities",
+    "description": "Explore five career opportunities at Tobinco Pharmaceuticals Limited across Marketing and Regulatory functions. Submit your CV and cover letter to careers@tobincopharma.com before 28 October 2026.",
+    "introduction": "Tobinco Pharmaceuticals Limited is inviting qualified, experienced and results-driven professionals to apply for the following exciting career opportunities within their Marketing and Regulatory functions.",
+    "openingCopy": "Are you an experienced professional ready to take the next step in your career? Tobinco Pharmaceuticals Limited is inviting qualified, experienced and results-driven professionals to explore exciting opportunities across its Marketing and Regulatory functions.",
+    "applyInstructions": "Interested and qualified candidates should submit their CVs and cover letter to careers@tobincopharma.com indicating the position you are applying for in the subject line.",
+    "applyEmail": "careers@tobincopharma.com",
+    "deadline": "2026-10-28",
+    "deadlineLabel": "28 October 2026",
+    "datePosted": "2026-10-23",
+    "image": "/careers/cintexa-careers-tobinco-pharmaceuticals-job-alert-october-2026.jpg",
+    "imageAlt": "Tobinco Pharmaceuticals Limited recruitment poster advertising five career opportunities with an application deadline of 28 October 2026.",
+    "imageWidth": 719,
+    "imageHeight": 1280,
+    "status": "open",
+    "roles": [
+      { "id": "group-marketing-director", "title": "Group Marketing Director" },
+      { "id": "head-of-medical-sales-field-force", "title": "Head of Medical Sales & Field Force" },
+      { "id": "product-manager", "title": "Product Manager" },
+      { "id": "product-development-manager", "title": "Product Development Manager" },
+      { "id": "regulatory-affairs-pharmacist", "title": "Regulatory Affairs Pharmacist" }
+    ]
+  }
+]

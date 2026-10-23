@@ -21,6 +21,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getOpenJobs, jobWhatsAppUrl, employmentLabel } from "../src/data/jobs.ts";
+import { CAMPAIGNS } from "../src/data/campaigns.ts";
+import { campaignSeo } from "../src/data/campaigns-seo.ts";
+import { isCampaignOpen, roleMailto, mailtoUrl } from "../src/data/campaigns.ts";
 import { jobSeo, careersListSeo, jobCanonical, absoluteUrl, SITE_URL } from "../src/data/careers-seo.ts";
 import { readImageSize } from "./image-info.mjs";
 
@@ -159,6 +162,36 @@ function listBody(jobs) {
 </main>`;
 }
 
+
+function campaignBody(c, now = new Date()) {
+  const open = isCampaignOpen(c, now);
+  const roles = c.roles
+    .map(
+      (r) => `<li>${escapeHtml(r.title)}${open ? ` — <a href="${escapeHtml(roleMailto(c, r))}" style="color:#F5C518">Apply Now!</a>` : ""}</li>`,
+    )
+    .join("");
+  return `
+<main id="prerender-careers" style="${MAIN_STYLE}">
+  <p style="font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:#F5C518">${escapeHtml(c.badge)}</p>
+  <h1 style="font-size:1.85rem;line-height:1.25;margin:0.5rem 0 0">${escapeHtml(c.headline)}</h1>
+  <p style="font-size:1.1rem"><strong>${escapeHtml(c.subheadline)}</strong></p>
+  <img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.imageAlt)}" width="${c.imageWidth}" height="${c.imageHeight}" style="max-width:100%;height:auto;border-radius:1rem;margin:1.5rem 0" />
+  <p style="line-height:1.6">${escapeHtml(c.openingCopy)}</p>
+  <p><strong>${open ? "Application Deadline" : "Applications closed"}: ${escapeHtml(c.deadlineLabel)}</strong></p>
+  <h2 style="font-size:1.15rem;margin-top:1.5rem">Open positions</h2>
+  <ol>${roles}</ol>
+  <h2 style="font-size:1.15rem;margin-top:1.5rem">How to Apply</h2>
+  <p style="line-height:1.6">${escapeHtml(c.applyInstructions)}</p>
+  <p><a href="${escapeHtml(mailtoUrl(c.applyEmail))}" style="color:#F5C518">${escapeHtml(c.applyEmail)}</a></p>
+  <p style="font-size:0.8rem;color:rgba(247,244,238,0.55);margin-top:2rem"><a href="/careers" style="color:inherit">All careers</a></p>
+</main>`;
+}
+
+export function renderCampaignPage(shell, campaign, now = new Date()) {
+  const html = injectHead(shell, campaignSeo(campaign, now));
+  return html.replace(/<div id="root"><\/div>/, `<div id="root">${campaignBody(campaign, now)}</div>`);
+}
+
 const FEED_LINK = '<link rel="alternate" type="application/rss+xml" title="CINTEXA job vacancies" href="/careers/feed.xml" />';
 
 export function renderListPage(shell, jobs) {
@@ -255,6 +288,13 @@ function run() {
   writePage("careers", renderListPage(shell, open));
   for (const job of open) {
     writePage(path.join("careers", job.slug), renderJobPage(shell, job));
+  }
+  for (const c of CAMPAIGNS) {
+    writePage(path.join("careers", c.slug), renderCampaignPage(shell, c));
+    if (!fs.existsSync(path.join(publicDir, c.image))) {
+      console.error(`prerender: campaign ${c.slug}: image ${c.image} not found in public/`);
+      process.exit(1);
+    }
   }
   fs.writeFileSync(path.join(dist, "careers", "feed.xml"), buildFeedXml(open));
   fs.writeFileSync(path.join(dist, "careers", "jobs.json"), `${JSON.stringify(buildJobsJson(open), null, 2)}\n`);

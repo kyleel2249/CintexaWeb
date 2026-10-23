@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { AdSenseInContent } from "@/components/ads/AdSenseSlot";
+import { CampaignCard } from "@/components/careers/CampaignCard";
 import { JobAlertForm } from "@/components/careers/JobAlertForm";
 import { JobCard } from "@/components/careers/JobCard";
 import { JobFilters } from "@/components/careers/JobFilters";
+import { CAMPAIGNS } from "@/data/campaigns";
 import { getOpenJobs } from "@/data/jobs";
 import { careersListSeo } from "@/data/careers-seo";
 import { DEFAULT_FILTERS, facets, filterJobs, parseFilters, serializeFilters, type JobFilters as Filters } from "@/lib/careers-filter";
@@ -32,6 +34,13 @@ export function Careers() {
   const saved = useMemo(() => new Set(savedSlugs), [savedSlugs]);
   const { categories, types } = useMemo(() => facets(jobs), [jobs]);
   const visible = useMemo(() => filterJobs(jobs, filters, saved), [jobs, filters, saved]);
+  // Multi-vacancy campaigns stay listed (open or closed) and match a search on the employer or any role.
+  const campaigns = useMemo(() => {
+    const q = filters.q.trim().toLowerCase();
+    return CAMPAIGNS.filter(
+      (c) => !q || [c.employerName, c.badge, ...c.roles.map((r) => r.title)].join(" ").toLowerCase().includes(q),
+    );
+  }, [filters.q]);
 
   return (
     <div className="cx-section">
@@ -57,7 +66,11 @@ export function Careers() {
           </p>
         )}
 
-        {jobs.length > 0 && visible.length === 0 && (
+        {campaigns.map((c) => (
+          <CampaignCard key={c.id} campaign={c} now={now} />
+        ))}
+
+        {jobs.length > 0 && visible.length === 0 && campaigns.length === 0 && (
           <div className="cx-card mt-8 text-center">
             <p className="font-medium">No vacancies match your search.</p>
             <button type="button" className="cx-btn cx-btn-secondary cx-btn-sm mt-3" onClick={() => updateFilters({ ...DEFAULT_FILTERS })}>

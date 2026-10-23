@@ -66,6 +66,9 @@ function subscribe(cb: () => void) {
   };
 }
 
+const EMPTY: string[] = [];
+const getServerSnapshot = () => EMPTY; // stable reference (a fresh [] each read breaks useSyncExternalStore)
+
 function getSnapshot(): string[] {
   const current = load();
   // Keep a stable reference between reads unless the content really changed.
@@ -75,7 +78,7 @@ function getSnapshot(): string[] {
 
 /** Live list of saved slugs plus helpers; every component using it stays in sync. */
 export function useSavedJobs() {
-  const slugs = useSyncExternalStore(subscribe, getSnapshot, () => []);
+  const slugs = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const isSaved = useCallback((slug: string) => slugs.includes(slug), [slugs]);
   const toggle = useCallback((slug: string) => toggleSavedSlug(slug), []);
   return { slugs, isSaved, toggle, count: slugs.length };

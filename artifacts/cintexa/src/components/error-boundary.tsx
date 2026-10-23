@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { isChunkLoadError, reloadOnce } from "@/lib/lazy-retry";
 
 interface Props {
   children: ReactNode;
@@ -21,6 +22,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error("CINTEXA render error:", error, info.componentStack);
+    // A stale chunk after a deploy is fixed by one automatic reload; anything else shows the message.
+    if (isChunkLoadError(error)) reloadOnce();
   }
 
   handleReload = () => {

@@ -3,6 +3,7 @@ import App from "@/App";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AuthProvider } from "@/lib/auth";
 import { initFirebase } from "@/lib/firebase";
+import { reloadOnce } from "@/lib/lazy-retry";
 import { registerBuiltInAnalyticsId } from "@/lib/tracking";
 
 import "./index.css";
@@ -11,6 +12,11 @@ import "./styles/design-system.css";
 // Initialize Firebase as early as possible so Analytics / other services are active
 initFirebase();
 registerBuiltInAnalyticsId(import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string | undefined);
+
+// Vite fires this when a preloaded chunk 404s (stale tab after a deploy): reload once for the new build.
+window.addEventListener("vite:preloadError", (event) => {
+  if (reloadOnce()) event.preventDefault();
+});
 
 const rootEl = document.getElementById("root");
 if (!rootEl) {

@@ -84,3 +84,13 @@ describe("Tobinco Pharmaceuticals Limited recruitment campaign", () => {
     expect(html).toContain("Applications closed");
   });
 });
+
+describe("static /careers HTML (what crawlers and no-JS visitors get)", () => {
+  it("links to the campaign page", async () => {
+    // @ts-expect-error - plain build script (no types)
+    const { renderListPage } = await import("../../../scripts/prerender-careers.mjs");
+    const html = renderListPage(SHELL, []);
+    expect(html).toContain(`href="/careers/${SLUG}"`);
+    expect(html).toContain("Group Marketing Director");
+  });
+});

@@ -141,7 +141,18 @@ function jobBody(job) {
 </main>`;
 }
 
-function listBody(jobs) {
+function listBody(jobs, campaigns = CAMPAIGNS) {
+  const campaignItems = campaigns
+    .map(
+      (c) => `
+    <article style="margin:1.25rem 0;padding:1rem;border:1px solid rgba(247,244,238,0.12);border-radius:0.75rem">
+      <h2 style="font-size:1.25rem;margin:0"><a href="/careers/${escapeHtml(c.slug)}" style="color:#F7F4EE;text-decoration:none">${escapeHtml(c.employerName)} — ${escapeHtml(c.badge)}</a></h2>
+      <p style="color:rgba(247,244,238,0.7);font-size:0.9rem">${c.roles.length} vacancies · ${isCampaignOpen(c) ? "Deadline" : "Closed"}: ${escapeHtml(c.deadlineLabel)}</p>
+      <p style="color:rgba(247,244,238,0.75);font-size:0.9rem">${escapeHtml(c.roles.map((r) => r.title).join(", "))}</p>
+      <p><a href="/careers/${escapeHtml(c.slug)}" style="color:#F5C518">View positions &amp; apply</a></p>
+    </article>`,
+    )
+    .join("");
   const items = jobs
     .map(
       (j) => `
@@ -157,7 +168,7 @@ function listBody(jobs) {
 <main id="prerender-careers" style="${MAIN_STYLE}">
   <h1 style="font-size:1.85rem">Careers &amp; job vacancies in Ghana</h1>
   <p style="color:rgba(247,244,238,0.75)">Open roles and application details. Call or WhatsApp listed contacts to apply.</p>
-  ${items}
+  ${campaignItems}${items}
 </main>`;
 }
 

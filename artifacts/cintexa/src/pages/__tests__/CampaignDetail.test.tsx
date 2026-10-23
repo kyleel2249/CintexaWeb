@@ -28,7 +28,8 @@ describe("Tobinco campaign page", () => {
     );
     expect(screen.getAllByRole("link", { name: /Apply Now for .* by email/ })).toHaveLength(5);
     expect(screen.getByRole("link", { name: "Email Your Application" })).toHaveAttribute("href", "mailto:careers@tobincopharma.com");
-    expect(screen.getByText(/does not\s+mean your application has been sent/)).toBeInTheDocument();
+    expect(screen.getByText(/Attach your CV and cover letter yourself before sending/)).toBeInTheDocument();
+    expect(screen.queryByText(/nothing is submitted or attached automatically/)).toBeNull();
   });
 
   it("disables every apply action after the deadline and keeps the record visible", () => {

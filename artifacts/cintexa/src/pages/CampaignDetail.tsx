@@ -150,8 +150,7 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
           </div>
           <p className="mt-5 rounded-lg border border-amber-500/50 px-3 py-2 text-sm text-[hsl(var(--fg))]">
             Attach your CV and cover letter yourself before sending. The button only opens your email app with the
-            recipient and subject filled in — nothing is submitted or attached automatically, and clicking it does not
-            mean your application has been sent.
+            recipient and subject filled in.
           </p>
           <div className="cx-no-print mt-5">
             {open ? (

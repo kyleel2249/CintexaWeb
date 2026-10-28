@@ -1,0 +1,157 @@
+{
+  "path": "/solutions/website-development",
+  "dateUpdated": "2026-10-28",
+  "eyebrow": "Solutions · Web design & development",
+  "h1": "Professional Web Design & Development Company",
+  "headline": "Custom Websites. Smarter Business. Lasting Results.",
+  "intro": "CINTEXA designs and develops responsive, accessible, high-performance websites that help businesses build credibility, explain what they offer, reach customers and turn visitors into qualified enquiries — from a first business website to custom web applications.",
+  "metaTitle": "Web Design & Development Company in Ghana | CINTEXA",
+  "metaDescription": "CINTEXA designs and develops responsive business websites, e-commerce stores and custom web applications for startups and established businesses in Ghana.",
+  "socialTitle": "Web Design & Development Company in Ghana | CINTEXA",
+  "image": "/images/og-web-design-development.png",
+  "imageAlt": "CINTEXA web design and development — custom websites, e-commerce and web applications",
+  "imageWidth": 1200,
+  "imageHeight": 630,
+  "services": [
+    {
+      "id": "corporate-business-websites",
+      "title": "Corporate & business websites",
+      "problem": "Customers judge a business by its website before they ever call. An outdated or unclear site costs trust and enquiries.",
+      "solution": "A clear, fast, mobile-friendly website that explains who you are, what you offer and how to get in touch, built on your brand.",
+      "benefits": ["Stronger first impression and credibility", "Customers find services, contacts and proof quickly", "A foundation you can grow page by page"],
+      "features": ["Service and about pages", "Contact and enquiry forms", "Google-friendly page structure", "Content you can update"],
+      "cta": { "label": "Discuss a business website", "href": "/contact" }
+    },
+    {
+      "id": "startup-personal-websites",
+      "title": "Startup & personal websites",
+      "problem": "New ventures and professionals need to look established quickly without a large budget or a long build.",
+      "solution": "A focused site that introduces you, shows your work or offer and gives people one obvious next step.",
+      "benefits": ["Launch a credible presence quickly", "Room to add pages as you grow", "Easy to share on WhatsApp and social media"],
+      "features": ["Lean page set", "Profile, portfolio or offer sections", "Social-sharing previews", "Simple enquiry route"],
+      "cta": { "label": "Start with a simple site", "href": "/get-started" }
+    },
+    {
+      "id": "ecommerce-retail-websites",
+      "title": "E-commerce & retail websites",
+      "problem": "Selling online needs a catalogue customers can browse, a checkout they trust and orders you can actually manage.",
+      "solution": "An online store with clear product pages, a straightforward ordering flow and order handling that fits how your business works.",
+      "benefits": ["Sell beyond your shop's opening hours", "Fewer manual order messages", "Clear product and price information"],
+      "features": ["Product catalogue and search", "Cart and checkout", "Payment and delivery options", "Order notifications"],
+      "cta": { "label": "See our e-commerce solution", "href": "/solutions/ecommerce" }
+    },
+    {
+      "id": "hotel-hospitality-websites",
+      "title": "Hotel & hospitality websites",
+      "problem": "Guests compare options on their phones. Unclear rooms, rates or contact details send them to a competitor.",
+      "solution": "A visual, mobile-first site that presents rooms, facilities, location and ways to enquire or book.",
+      "benefits": ["Present rooms and facilities clearly", "Make enquiries and bookings easier", "Show up for local searches"],
+      "features": ["Room and facility pages", "Photo galleries", "Enquiry or booking requests", "Map and contact details"],
+      "cta": { "label": "Plan a hospitality website", "href": "/contact" }
+    },
+    {
+      "id": "insurance-professional-services-websites",
+      "title": "Insurance & professional-services websites",
+      "problem": "Clients choose advisers they trust. A site has to explain complex services plainly and make contact simple.",
+      "solution": "A credible, plain-language site that organises services, team and enquiry routes, with careful handling of client data.",
+      "benefits": ["Explain services in clear terms", "Build trust before the first conversation", "Capture structured enquiries"],
+      "features": ["Service and product pages", "Team and credentials sections", "Quote or consultation request forms", "Privacy-conscious data handling"],
+      "cta": { "label": "Discuss your firm's website", "href": "/contact" }
+    },
+    {
+      "id": "engineering-industrial-websites",
+      "title": "Engineering & industrial websites",
+      "problem": "Technical firms need to show capability, standards and projects to buyers who compare suppliers carefully.",
+      "solution": "An organised site that presents capabilities, services and project information, and makes requesting a quotation easy.",
+      "benefits": ["Show capability and standards clearly", "Help buyers request quotations", "Keep technical content easy to scan"],
+      "features": ["Capability and service pages", "Project or sector sections", "Quotation request forms", "Document and brochure downloads"],
+      "cta": { "label": "Talk through your requirements", "href": "/contact" }
+    },
+    {
+      "id": "landing-pages-lead-generation",
+      "title": "Landing pages & lead-generation websites",
+      "problem": "Campaign traffic is wasted when it lands on a page that does not match the offer or make the next step obvious.",
+      "solution": "Focused pages built around one offer and one action, with fast loading and measurable enquiries.",
+      "benefits": ["Match the page to the campaign", "Make the next step obvious", "Measure which pages produce enquiries"],
+      "features": ["Single-goal layouts", "Enquiry forms with validation", "Analytics events", "Fast mobile loading"],
+      "cta": { "label": "See marketing technology", "href": "/solutions/marketing" }
+    },
+    {
+      "id": "custom-web-applications-portals",
+      "title": "Custom web applications & business portals",
+      "problem": "Spreadsheets, chat threads and paper forms slow teams down and hide information customers should be able to see.",
+      "solution": "Secure web applications — dashboards, booking tools, customer portals and workflows — shaped around how your team works.",
+      "benefits": ["One place for records and requests", "Less repeated manual work", "Customers can check status themselves"],
+      "features": ["User accounts and roles", "Dashboards and reports", "Forms and approvals", "Integrations with existing tools"],
+      "cta": { "label": "See software development", "href": "/solutions/software-development" }
+    },
+    {
+      "id": "website-redesign-modernisation",
+      "title": "Website redesign & modernisation",
+      "problem": "An older site may be slow, hard to use on phones, difficult to update or no longer reflect the business.",
+      "solution": "We review what you have, keep what works, and rebuild structure, design and performance without losing your existing content and links.",
+      "benefits": ["Better mobile experience and speed", "Cleaner structure for visitors and search engines", "Easier to maintain"],
+      "features": ["Content and link review", "Redirect planning", "Modern responsive design", "Performance improvements"],
+      "cta": { "label": "Ask about a redesign", "href": "/contact" }
+    },
+    {
+      "id": "maintenance-performance-technical-seo",
+      "title": "Maintenance, performance & technical SEO",
+      "problem": "A site that is launched and then ignored slows down, accumulates errors and stops improving.",
+      "solution": "Ongoing support, performance work and technical SEO fixes — crawlable pages, correct metadata, sitemaps and structured data — scoped to what your site needs.",
+      "benefits": ["Fewer errors and slowdowns", "A technically sound base for search visibility", "Continued improvement as the business grows"],
+      "features": ["Updates and monitoring", "Page-speed improvements", "Metadata, sitemap and structured data", "Search Console setup guidance"],
+      "cta": { "label": "See marketing & SEO support", "href": "/solutions/marketing" }
+    }
+  ],
+  "process": [
+    { "step": "01", "title": "Discovery", "copy": "We learn about your business, customers and goals, and agree what the website must achieve." },
+    { "step": "02", "title": "Planning", "copy": "Pages, features, content and integrations are mapped, with a written scope and timeline." },
+    { "step": "03", "title": "Design", "copy": "Layouts and visual style are shaped around your brand and tested for clarity on phones and desktops." },
+    { "step": "04", "title": "Development", "copy": "The site is built with responsive, accessible code and connected to the forms, payments or tools you need." },
+    { "step": "05", "title": "Testing & launch", "copy": "We check devices, forms, speed, accessibility and links before going live, then confirm everything works in production." },
+    { "step": "06", "title": "Support & improvement", "copy": "After launch we help you update, measure and improve the site as your business grows." }
+  ],
+  "standards": [
+    { "title": "Performance", "copy": "Optimised images, lean code and sensible loading so pages feel fast on mobile connections. Core Web Vitals are a target we measure, not a promise we make in advance." },
+    { "title": "Accessibility", "copy": "Semantic HTML, keyboard navigation, visible focus, readable contrast and labelled forms, aiming for WCAG 2.2 AA." },
+    { "title": "Security", "copy": "HTTPS, validated forms, careful handling of customer information and secrets kept out of browser code." },
+    { "title": "Search-ready structure", "copy": "Crawlable pages, descriptive titles, clean URLs, sitemaps and structured data that matches what visitors actually see." }
+  ],
+  "faqs": [
+    {
+      "q": "How much does a website cost?",
+      "a": "The cost depends on scope — how many pages, whether you need e-commerce, bookings or a customer portal, what integrations are involved and how much content has to be produced. We give a written estimate after a short discovery conversation instead of quoting a fixed price before we understand the project."
+    },
+    {
+      "q": "How long does it take to build a website?",
+      "a": "A focused business website takes less time than an online store or a custom web application. We agree a timeline in the project plan once the scope is clear, and tell you early if something changes it."
+    },
+    {
+      "q": "Will my website work well on phones?",
+      "a": "Yes. Every site we build is responsive and checked on phone, tablet and desktop screen sizes, because most visitors in Ghana browse on their phones."
+    },
+    {
+      "q": "Can you build an online store?",
+      "a": "Yes. We build e-commerce websites with product catalogues, checkout and order handling. See our e-commerce solution for details."
+    },
+    {
+      "q": "Can you redesign my existing website?",
+      "a": "Yes. We review what you have, keep the content and links that work, and improve the design, structure and speed. We plan redirects so existing pages do not simply disappear from search results."
+    },
+    {
+      "q": "Can you guarantee first place on Google?",
+      "a": "No one honestly can. Search engines decide rankings. What we do is build a technically sound foundation — crawlable pages, correct metadata, sitemaps, fast loading and useful content — and measure the results, so your site has the best chance of being found."
+    },
+    {
+      "q": "Do you support the website after launch?",
+      "a": "Yes. We can help with updates, performance, technical SEO and new features after launch, scoped to what your site needs."
+    }
+  ],
+  "related": [
+    { "label": "E-commerce", "href": "/solutions/ecommerce", "copy": "Online stores, catalogues and checkout." },
+    { "label": "Software development", "href": "/solutions/software-development", "copy": "Custom applications and business systems." },
+    { "label": "Marketing technology", "href": "/solutions/marketing", "copy": "SEO, campaigns and measurement." },
+    { "label": "Sales technology", "href": "/solutions/sales", "copy": "Lead capture and customer follow-up." }
+  ]
+}

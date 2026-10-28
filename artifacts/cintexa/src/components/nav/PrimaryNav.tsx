@@ -17,9 +17,9 @@ const SOLUTIONS: NavGroup = {
     { label: "Ads Boost", href: "/solutions/ads-boost", blurb: "Programmatic campaign lifecycle" },
     { label: "E-commerce", href: "/solutions/ecommerce", blurb: "Storefront, catalog, and checkout" },
     {
-      label: "Website development",
+      label: "Web design & development",
       href: "/solutions/website-development",
-      blurb: "Custom websites and web apps for your business",
+      blurb: "Custom websites, stores and web apps for your business",
     },
     {
       label: "Software development",

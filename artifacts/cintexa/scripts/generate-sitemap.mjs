@@ -14,6 +14,8 @@ const jobs = JSON.parse(fs.readFileSync(path.join(appRoot, "src/data/jobs.json")
   .sort((a, b) => b.datePosted.localeCompare(a.datePosted));
 // Multi-vacancy campaigns stay in the sitemap after they close (the page is kept as a record).
 const campaigns = JSON.parse(fs.readFileSync(path.join(appRoot, "src/data/campaigns.json"), "utf8"));
+// Service page content lives in web-design.json; its dateUpdated is the real last content change.
+const webDesign = JSON.parse(fs.readFileSync(path.join(appRoot, "src/data/web-design.json"), "utf8"));
 const careersLastmod = jobs[0]?.datePosted;
 // Case studies come from the same data file as the site (plain JSON, so bare `node` works).
 const cases = JSON.parse(fs.readFileSync(path.join(appRoot, "src/data/case-studies.json"), "utf8")).sort((a, b) => b.dateUpdated.localeCompare(a.dateUpdated));
@@ -21,7 +23,7 @@ const routes = [
   ["/", "1.0"], ["/about", "0.8"],
   ["/solutions/marketing", "0.8"], ["/solutions/sales", "0.8"],
   ["/solutions/ads-boost", "0.7"], ["/solutions/ecommerce", "0.8"],
-  ["/solutions/website-development", "0.8"], ["/solutions/software-development", "0.8"],
+  ["/solutions/website-development", "0.9", webDesign.dateUpdated], ["/solutions/software-development", "0.8"],
   ["/blog", "0.9"], ["/case-studies", "0.8", cases[0]?.dateUpdated],
   ...cases.map((c) => [`/case-studies/${c.slug}`, "0.7", c.dateUpdated]), ["/careers", "0.9", careersLastmod],
   ...jobs.map((j) => [`/careers/${j.slug}`, "0.8", j.datePosted]),

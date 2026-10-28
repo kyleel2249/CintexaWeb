@@ -169,10 +169,10 @@ export const SEO_MASTER_MAP: SeoPageEntry[] = [
     primary: ["website development company", "custom website development"],
     secondary: ["high performance websites", "business website design", "web application development"],
     longTail: ["custom websites for business growth", "high performance websites for modern businesses"],
-    h1: "Custom Website Development & High-Performance Web Apps",
-    metaTitle: "Website Development Company & Custom Websites | CINTEXA",
+    h1: "Professional Web Design & Development Company",
+    metaTitle: "Web Design & Development Company in Ghana | CINTEXA",
     metaDescription:
-      "Website development company building custom websites, business website design and high performance web applications that support sales and growth.",
+      "CINTEXA designs and develops responsive business websites, e-commerce stores and custom web applications for startups and established businesses in Ghana.",
     imageAlt: [
       "custom website development",
       "high performance business website",

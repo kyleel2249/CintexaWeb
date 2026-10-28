@@ -62,7 +62,7 @@ export function SoftwareDev() {
           Talk about your project
         </Link>
         <Link href="/solutions/website-development" className="cx-btn cx-btn-secondary cx-btn-lg">
-          Website development
+          Web design & development
         </Link>
       </div>
     </SolutionPageShell>

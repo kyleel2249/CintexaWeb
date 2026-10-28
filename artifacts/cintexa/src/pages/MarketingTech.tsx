@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { SolutionPageShell } from "./SolutionPageShell";
 
 const CHANNELS = [
@@ -22,6 +23,13 @@ export function MarketingTech() {
           </div>
         ))}
       </div>
+      <p className="mt-8 max-w-xl text-sm text-[hsl(var(--fg-muted))]">
+        Campaigns work best when visitors land on a fast, clear website. Explore our{" "}
+        <Link href="/solutions/website-development" className="text-[hsl(var(--accent))] underline">
+          web design &amp; development services
+        </Link>{" "}
+        and landing pages built for enquiries.
+      </p>
     </SolutionPageShell>
   );
 }

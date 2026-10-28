@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write # lets the job start the Pages deploy after it commits a changed sitemap
 
 concurrency:
   group: daily-sitemap
@@ -26,7 +27,11 @@ jobs:
           node-version: 22
       - name: Regenerate sitemap
         run: node artifacts/cintexa/scripts/generate-sitemap.mjs
+      - name: Validate sitemap (stops here and keeps the last valid file if anything is wrong)
+        run: node artifacts/cintexa/scripts/validate-sitemap.mjs
       - name: Commit daily sitemap update
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -36,4 +41,6 @@ jobs:
           else
             git commit -m "chore(seo): refresh sitemap daily"
             git push origin HEAD:main
+            # Pushes made with GITHUB_TOKEN do not trigger other workflows, so start the deploy explicitly.
+            gh workflow run deploy-pages.yml --ref main
           fi

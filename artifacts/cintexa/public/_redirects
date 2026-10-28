@@ -1,3 +1,7 @@
+# Preferred marketing URL for the web design & development service → the canonical page (single URL, no duplicate content)
+/services/web-design-development    /solutions/website-development    301
+/services/web-design-development/   /solutions/website-development    301
+
 # SPA fallback for Cloudflare Pages / Netlify-style hosts
 # Ensures client routes never hard-404 when refreshed
 /*    /index.html   200

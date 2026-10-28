@@ -9,7 +9,7 @@ const COLUMNS = [
       { label: "Sales technology", href: "/solutions/sales" },
       { label: "Ads Boost", href: "/solutions/ads-boost" },
       { label: "E-commerce", href: "/solutions/ecommerce" },
-      { label: "Website development", href: "/solutions/website-development" },
+      { label: "Web design & development", href: "/solutions/website-development" },
       { label: "Software development", href: "/solutions/software-development" },
     ],
   },

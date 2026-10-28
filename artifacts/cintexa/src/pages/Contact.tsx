@@ -82,7 +82,7 @@ export function Contact() {
 
         <section className="mx-auto mt-8 max-w-xl text-center"><h2 className="cx-display text-xl">Connect with CINTEXA</h2><div className="mt-3 flex flex-wrap justify-center gap-3"><a className="cx-btn cx-btn-secondary" href="https://web.facebook.com/profile.php?id=61591131675150" target="_blank" rel="noopener noreferrer">Facebook</a><a className="cx-btn cx-btn-secondary" href="https://www.tiktok.com/@cintexadotcom" target="_blank" rel="noopener noreferrer">TikTok</a></div><p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">Contact us by email or WhatsApp to arrange a suitable response time.</p></section>
 
-        <div className="mt-8 flex flex-wrap justify-center gap-3"><Link href="/get-started" className="cx-btn cx-btn-primary">Create an account</Link><Link href="/solutions/website-development" className="cx-btn cx-btn-secondary">Website development</Link><Link href="/solutions/software-development" className="cx-btn cx-btn-secondary">Software development</Link></div>
+        <div className="mt-8 flex flex-wrap justify-center gap-3"><Link href="/get-started" className="cx-btn cx-btn-primary">Create an account</Link><Link href="/solutions/website-development" className="cx-btn cx-btn-secondary">Web design &amp; development</Link><Link href="/solutions/software-development" className="cx-btn cx-btn-secondary">Software development</Link></div>
       </div>
     </div>
   );

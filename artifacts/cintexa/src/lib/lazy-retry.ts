@@ -37,6 +37,8 @@ function markLoaded() {
 }
 
 /** Drop-in replacement for React.lazy that recovers from stale chunks. */
+// `any` props are required here: React.lazy accepts components of every prop shape.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function lazyRetry<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
   return lazy(async () => {
     try {

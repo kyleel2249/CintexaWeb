@@ -8,6 +8,14 @@ import { renderServicesPage } from "../../../scripts/prerender-services.mjs";
 // @ts-expect-error - plain build script (no types)
 import { validateSitemap } from "../../../scripts/validate-sitemap.mjs";
 
+// Minimal shape of the JSON-LD nodes asserted below.
+type GraphNode = {
+  "@type": string;
+  provider?: unknown;
+  mainEntity: { name: string }[];
+  itemListElement: { item: string }[];
+};
+
 const root = path.resolve(__dirname, "../../..");
 const SHELL = `<!doctype html><html><head><title>Home</title></head><body><div id="root"></div></body></html>`;
 
@@ -46,12 +54,12 @@ describe("Web design & development page data + SEO", () => {
   });
 
   it("JSON-LD only describes visible content (FAQ mirrors the page FAQ; breadcrumb matches)", () => {
-    const g = (webDesignSeo().jsonLd as { "@graph": Record<string, any>[] })["@graph"];
+    const g = (webDesignSeo().jsonLd as { "@graph": GraphNode[] })["@graph"];
     const faq = g.find((n) => n["@type"] === "FAQPage")!;
-    expect(faq.mainEntity.map((q: any) => q.name)).toEqual(WEB_DESIGN.faqs.map((f) => f.q));
+    expect(faq.mainEntity.map((q) => q.name)).toEqual(WEB_DESIGN.faqs.map((f) => f.q));
     expect(g.find((n) => n["@type"] === "Service")?.provider).toEqual({ "@id": "https://cintexa.com/#organization" });
     const bc = g.find((n) => n["@type"] === "BreadcrumbList")!;
-    expect(bc.itemListElement.map((i: any) => i.item)).toEqual(["https://cintexa.com/", WEB_DESIGN_URL]);
+    expect(bc.itemListElement.map((i) => i.item)).toEqual(["https://cintexa.com/", WEB_DESIGN_URL]);
     // telephone is allowed: it is the published contact number carried by the shared Organization node (data/site-entity.ts).
     expect(JSON.stringify(g)).not.toMatch(/"(aggregateRating|review|priceRange|openingHours)":/);
   });

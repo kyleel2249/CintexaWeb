@@ -14,7 +14,6 @@
 import type { PageSeoData } from "./careers-seo";
 import { HOME_FAQS, SOLUTION_CONTENT } from "./page-content";
 import {
-  blogPostingNode,
   breadcrumbNode,
   faqNode,
   graph,

@@ -7,55 +7,55 @@ import { cn } from "@/lib/utils";
 const SLIDES = [
   {
     id: "challenge",
-    src: "/images/carousel/01-challenge.png",
+    src: "/images/carousel/01-challenge.webp",
     alt: "Challenge — Every business has a challenge. Leaders need clearer insight into performance, customers, and systems.",
     href: "/get-started",
   },
   {
     id: "assessment",
-    src: "/images/carousel/02-assessment.png",
+    src: "/images/carousel/02-assessment.webp",
     alt: "Assessment — CINTEXA helps you see where you are. Business assessment across sales, marketing, operations, technology, and growth.",
     href: "/platform",
   },
   {
     id: "technology",
-    src: "/images/carousel/03-technology.png",
+    src: "/images/carousel/03-technology.webp",
     alt: "Technology solves real problems. Software, websites, automation, analytics, and customer growth systems built for how teams work.",
     href: "/platform",
   },
   {
     id: "web-dev",
-    src: "/images/carousel/04-web-development.png",
+    src: "/images/carousel/04-web-development.webp",
     alt: "Professional web development solutions — modern, fast, secure, scalable websites and web applications.",
     href: "/solutions/website-development",
   },
   {
     id: "automation",
-    src: "/images/carousel/05-business-automation.png",
+    src: "/images/carousel/05-business-automation.webp",
     alt: "Business automation — work smarter, grow faster. Process automation, cloud solutions, workflow optimization.",
     href: "/platform",
   },
   {
     id: "logo",
-    src: "/images/carousel/06-cintexa-logo.png",
+    src: "/images/carousel/06-cintexa-logo.webp",
     alt: "CINTEXA — Technology that helps businesses understand, improve, and grow.",
     href: "/",
   },
   {
     id: "software",
-    src: "/images/carousel/07-software-development.png",
+    src: "/images/carousel/07-software-development.webp",
     alt: "Software development — custom solutions, real impact. Mobile apps, cloud, API integration, maintenance.",
     href: "/solutions/software-development",
   },
   {
     id: "marketing",
-    src: "/images/carousel/08-marketing.png",
+    src: "/images/carousel/08-marketing.webp",
     alt: "Let's turn your marketing goals into reality. Brand strategy, social media, digital campaigns, content, SEO.",
     href: "/solutions/marketing",
   },
   {
     id: "growth",
-    src: "/images/carousel/09-growth.png",
+    src: "/images/carousel/09-growth.webp",
     alt: "Growth through smart systems. Assessment to technology to better decisions to measurable growth.",
     href: "/get-started",
   },
@@ -194,6 +194,7 @@ export function HeroCarousel3D({ className }: { className?: string }) {
                     height={1080}
                     className="h-full w-full select-none object-cover object-center"
                     loading={index === 0 ? "eager" : "lazy"}
+                    fetchPriority={index === 0 ? "high" : undefined}
                     decoding="async"
                     draggable={false}
                   />

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(here, "..");
-const source = fs.readFileSync(path.join(appRoot, "src/pages/Blog.tsx"), "utf8");
+const source = fs.readFileSync(path.join(appRoot, "src/data/blog-posts.ts"), "utf8");
 const posts = [...source.matchAll(/slug:\s*"([a-z0-9-]+)"[\s\S]*?date:\s*"([0-9]{4}-[0-9]{2}-[0-9]{2})"(?:,\s*updated:\s*"([0-9]{4}-[0-9]{2}-[0-9]{2})")?/g)]
   .map((match) => ({ slug: match[1], lastmod: match[3] || match[2] }));
 // Careers pages come from the same data file as the site itself (plain JSON: no build step needed,
@@ -20,11 +20,11 @@ const careersLastmod = jobs[0]?.datePosted;
 // Case studies come from the same data file as the site (plain JSON, so bare `node` works).
 const cases = JSON.parse(fs.readFileSync(path.join(appRoot, "src/data/case-studies.json"), "utf8")).sort((a, b) => b.dateUpdated.localeCompare(a.dateUpdated));
 const routes = [
-  ["/", "1.0"], ["/about", "0.8"],
+  ["/", "1.0"], ["/about", "0.8"], ["/platform", "0.9"],
   ["/solutions/marketing", "0.8"], ["/solutions/sales", "0.8"],
   ["/solutions/ads-boost", "0.7"], ["/solutions/ecommerce", "0.8"],
   ["/solutions/website-development", "0.9", webDesign.dateUpdated], ["/solutions/software-development", "0.8"],
-  ["/blog", "0.9"], ["/case-studies", "0.8", cases[0]?.dateUpdated],
+  ["/blog", "0.9", posts.map((p) => p.lastmod).sort().at(-1)], ["/case-studies", "0.8", cases[0]?.dateUpdated],
   ...cases.map((c) => [`/case-studies/${c.slug}`, "0.7", c.dateUpdated]), ["/careers", "0.9", careersLastmod],
   ...jobs.map((j) => [`/careers/${j.slug}`, "0.8", j.datePosted]),
   ...campaigns.map((c) => [`/careers/${c.slug}`, "0.8", c.datePosted]),

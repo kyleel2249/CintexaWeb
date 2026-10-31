@@ -1,78 +1,46 @@
 import { useEffect } from "react";
-import { DEFAULT_OG_IMAGE, absoluteUrl, getSeoForPath, type SeoPageEntry } from "@/data/seo-master-map";
+import { applyPageSeo } from "@/lib/seo-dom";
 
-function setMeta(attr: "name" | "property", key: string, content: string) {
-  let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute(attr, key);
-    document.head.appendChild(el);
-  }
-  el.setAttribute("content", content);
+/** Routes whose pages build their own head from live content (careers, case studies, blog articles, web design). */
+function ownsItsHead(path: string): boolean {
+  return (
+    path === "/careers" ||
+    path.startsWith("/careers/") ||
+    path === "/case-studies" ||
+    path.startsWith("/case-studies/") ||
+    path.startsWith("/blog/") ||
+    path === "/solutions/website-development"
+  );
 }
 
-function setCanonical(href: string) {
-  let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-  if (!link) {
-    link = document.createElement("link");
-    link.rel = "canonical";
-    document.head.appendChild(link);
-  }
-  link.href = href;
-}
-
-function setRobots(noIndex: boolean) {
-  setMeta("name", "robots", noIndex ? "noindex, nofollow" : "index, follow");
-}
+const isPrivateArea = (path: string) =>
+  path === "/dashboard" || path.startsWith("/dashboard/") || path === "/admin" || path.startsWith("/admin/") || path === "/sign-in" || path === "/sign-up";
 
 /**
- * Applies ELSIM master-map SEO: title, description, OG/Twitter, canonical, robots.
- * Job detail keeps its own JobPosting JSON-LD via JobDetail page.
+ * Applies the full head (title, description, canonical, robots, Open Graph, Twitter, JSON-LD) for every static route from
+ * the central registry in data/seo-pages.ts. The registry is loaded lazily so it never weighs down the first bundle; the
+ * prerendered HTML already carries the same head, so crawlers and link previews do not wait for this.
+ *
+ * Unknown routes are left alone: NotFound sets its own noindex head. (Previously every unknown URL inherited the home
+ * page's canonical and indexable robots tag.)
  */
-export function applySeo(entry: SeoPageEntry, pathname: string) {
-  const url = absoluteUrl(pathname.replace(/\/$/, "") || "/");
-  // Prefer the first meaningful image in page content so previews reflect the leading visual/update.
-  const pageImage = document.querySelector("main img[src]") as HTMLImageElement | null;
-  const pageImageSrc = pageImage?.getAttribute("src");
-  const resolvedPageImage = pageImageSrc
-    ? new URL(pageImageSrc, window.location.origin).toString()
-    : undefined;
-  const image = resolvedPageImage || entry.ogImage || DEFAULT_OG_IMAGE;
-
-  document.title = entry.metaTitle;
-  setMeta("name", "description", entry.metaDescription);
-  setCanonical(url);
-  setRobots(Boolean(entry.noIndex));
-
-  setMeta("property", "og:type", entry.path === "/" ? "website" : "article");
-  setMeta("property", "og:site_name", "Cintexa");
-  setMeta("property", "og:url", url);
-  setMeta("property", "og:title", entry.metaTitle);
-  setMeta("property", "og:description", entry.metaDescription);
-  setMeta("property", "og:image", image);
-  setMeta("property", "og:image:secure_url", image);
-  setMeta("property", "og:image:alt", entry.imageAlt[0] || entry.metaTitle);
-  // Size/type belong to a specific image; drop stale values left by index.html or a previous page.
-  ["og:image:width", "og:image:height", "og:image:type"].forEach((key) =>
-    document.querySelector(`meta[property="${key}"]`)?.remove(),
-  );
-
-  setMeta("name", "twitter:card", "summary_large_image");
-  setMeta("name", "twitter:title", entry.metaTitle);
-  setMeta("name", "twitter:description", entry.metaDescription);
-  setMeta("name", "twitter:image", image);
-  setMeta("name", "twitter:image:alt", entry.imageAlt[0] || entry.metaTitle);
-}
-
 export function usePageSeo(pathname: string) {
   useEffect(() => {
-    // These routes set metadata from their own editorial content; do not overwrite it with the global fallback.
-    // /careers and /careers/:slug build their own head from the live job data (see careers-seo.ts).
-    if (pathname === "/careers" || pathname.startsWith("/careers/")) return;
-    // The web design & development page builds its own head (src/data/web-design-seo.ts).
-    if (pathname === "/solutions/website-development") return;
-    if (pathname.startsWith("/blog/") || pathname.startsWith("/case-studies/") || ["/about", "/case-studies", "/privacy-policy", "/terms", "/cookie-policy", "/disclaimer"].includes(pathname)) return;
-    const entry = getSeoForPath(pathname);
-    applySeo(entry, pathname);
+    const path = pathname.replace(/\/+$/, "") || "/";
+    if (ownsItsHead(path)) return;
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+    void (async () => {
+      const pages = await import("@/data/seo-pages");
+      if (cancelled) return;
+      let seo = path === "/blog" ? (await import("@/data/seo-blog")).blogListSeo() : pages.staticPageSeo(path);
+      if (!seo && isPrivateArea(path)) seo = pages.privateAreaSeo(path.startsWith("/admin") ? "Admin | CINTEXA" : "CINTEXA");
+      if (!seo || cancelled) return;
+      cleanup = applyPageSeo(seo);
+    })();
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, [pathname]);
 }

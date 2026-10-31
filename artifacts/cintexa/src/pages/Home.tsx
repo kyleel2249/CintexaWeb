@@ -8,6 +8,9 @@ import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { PointerParallax } from "@/components/motion/PointerParallax";
 import { SignupBanner } from "@/components/marketing/SignupBanner";
 import { useMotion } from "@/components/motion/MotionProvider";
+import { AnswerBlock } from "@/components/seo/AnswerBlock";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { HOME_ANSWER, HOME_FAQS } from "@/data/page-content";
 
 const WORDS = [
   "TECHNOLOGY",
@@ -131,6 +134,12 @@ export function Home() {
       </section>
 
 
+      <section className="cx-section">
+        <div className="cx-container max-w-3xl">
+          <AnswerBlock id="home" question={HOME_ANSWER.question} answer={HOME_ANSWER.answer} />
+        </div>
+      </section>
+
       <BrandStorySection />
 
       <SignupBanner />
@@ -199,6 +208,12 @@ export function Home() {
         <div className="cx-container grid gap-8 md:grid-cols-2">
           <div><p className="cx-eyebrow">Case studies</p><h2 className="cx-display mt-2 text-2xl sm:text-3xl">See how solutions are planned and measured</h2><p className="mt-3 leading-7 text-[hsl(var(--fg-muted))]">Explore clearly labelled illustrative scenarios covering website enquiries, e-commerce operations and workflow automation. We do not invent client names or performance results.</p><Link href="/case-studies" className="cx-btn cx-btn-secondary mt-5">View case studies</Link></div>
           <div className="cx-card"><p className="cx-eyebrow">Careers & opportunities</p><h3 className="cx-display mt-2 text-xl">Explore current vacancies and career updates</h3><p className="mt-3 text-sm leading-6 text-[hsl(var(--fg-muted))]">Review listed opportunities, application requirements and career alerts on the CINTEXA careers page.</p><Link href="/careers" className="cx-btn cx-btn-primary mt-5">Visit careers</Link></div>
+        </div>
+      </section>
+
+      <section className="cx-section border-t border-[hsl(var(--border))]">
+        <div className="cx-container max-w-3xl">
+          <FaqSection id="home" title="Questions about CINTEXA" faqs={HOME_FAQS} />
         </div>
       </section>
 

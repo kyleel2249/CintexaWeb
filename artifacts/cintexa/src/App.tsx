@@ -19,6 +19,7 @@ const SalesTech = lazyRetry(() => import("@/pages/SalesTech").then((m) => ({ def
 const AdsBoost = lazyRetry(() => import("@/pages/AdsBoost").then((m) => ({ default: m.AdsBoost })));
 const Ecommerce = lazyRetry(() => import("@/pages/Ecommerce").then((m) => ({ default: m.Ecommerce })));
 const WebsiteDev = lazyRetry(() => import("@/pages/WebsiteDev").then((m) => ({ default: m.WebsiteDev })));
+const Platform = lazyRetry(() => import("@/pages/Platform").then((m) => ({ default: m.Platform })));
 const SoftwareDev = lazyRetry(() => import("@/pages/SoftwareDev").then((m) => ({ default: m.SoftwareDev })));
 const Contact = lazyRetry(() => import("@/pages/Contact").then((m) => ({ default: m.Contact })));
 const Careers = lazyRetry(() => import("@/pages/Careers").then((m) => ({ default: m.Careers })));
@@ -86,6 +87,7 @@ export default function App() {
           <Suspense fallback={<RouteFallback />}>
             <Switch>
               <Route path="/" component={Home} />
+              <Route path="/platform" component={Platform} />
               <Route path="/solutions/marketing" component={MarketingTech} />
               <Route path="/solutions/sales" component={SalesTech} />
               <Route path="/solutions/ads-boost" component={AdsBoost} />

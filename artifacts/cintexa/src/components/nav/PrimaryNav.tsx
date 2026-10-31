@@ -12,6 +12,7 @@ interface NavGroup {
 const SOLUTIONS: NavGroup = {
   label: "Solutions",
   items: [
+    { label: "All solutions", href: "/platform", blurb: "Software, web, e-commerce, automation and more" },
     { label: "Marketing technology", href: "/solutions/marketing", blurb: "Campaign channels and content velocity" },
     { label: "Sales technology", href: "/solutions/sales", blurb: "Visitor-to-loyal customer pipeline" },
     { label: "Ads Boost", href: "/solutions/ads-boost", blurb: "Programmatic campaign lifecycle" },

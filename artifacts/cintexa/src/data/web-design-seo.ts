@@ -1,6 +1,7 @@
 /** Pure SEO builder for the Web Design & Development page — shared by the React page and the build-time prerender. */
 import { WEB_DESIGN } from "./web-design";
-import { SITE_NAME, SITE_URL, absoluteUrl, imageMimeType, twitterCardFor, type PageSeoData } from "./careers-seo";
+import { SITE_URL, absoluteUrl, imageMimeType, twitterCardFor, type PageSeoData } from "./careers-seo";
+import { organizationNode, websiteNode } from "./seo-schema";
 
 export const WEB_DESIGN_URL = `${SITE_URL}${WEB_DESIGN.path}`;
 
@@ -23,8 +24,8 @@ export function webDesignSeo(): PageSeoData {
     jsonLd: {
       "@context": "https://schema.org",
       "@graph": [
-        { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "CINTEXA Technologies", alternateName: SITE_NAME, url: `${SITE_URL}/` },
-        { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: `${SITE_URL}/`, name: SITE_NAME, publisher: { "@id": `${SITE_URL}/#organization` } },
+        organizationNode(),
+        websiteNode(),
         {
           "@type": "WebPage",
           "@id": WEB_DESIGN_URL,

@@ -1,23 +1,13 @@
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Link } from "wouter";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { EntityFacts } from "@/components/seo/EntityFacts";
+import { breadcrumbTrail, getStaticPage } from "@/data/seo-pages";
 
-function PageMeta({ title, description, path }: { title: string; description: string; path: string }) {
-  useEffect(() => {
-    document.title = title;
-    let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-    if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
-    meta.content = description;
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
-    canonical.href = `https://cintexa.com${path}`;
-    let robots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
-    if (!robots) { robots = document.createElement("meta"); robots.name = "robots"; document.head.appendChild(robots); }
-    robots.content = "index, follow";
-  }, [title, description, path]);
-  return null;
-}
-function Shell({ eyebrow, title, intro, children, path, description }: { eyebrow: string; title: string; intro: string; children: ReactNode; path: string; description: string }) {
-  return <div className="cx-section"><PageMeta title={title + " | CINTEXA"} description={description} path={path} /><div className="cx-container max-w-4xl"><p className="cx-eyebrow">{eyebrow}</p><h1 className="cx-display mt-3 text-3xl sm:text-5xl">{title}</h1><p className="mt-5 max-w-3xl text-lg leading-8 text-[hsl(var(--fg-muted))]">{intro}</p><div className="mt-10 space-y-8">{children}</div></div></div>;
+function Shell({ eyebrow, title, intro, children, path }: { eyebrow: string; title: string; intro: string; children: ReactNode; path: string; description: string }) {
+  const page = getStaticPage(path);
+  const crumbs = page ? <Breadcrumbs trail={breadcrumbTrail(page)} /> : null;
+  return <div className="cx-section"><div className="cx-container max-w-4xl">{crumbs}<p className="cx-eyebrow mt-6">{eyebrow}</p><h1 className="cx-display mt-3 text-3xl sm:text-5xl">{title}</h1><p className="mt-5 max-w-3xl text-lg leading-8 text-[hsl(var(--fg-muted))]">{intro}</p><div className="mt-10 space-y-8">{children}</div></div></div>;
 }
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return <section><h2 className="cx-display text-2xl">{title}</h2><div className="mt-3 space-y-3 leading-7 text-[hsl(var(--fg-muted))]">{children}</div></section>;
@@ -32,6 +22,7 @@ export function About() {
     <Section title="Who we serve"><p>We work with small and medium-sized businesses, founders, service providers, retailers, professional teams and organisations that need a practical digital foundation or want to improve existing systems. Scope and delivery are agreed around the client’s goals, budget, available information and support needs.</p></Section>
     <Section title="How we work"><p>Our process typically includes discovery, requirements and success measures, solution design, implementation, testing, launch and ongoing improvement. We explain assumptions, identify dependencies and avoid promising results that cannot be supported by evidence. Security, accessibility, maintainability and ownership are considered throughout.</p></Section>
     <Section title="Company and contact information"><p>CINTEXA operates digitally and serves clients through online communication and project collaboration. For project enquiries, email <a className="underline text-[hsl(var(--accent))]" href="mailto:info@cintexa.com">info@cintexa.com</a> or visit our <Link className="underline text-[hsl(var(--accent))]" href="/contact">contact page</Link>. Follow us on <a className="underline" href="https://web.facebook.com/profile.php?id=61591131675150" target="_blank" rel="noopener noreferrer">Facebook</a> and <a className="underline" href="https://www.tiktok.com/@cintexadotcom" target="_blank" rel="noopener noreferrer">TikTok</a>.</p><p>We will publish verified team biographies and project information when approved for public release. We do not invent staff credentials, client endorsements or project outcomes.</p></Section>
+    <EntityFacts />
     <Link href="/get-started" className="cx-btn cx-btn-primary">Discuss a project</Link>
   </Shell>;
 }

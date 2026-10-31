@@ -5,6 +5,7 @@ const COLUMNS = [
   {
     title: "Solutions",
     links: [
+      { label: "All solutions", href: "/platform" },
       { label: "Marketing technology", href: "/solutions/marketing" },
       { label: "Sales technology", href: "/solutions/sales" },
       { label: "Ads Boost", href: "/solutions/ads-boost" },

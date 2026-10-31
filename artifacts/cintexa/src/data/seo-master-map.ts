@@ -17,8 +17,8 @@ export type SeoPageEntry = {
   noIndex?: boolean;
 };
 
-export const DEFAULT_OG_IMAGE =
-  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&h=630&q=80";
+/** Default social preview (1200x630 PNG served from /public/images). */
+export const DEFAULT_OG_IMAGE = "https://cintexa.com/images/og-cintexa.png";
 
 export const SEO_MASTER_MAP: SeoPageEntry[] = [
   {

@@ -4,6 +4,7 @@ import { SolutionPageShell } from "./SolutionPageShell";
 export function AdsBoost() {
   return (
     <SolutionPageShell
+      path="/solutions/ads-boost"
       eyebrow="Solutions · Ads Boost"
       title="Ads Boost — Digital Advertising Platform for Campaigns"
       intro="Watch a campaign move from impression to revenue, and plan the next one with the same funnel in view."

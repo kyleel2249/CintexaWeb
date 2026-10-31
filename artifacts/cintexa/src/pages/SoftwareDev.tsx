@@ -1,4 +1,3 @@
-import { Link } from "wouter";
 import { SolutionPageShell } from "@/pages/SolutionPageShell";
 
 const CAPABILITIES = [
@@ -30,6 +29,7 @@ const OUTCOMES = [
 export function SoftwareDev() {
   return (
     <SolutionPageShell
+      path="/solutions/software-development"
       eyebrow="Solutions · Software development"
       title="Custom Software Development for Growing Companies"
       intro="We design and build custom software and applications that suit your business needs—from internal operations tools to customer-facing systems—aligned to your requirements, timelines, and growth plans."
@@ -55,15 +55,6 @@ export function SoftwareDev() {
             </li>
           ))}
         </ul>
-      </div>
-
-      <div className="mt-10 flex flex-wrap gap-3">
-        <Link href="/contact" className="cx-btn cx-btn-primary cx-btn-lg">
-          Talk about your project
-        </Link>
-        <Link href="/solutions/website-development" className="cx-btn cx-btn-secondary cx-btn-lg">
-          Web design & development
-        </Link>
       </div>
     </SolutionPageShell>
   );

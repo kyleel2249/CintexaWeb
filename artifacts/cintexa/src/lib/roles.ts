@@ -35,7 +35,7 @@ const INTEREST_RECOMMENDATIONS: Record<string, Recommendation> = {
   "Physical products": { title: "E-commerce", description: "Catalog, checkout, and a 3D storefront preview.", href: "/solutions/ecommerce" },
   "Digital products": { title: "E-commerce", description: "Set up delivery and checkout for digital goods.", href: "/solutions/ecommerce" },
   Services: { title: "Sales technology", description: "Track leads from first visit to booked call.", href: "/solutions/sales" },
-  Subscriptions: { title: "Pricing", description: "See how plans and entitlements are structured.", href: "/pricing" },
+  Subscriptions: { title: "Request a quote", description: "Scope and pricing are agreed in writing after a short conversation.", href: "/contact" },
   "Marketing tools": { title: "Marketing technology", description: "Explore the channel toolkit.", href: "/solutions/marketing" },
   "E-commerce tools": { title: "E-commerce", description: "Explore the commerce toolkit.", href: "/solutions/ecommerce" },
   "Ad campaigns": { title: "Ads Boost", description: "See the campaign lifecycle view.", href: "/solutions/ads-boost" },
@@ -43,7 +43,7 @@ const INTEREST_RECOMMENDATIONS: Record<string, Recommendation> = {
   "Product promotion": { title: "Marketing technology", description: "Promote products and offers across channels.", href: "/solutions/marketing" },
   "Affiliate links & referrals": { title: "Sales technology", description: "Track referral-driven leads through the pipeline.", href: "/solutions/sales" },
   "Commission tracking": { title: "Contributions", description: "See your commission payouts as they come in.", href: "/dashboard/contributions" },
-  "Partner programs": { title: "Pricing", description: "See plans built for partners and affiliates.", href: "/pricing" },
+  "Partner programs": { title: "Request a quote", description: "Talk to the team about partner and affiliate options.", href: "/contact" },
 };
 
 /** Deduplicates by destination page, in case multiple interests point at the same place. */

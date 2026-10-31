@@ -1,306 +1,209 @@
 import { useEffect } from "react";
 import { Link, useRoute } from "wouter";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import {
+  CATEGORY_SERVICE,
+  POSTS,
+  POST_IMAGE_SIZE,
+  getPost,
+  postSections,
+  postsNewestFirst,
+  relatedPosts,
+  sectionId,
+} from "@/data/blog-posts";
+import { blogPostCrumbs, blogSeoForSlug } from "@/data/seo-blog";
+import { breadcrumbTrail, getStaticPage } from "@/data/seo-pages";
+import { SERVICES } from "@/data/site-entity";
+import { applyPageSeo } from "@/lib/seo-dom";
 
-type Section = { heading: string; paragraphs: string[]; bullets?: string[] };
-type Post = {
-  slug: string; title: string; excerpt: string; date: string; updated?: string;
-  category: string; readTime: string; keyword: string; image: string; imageAlt: string;
-  intro: string; sections: Section[]; references: { label: string; url: string }[];
-};
-export const POSTS: Post[] = [
-  {
-    slug: "connected-technology-systems-for-business-growth",
-    title: "How Connected Technology Systems Support Business Growth",
-    excerpt: "A practical look at connecting lead capture, customer records, sales activity and reporting so teams can work with consistent information.",
-    date: "2026-10-01", updated: "2026-10-08", category: "Business technology", readTime: "7 min",
-    keyword: "connected business technology systems",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Business analytics dashboard on a computer screen",
-    intro: "When customer information sits in separate spreadsheets, inboxes and applications, teams spend time reconciling records instead of serving customers. Connected business technology links the steps that matter—from the first enquiry to delivery and follow-up—while keeping people responsible for decisions.",
-    sections: [
-      { heading: "Start with the business process", paragraphs: ["List the steps from first contact to completed sale and repeat purchase. Note who owns each step, which information they need, and where delays or duplicate entry happen. This process map is a better starting point than buying software because it reveals the actual work the system must support.", "For a small business, a first improvement might be a single enquiry form that creates a consistent lead record, assigns a follow-up owner and records the next action. The initial system can be modest; consistency matters more than feature count."] },
-      { heading: "Connect records, not every tool", paragraphs: ["A useful system gives teams a reliable customer record and clear rules for how information moves. Website forms, customer relationship management (CRM), email and order management can exchange selected data through supported integrations or APIs. Avoid copying every field everywhere: decide which system owns each record and how errors are resolved."] },
-      { heading: "Measure the outcome", paragraphs: ["Choose a baseline before changing the process. Useful measures include time to respond to an enquiry, lead-to-sale conversion, order errors, repeat purchases and hours spent on manual reporting. Compare like-for-like periods and document other changes that may affect results. Do not claim an improvement until the data supports it.", "Review access permissions, backups, retention and staff training as part of the rollout. A connected system can spread incorrect information quickly if data quality and ownership are neglected."] },
-      { heading: "A practical implementation sequence", paragraphs: ["Choose one high-friction process, map it, clean the data, configure a small workflow, test it with real users, and review results before expanding. Keep a manual fallback for critical tasks during the transition."] , bullets: ["Document the current workflow and its pain points.", "Set a measurable baseline and one primary goal.", "Pilot with a small group and gather feedback.", "Review security, permissions and recovery procedures.", "Expand only after the workflow proves useful."] }
-    ],
-    references: [{ label: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }, { label: "Google Search Central: helpful, reliable, people-first content", url: "https://developers.google.com/search/docs/fundamentals/creating-helpful-content" }]
-  },
-  {
-    slug: "sales-marketing-technology-platform-guide",
-    title: "Choosing Sales and Marketing Technology for a Growing Team",
-    excerpt: "A selection framework for lead capture, follow-up, campaign measurement and customer records without buying tools your team cannot maintain.",
-    date: "2026-09-22", category: "Sales & marketing", readTime: "8 min", keyword: "sales and marketing technology",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Team discussing a business plan around a table",
-    intro: "Sales and marketing software works best when both teams agree on what a qualified enquiry looks like, how quickly it should receive attention and what counts as a successful outcome. Buying separate tools before agreeing on these definitions often creates more reporting work.",
-    sections: [
-      { heading: "Define the hand-off", paragraphs: ["Map the customer path from campaign or referral to enquiry, qualification, proposal and sale. Decide which team owns each stage, what information must be captured, and when an enquiry is considered ready for sales follow-up. Record these rules in plain language so new staff can use them."] },
-      { heading: "Select tools against requirements", paragraphs: ["Prioritise reliable forms, contact history, task reminders, campaign source tracking, consent records, reporting and export options. Check whether a product integrates with the systems you already use, supports the expected number of users, and provides adequate access controls. Request a realistic demonstration using your workflow rather than a generic sales presentation."] },
-      { heading: "Keep measurement honest", paragraphs: ["Track response time, qualified lead rate, stage conversion, sales cycle length and campaign cost where reliable cost data exists. Distinguish attributed conversions from conversions that merely happened after a campaign. Attribution is a model, not proof that a single channel caused the sale."] },
-      { heading: "Roll out in stages", paragraphs: ["Start with one customer segment or sales team. Clean duplicate contacts, train users on a shared process, and review data completeness weekly. Add automation only after the underlying process is stable; otherwise, automation can make mistakes faster."] , bullets: ["Agree on lifecycle stages and definitions.", "Choose a small set of business-critical fields.", "Test integrations and exports before migration.", "Train staff and assign data ownership.", "Review adoption and results before adding features."] }
-    ],
-    references: [{ label: "Google Analytics documentation", url: "https://support.google.com/analytics/" }, { label: "NIST Privacy Framework", url: "https://www.nist.gov/privacy-framework" }]
-  },
-  {
-    slug: "ecommerce-and-digital-commerce-for-smes",
-    title: "Planning an E-commerce Website for a Small Business in Ghana",
-    excerpt: "The practical building blocks of online selling: product data, payments, delivery, customer support, security and order operations.",
-    date: "2026-09-10", category: "E-commerce", readTime: "8 min", keyword: "e-commerce website for small business Ghana",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Customer completing a purchase at a checkout counter",
-    intro: "An e-commerce website is an operating process as well as a storefront. Before investing in design, a business should decide how products are maintained, how customers pay, how orders are fulfilled and who resolves delivery or refund issues.",
-    sections: [
-      { heading: "Prepare reliable product information", paragraphs: ["Each product needs a clear name, useful description, accurate price, current availability, good photographs and any relevant size, colour or specification options. Agree on who updates inventory and how quickly online stock reflects sales made elsewhere. Incorrect product data creates avoidable support work and erodes customer trust."] },
-      { heading: "Plan payments and delivery early", paragraphs: ["Choose payment methods suitable for your customers and confirm settlement timing, transaction charges, refund handling and reconciliation. For Ghanaian businesses, test the complete customer path with the payment providers you intend to use, including mobile-friendly checkout and failed-payment recovery. Set delivery zones, fees, dispatch expectations and a process for communicating delays."] },
-      { heading: "Build trust into the buying experience", paragraphs: ["Display clear contact details, delivery and return terms, privacy information and secure checkout indicators. Collect only information needed to fulfil an order. Make checkout forms accessible on mobile devices and avoid requiring account creation unless it serves a clear customer need."] },
-      { heading: "Measure operations after launch", paragraphs: ["Monitor product views, cart abandonment, successful payment rate, fulfilment time, cancellations and repeat purchases. Use the measures to find friction, not to assume that every change caused an outcome. Start with a manageable product range and improve the process before adding complexity."] }
-    ],
-    references: [{ label: "PCI Security Standards Council", url: "https://www.pcisecuritystandards.org/" }, { label: "Ghana Revenue Authority", url: "https://gra.gov.gh/" }]
-  },
-  {
-    slug: "website-and-software-development-that-drives-growth",
-    title: "Website and Software Development: What Businesses Should Plan Before Building",
-    excerpt: "Turn a business need into a maintainable website or application with clear scope, user journeys, security, testing and ownership.",
-    date: "2026-08-28", category: "Software development", readTime: "7 min", keyword: "website and software development for businesses",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Developer workstation with code on a monitor",
-    intro: "A successful digital project begins with a clearly defined problem. A website may need to explain services and generate enquiries; an internal application may need to reduce duplicate entry or make approvals visible. The purpose determines the features, architecture and measures of success.",
-    sections: [
-      { heading: "Write requirements users can verify", paragraphs: ["Describe who will use the system, what they need to do, which information is required and what should happen when something fails. Turn broad requests into testable acceptance criteria. For example, specify what a contact form must validate, where a successful submission is stored and what confirmation the visitor receives."] },
-      { heading: "Design for maintainability", paragraphs: ["Choose technologies that match the project’s needs and the team’s ability to support them. Plan hosting, backups, monitoring, content updates, ownership of domains and accounts, and a way to recover from failed releases. Keep secrets out of frontend code and give each service only the permissions it needs."] },
-      { heading: "Test beyond the happy path", paragraphs: ["Test mobile layouts, keyboard navigation, slow connections, invalid inputs, permission boundaries, missing configuration and failed network requests. Automated tests are useful, but a human review of the real user journey remains necessary."] },
-      { heading: "Measure business value", paragraphs: ["Set a baseline and review outcomes after launch: enquiry quality, task completion time, support requests, conversion rates or operational errors. Include training and maintenance in the project plan. A site that launches quickly but cannot be updated safely is not a finished business solution."] }
-    ],
-    references: [{ label: "OWASP Top 10", url: "https://owasp.org/www-project-top-ten/" }, { label: "W3C Web Accessibility Initiative", url: "https://www.w3.org/WAI/standards-guidelines/wcag/" }]
-  },
-  {
-    slug: "lead-generation-and-customer-accounts-one-core",
-    title: "Building a Better Lead Follow-up Process With a CRM",
-    excerpt: "A straightforward way to capture enquiries, assign ownership, follow up consistently and keep customer information useful.",
-    date: "2026-08-15", category: "CRM & productivity", readTime: "6 min", keyword: "CRM lead follow-up process",
-    image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Colleagues reviewing customer and sales information",
-    intro: "Leads are easily lost when enquiries arrive through different channels and no one owns the next action. A simple customer relationship management (CRM) process makes responsibilities visible and preserves context between the first conversation and later service.",
-    sections: [
-      { heading: "Capture only useful information", paragraphs: ["Collect the customer’s name, preferred contact method, request, source and the next step. Avoid gathering sensitive or unrelated information. Explain how contact details will be used and record marketing preferences separately from service-related communications."] },
-      { heading: "Give every enquiry an owner", paragraphs: ["Use clear stages such as New, Contacted, Qualified, Proposal and Won/Lost. Each open record should have an owner, next action and due date. Agree on response expectations and define when a lead can be closed or reassigned."] },
-      { heading: "Automate reminders, not judgement", paragraphs: ["Notifications and task reminders can reduce missed follow-ups. Avoid sending repeated messages without checking consent and context. Staff should review customer history before contacting someone and should be able to correct inaccurate records."] },
-      { heading: "Review the process regularly", paragraphs: ["Review overdue tasks, duplicate contacts, stage conversion and reasons deals are lost. Use the findings to improve the process and training. Keep exports, access controls and retention rules in place so customer records remain secure and useful."] }
-    ],
-    references: [{ label: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }, { label: "Google Search Central", url: "https://developers.google.com/search/docs/fundamentals/creating-helpful-content" }]
-  },
-  {
-    slug: "business-automation-for-small-businesses",
-    title: "Business Automation for Small Businesses: Where to Start",
-    excerpt: "Map repeatable work and automate predictable steps without losing human oversight.",
-    date: "2026-10-08", category: "Business automation", readTime: "6 min", keyword: "business automation for small businesses",
-    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Team collaborating with digital tools on a laptop",
-    intro: "Business automation works best when it removes a clear source of repeated effort. It does not mean removing people from every decision. For many small businesses, a useful first step is to make an existing workflow consistent, then automate predictable parts.",
-    sections: [
-      { heading: "Find repeatable work", paragraphs: ["Look for tasks that happen often and follow a stable sequence: capturing enquiries, sending acknowledgements, assigning tasks, preparing routine reports or reminding a team member about a due date. Record the current steps, including exceptions and approvals.", "Do not automate a process that staff cannot explain. Clarify ownership and remove unnecessary steps before choosing software."] },
-      { heading: "Design safeguards into the workflow", paragraphs: ["Specify what starts the workflow, what information is required, who receives the task and what happens if a step fails. Use validation to prevent incomplete records, logs to show what happened and an escalation path for exceptions. People should be able to correct mistakes and handle unusual cases.", "Protect customer and employee information with role-based access, retention rules and secure integrations. Test with sample records before connecting automation to live operations."] },
-      { heading: "Measure whether it helped", paragraphs: ["Track time per task, error rates, overdue work and user adoption before and after rollout. Document the baseline and other changes that may affect results. A workflow is useful when it improves reliability or frees time for valuable work—not simply because it contains automation."] }
-    ],
-    references: [{ label: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }]
-  },
-  {
-    slug: "technical-seo-checklist-for-business-websites",
-    title: "Technical SEO Checklist for a Business Website",
-    excerpt: "Review crawl access, metadata, canonical URLs, internal links, mobile usability and structured data.",
-    date: "2026-10-07", category: "SEO", readTime: "7 min", keyword: "technical SEO checklist for business websites",
-    image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Website analytics and search performance on a display",
-    intro: "Technical SEO helps search engines access and interpret useful pages. It cannot compensate for weak content, but broken routes, duplicate URLs or missing metadata can make a strong site harder to understand. Review technical health alongside content quality and user experience.",
-    sections: [
-      { heading: "Check indexing and crawl access", paragraphs: ["Confirm important pages return successful responses, are linked from relevant pages and are not accidentally marked noindex. Keep robots.txt focused on crawl guidance rather than using it to hide private information. Submit a valid XML sitemap in Google Search Console and review unexpected indexing exclusions."] },
-      { heading: "Give each page a clear purpose", paragraphs: ["Write a descriptive title and concise meta description for each page. Use a clear H1, logical subheadings, descriptive link text and useful image alternative text. Add canonical URLs where duplicate or parameterised versions may exist. Avoid repeating keywords unnaturally or creating thin pages solely for search phrases."] },
-      { heading: "Improve experience and validate markup", paragraphs: ["Test navigation and forms on mobile devices. Compress images, avoid unnecessary scripts, reserve image dimensions to reduce layout shifts and make key content keyboard-accessible. Add structured data only when it accurately describes visible content; valid markup does not guarantee rich results or higher rankings."] }
-    ],
-    references: [{ label: "Google Search Central SEO Starter Guide", url: "https://developers.google.com/search/docs/fundamentals/seo-starter-guide" }, { label: "Google Search Console", url: "https://search.google.com/search-console/about" }]
-  },
-  {
-    slug: "cybersecurity-basics-for-small-businesses-in-ghana",
-    title: "Cybersecurity Basics for Small Businesses in Ghana",
-    excerpt: "Practical steps for account security, backups, staff awareness and incident response.",
-    date: "2026-10-06", category: "Cybersecurity", readTime: "7 min", keyword: "cybersecurity for small businesses in Ghana",
-    image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Laptop displaying a digital security interface",
-    intro: "Small organisations hold customer contacts, invoices, credentials and operational records that can be valuable to attackers. Security does not require a large security department to begin; consistent basic practices can reduce common risks. The right controls depend on the business and its systems.",
-    sections: [
-      { heading: "Protect important accounts", paragraphs: ["Use unique passwords stored in a reputable password manager and enable multi-factor authentication wherever available, especially for email, banking, hosting, domain registration and administrator accounts. Remove access promptly when a worker or supplier no longer needs it. Avoid sharing administrator credentials in group chats."] },
-      { heading: "Maintain systems and backups", paragraphs: ["Install operating-system and application updates, remove unused software and restrict administrator privileges. Keep backups separate from everyday access where possible and test restoring a file or system; an untested backup may not be recoverable when needed.", "Check that website, domain and cloud accounts have current recovery details. Teach staff to verify unexpected payment changes, attachments and urgent requests through a known contact channel."] },
-      { heading: "Prepare for incidents", paragraphs: ["Write down who to contact, how to disable compromised accounts, where backups are stored and how to preserve evidence. If customer data may be affected, seek qualified incident-response and legal guidance and follow applicable notification requirements. This is general guidance, not a substitute for a security assessment."] }
-    ],
-    references: [{ label: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }, { label: "Cyber Security Authority Ghana", url: "https://csa.gov.gh/" }]
-  },
-  {
-    slug: "digital-marketing-metrics-small-businesses-should-track",
-    title: "Digital Marketing Metrics Small Businesses Should Track",
-    excerpt: "Connect marketing activity to qualified enquiries, sales outcomes and customer retention instead of relying on likes alone.",
-    date: "2026-10-05", category: "Digital marketing", readTime: "6 min", keyword: "digital marketing metrics for small businesses",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Marketing analytics charts on a computer monitor",
-    intro: "Views, followers and clicks can help explain attention, but they do not tell the whole story. A small business should choose a compact set of measures tied to its objective, then use consistent definitions to compare activity over time.",
-    sections: [
-      { heading: "Start with the business outcome", paragraphs: ["For a service business, the outcome may be qualified enquiries or booked consultations. For an online store, it may be completed orders, average order value or repeat purchases. Define what counts as a qualified lead or successful order before setting up reports."] },
-      { heading: "Track the path to action", paragraphs: ["Useful measures include landing-page visits, enquiry completion rate, cost per qualified lead when spend is known, lead-to-sale conversion and time to first response. Use campaign tags consistently and check that analytics events are not duplicated. A conversion after an ad click does not prove that the ad alone caused the sale."] },
-      { heading: "Turn reporting into a decision", paragraphs: ["Review missing campaign sources and mismatches between analytics and sales records. Configure analytics and advertising technologies in line with privacy requirements. Use each review to decide what to test, improve or stop, and record changes so the result can be interpreted honestly."] }
-    ],
-    references: [{ label: "Google Analytics Help", url: "https://support.google.com/analytics/" }, { label: "Google Ads Help", url: "https://support.google.com/google-ads/" }]
-  },
-  {
-    slug: "crm-data-quality-and-customer-follow-up",
-    title: "CRM Data Quality: Keep Customer Records Useful and Trustworthy",
-    excerpt: "Rules for duplicate prevention, consistent fields, record ownership, consent and routine CRM maintenance.",
-    date: "2026-10-04", category: "CRM", readTime: "6 min", keyword: "CRM data quality and customer records",
-    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Team reviewing customer records and business workflow",
-    intro: "A CRM is only useful when staff trust its records. Duplicate contacts, outdated details and unclear deal stages can lead to repeated messages, missed follow-ups and unreliable reports. Data quality is an ongoing process, not a one-time import task.",
-    sections: [
-      { heading: "Agree on shared fields", paragraphs: ["Define required fields, how phone numbers are formatted and what each sales stage means. Collect information that supports service and follow-up, not every possible detail. Make field instructions visible to staff and review them when the process changes."] },
-      { heading: "Assign ownership and handle duplicates", paragraphs: ["Decide who owns a customer record and how records are merged. Use appropriate matching rules to flag likely duplicates, but review uncertain identities before merging. Give staff a clear process for correcting inaccurate data instead of creating another shadow spreadsheet."] },
-      { heading: "Respect preferences and review quality", paragraphs: ["Record the source and purpose of customer information, keep marketing preferences separate from service communications and honour unsubscribe requests. Restrict sensitive notes and exports, define retention periods and review incomplete records, overdue tasks and stale opportunities on a regular schedule."] }
-    ],
-    references: [{ label: "NIST Privacy Framework", url: "https://www.nist.gov/privacy-framework" }]
-  },
-  {
-    slug: "using-business-data-to-make-better-decisions",
-    title: "How Small Businesses Can Use Data to Make Better Decisions",
-    excerpt: "Turn sales, customer and operational records into clear questions, trustworthy measures and decisions the team can review.",
-    date: "2026-10-02", category: "Data & analytics", readTime: "6 min", keyword: "business data analytics for small businesses",
-    image: "https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&w=1400&q=80",
-    imageAlt: "Data charts and a business performance report",
-    intro: "Business analytics does not begin with a complex dashboard. It begins with a question: which products are often returned, where do enquiries stall, or which service tasks take longer than expected? Reliable answers depend on consistent records and measures people understand.",
-    sections: [
-      { heading: "Start with a decision", paragraphs: ["Choose a decision the business needs to make and identify the data that could inform it. Define the measure, period, source and owner. If the data cannot support the question, record that limitation rather than filling gaps with assumptions."] },
-      { heading: "Check data quality", paragraphs: ["Look for missing values, duplicates, inconsistent date ranges and changes in how staff record activity. Compare totals with a trusted operational source where possible. Label estimated or incomplete values and document how metrics are calculated."] },
-      { heading: "Make reporting repeatable", paragraphs: ["A weekly report may show sales, qualified enquiries, fulfilment time and overdue work. Use consistent definitions and include context for unusual events. Record the action agreed, its owner and the review date. Protect personal information in reports and give users access only to data they need."] }
-    ],
-    references: [{ label: "Google Analytics Help", url: "https://support.google.com/analytics/" }, { label: "NIST Privacy Framework", url: "https://www.nist.gov/privacy-framework" }]
-  },
-];
+// Article text lives in src/data/blog-posts.ts (shared with the prerender, llms.txt and the sitemap).
+// Re-exported so existing imports of POSTS from this module keep working.
+export { POSTS };
 
-function useArticleSeo(post: Post | undefined) {
-  useEffect(() => {
-    if (!post) return;
-    const canonical = `https://cintexa.com/blog/${post.slug}`;
-    document.title = `${post.title} | CINTEXA`;
-    const set = (selector: string, attr: string, value: string) => {
-      let node = document.querySelector(selector) as HTMLMetaElement | null;
-      if (!node) { node = document.createElement("meta"); node.setAttribute(attr, selector.includes('property=') ? selector.match(/property="([^"]+)"/)?.[1] || "" : selector.match(/name="([^"]+)"/)?.[1] || ""); document.head.appendChild(node); }
-      node.content = value;
-    };
-    set('meta[name="description"]', "name", post.excerpt);
-    set('meta[name="robots"]', "name", "index, follow");
-    set('meta[property="og:title"]', "property", post.title);
-    set('meta[property="og:description"]', "property", post.excerpt);
-    set('meta[property="og:image"]', "property", post.image);
-    set('meta[property="og:url"]', "property", canonical);
-    let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!link) { link = document.createElement("link"); link.rel = "canonical"; document.head.appendChild(link); }
-    link.href = canonical;
-  }, [post]);
-}
-
-const EDITORIAL_EXPANSIONS: Record<string, Section[]> = {
-"connected-technology-systems-for-business-growth": [
-    { heading: "What should a connected business system include?", paragraphs: ["A practical connected system usually starts with a website or enquiry channel, one dependable customer record, a task or sales pipeline, and a reporting view that shows what needs attention. Depending on the business, it may also connect inventory, invoicing, customer support or delivery updates. The goal is not to connect every application; it is to make important hand-offs reliable and visible.", "Choose a clear source of truth for each kind of data. Customer contact details might belong in a CRM, stock quantities in inventory software, and accounting entries in the finance system. Integration rules should define which system can update each field, how duplicates are handled and what happens when a connection fails. This prevents conflicting records from spreading between tools."] },
-    { heading: "How can a small business connect its tools affordably?", paragraphs: ["Begin with tools the team already uses and confirm whether they support native integrations, webhooks or documented APIs. A shared form and a consistent spreadsheet can be a sensible temporary starting point if access is controlled and a migration path exists. Compare the full cost of subscriptions, setup, staff time, support and future changes—not just the advertised monthly price.", "Build one small workflow first, such as turning a website enquiry into an assigned follow-up task. Test normal cases, incomplete data, duplicate submissions and service outages. Keep a human review step for high-value or unusual requests. Once the first workflow is stable, reuse what worked instead of attempting a large, risky integration project all at once."] },
-    { heading: "Common integration mistakes to avoid", paragraphs: ["Connecting systems before cleaning data often creates duplicates at a higher speed. Other common mistakes include giving every employee administrator access, synchronising fields nobody needs, overlooking consent preferences and failing to document who supports an integration. Set minimum permissions, back up critical records, log errors and make it clear who owns the workflow when the person who built it is unavailable.", "A monthly review should ask whether the integration is still used, whether data is arriving correctly and whether the process saves time or improves service. Track practical measures such as response time, rework and missing records. If the integration adds more manual correction than value, simplify or remove it. Connected technology should serve the business process, not become an end in itself."] },
-    { heading: "Questions business owners often ask", paragraphs: ["Do you need an expensive enterprise platform? Usually not at the beginning. A small business can start with a few well-chosen tools, clear ownership and a documented process, then scale when the volume and complexity justify it. Will integration eliminate manual work completely? No. Exceptions, judgement, customer care and data-quality checks still need people.", "How do you know the project is working? Compare an agreed baseline with results after rollout, using similar periods and recording other changes. What should happen first? Map one important process, identify its information hand-offs and select a measurable improvement. These steps help a business invest in connected systems that solve an actual operational problem rather than simply adding software."] }
-  ],
-"sales-marketing-technology-platform-guide": [
-    { heading: "Which sales and marketing tools are essential?", paragraphs: ["Most growing teams need a dependable way to capture enquiries, manage contacts, schedule follow-ups, publish campaigns and understand which activities generate qualified opportunities. A CRM can hold contact history and pipeline stages, while analytics tools help measure website behaviour and campaign traffic. Email or messaging platforms support communication, but consent and customer preferences should be recorded and respected.", "Do not buy every category immediately. First document the current customer journey and identify where work is delayed or information disappears. If leads are missed, prioritise assignment and reminders. If the team cannot explain campaign results, improve source tracking and measurement. The business problem should determine the tool, rather than a product demonstration defining the problem for you."] },
-    { heading: "How should you compare platforms?", paragraphs: ["Compare options against a written scorecard: required features, ease of use, mobile experience, integrations, reporting, data export, permissions, support, reliability and total cost. Ask vendors to demonstrate a realistic scenario using your own lead stages and reporting questions. Check what happens when a subscription ends and whether you can retrieve your contacts, notes and campaign history in a usable format.", "Include the cost of configuration, staff training, migration, support and any usage-based charges. A low subscription price can become expensive if the team needs constant manual work or specialist help. Confirm security practices and contract terms before transferring customer information. For businesses serving customers in multiple markets, check local payment, language and communication requirements as well."] },
-    { heading: "Create a shared definition of a qualified lead", paragraphs: ["Sales and marketing should agree on lifecycle stages and what information is required before a lead moves forward. A simple definition might include a genuine need, a relevant product or service fit, a way to contact the person and an agreed next step. Document how referrals, existing customers and enquiries outside your target market should be handled.", "Use shared reporting to review the quality of enquiries, not only their quantity. Track response time, qualification rate, conversion between stages and reasons opportunities are lost. These measures help teams improve targeting and follow-up without blaming one department for every result. Review the definitions periodically as the business learns which customers are best served by its offer."] },
-    { heading: "Questions to ask before buying", paragraphs: ["Can one platform do everything? Some platforms combine several functions, but a broad feature list does not guarantee that each workflow will suit your team. Should you migrate all historical data? Only migrate what is useful, accurate and lawful to retain; clean duplicates first and test exports before committing.", "When should automation be added? After the team agrees on a stable process and knows how exceptions should be handled. What is the best success measure? Start with a small set linked to business goals, such as time to first response or qualified opportunity rate. Review them regularly and avoid assuming that a campaign caused a sale merely because the two happened close together."] }
-  ],
-"ecommerce-and-digital-commerce-for-smes": [
-    { heading: "What features does a small-business online store need?", paragraphs: ["At minimum, customers need clear product pages, accurate availability and pricing, a usable cart, dependable checkout, delivery information, customer support and a way to resolve order problems. Store owners also need product and inventory management, order notifications, refund handling, access controls and a process for reconciling payments. The best first version is the one the business can operate consistently, not the one with the longest feature list.", "Make the buying journey comfortable on a phone because many customers browse and purchase on mobile devices. Use readable text, accessible controls, clear error messages and as few checkout fields as practical. Show costs and delivery expectations before payment. Test the complete journey with real devices and realistic orders, including cancellations and unsuccessful payment attempts."] },
-    { heading: "Payments, delivery and customer trust in Ghana", paragraphs: ["Select payment providers only after reviewing supported payment methods, settlement timing, transaction charges, refunds, dispute handling and technical integration requirements. Test how an order is marked as paid and how staff verify payments without relying solely on a screenshot from a customer. Reconcile provider records against orders and accounting records so that missing or duplicated transactions can be investigated.", "Define delivery areas, charges, dispatch cut-offs, expected timelines and a process for communicating delays. Make return, exchange and refund terms easy to find. Provide a real contact route and protect customer information during fulfilment. The exact requirements depend on your products, providers and applicable laws, so confirm operational and regulatory obligations before launch rather than assuming one setup fits every business."] },
-    { heading: "How to attract customers and improve conversions", paragraphs: ["Create useful category pages and product descriptions that explain the buyer's questions: what the item does, who it is for, what is included, how it compares with alternatives and how it will be delivered. Use original product photographs where possible, descriptive page titles and internal links to related items. Avoid copied supplier text that gives shoppers little additional value.", "Measure product views, add-to-cart activity, checkout completion, failed payments, fulfilment time, returns and repeat orders. Investigate where customers leave instead of changing several things at once. A clear delivery estimate or a simpler form may help, but test changes and compare results over meaningful periods. Use feedback and support questions to improve product information and remove recurring friction."] },
-    { heading: "Online store planning questions", paragraphs: ["How many products should launch first? Start with a range you can price, photograph, keep in stock and fulfil accurately. Do you need customer accounts? Not always; guest checkout can reduce friction if repeat-purchase features do not require an account. How do you prevent overselling? Establish one inventory source of truth and define how quickly stock updates after orders or in-person sales.", "What should be tested before launch? Test mobile checkout, payment success and failure, order notifications, refunds, stock changes, delivery charges, backups and access permissions. How should success be judged? Look beyond total sales to margin, cancellations, fulfilment reliability, customer support load and repeat purchases. These operational measures show whether the store is sustainable as well as attractive."] }
-  ],
-"website-and-software-development-that-drives-growth": [
-    { heading: "How to write a useful project brief", paragraphs: ["A strong brief describes the users, their goals, the business problem, current workarounds and the outcome the project should improve. List essential features separately from optional ideas, and explain what must happen when a user submits incorrect information or a service is unavailable. This makes estimates more realistic and gives the team a shared basis for decisions when the scope changes.", "Define acceptance criteria in observable terms. Instead of saying a site must be fast or user-friendly, specify key journeys to test, devices to support, accessibility expectations and the content the business must provide. Identify who approves designs, who owns the domain and accounts, and who will maintain the system after launch. These decisions reduce confusion near delivery."] },
-    { heading: "Choosing the right architecture and technology", paragraphs: ["Technology choices should reflect the product's complexity, expected traffic, data sensitivity, integration needs and available maintenance skills. A simple informational website may not need the same architecture as a customer portal or transaction-heavy application. Prefer proven components and documented interfaces over unnecessary complexity, and check hosting, backup, recovery and monitoring requirements before committing to a stack.", "Plan for secure authentication, least-privilege access, secret management, dependency updates and clear ownership of third-party services. Keep credentials out of browser code and use server-side validation for important operations. Ask how the system can be tested, restored and handed over if the original developer is no longer available. Maintainability is part of the initial design, not an optional task after launch."] },
-    { heading: "What testing should happen before release?", paragraphs: ["Test complete user journeys, not only individual screens. Include small mobile displays, keyboard navigation, readable contrast, form validation, slow or interrupted connections, empty states, permissions and unexpected server responses. Verify that error messages help users recover without exposing internal details. Automated checks catch repeatable regressions, while manual testing reveals confusing language and workflow problems.", "Before release, review analytics and privacy choices, broken links, metadata, redirects, accessibility, backups and monitoring. Prepare a rollback plan and decide who responds if a critical feature fails. After launch, watch real error reports and user feedback, prioritise fixes by impact and avoid adding features until the core experience is stable."] },
-    { heading: "Software project questions", paragraphs: ["How long will development take? Timing depends on scope, integrations, content readiness, review speed and testing needs; a reliable estimate follows discovery rather than a generic promise. Should every requested feature be included in version one? No. Prioritise the minimum useful release and schedule lower-value features after real users validate the core workflow.", "What should a handover include? Source code, deployment instructions, account ownership, environment configuration guidance, documentation, backup and recovery steps, and a list of known limitations. How do you measure value? Compare the agreed baseline with outcomes such as task completion, lead quality, errors or support requests. Clear ownership and measurement make a website or application an ongoing business asset."] }
-  ],
-"lead-generation-and-customer-accounts-one-core": [
-    { heading: "Build a lead pipeline people will actually use", paragraphs: ["A useful pipeline reflects the real steps your team follows, rather than copying a complex template from another company. Begin with a small number of stages, such as New, Contacted, Qualified, Proposal and Won or Lost. Define what evidence is required to move a record between stages and what action should happen next. Every open lead should have an owner and a due date.", "Capture the original source, the customer's request, preferred contact method and relevant conversation history. Avoid filling the CRM with fields nobody uses. Make the record easy to update during a busy workday, and provide a short guide so new staff follow the same definitions. Consistent use is more valuable than a highly customised CRM that employees avoid."] },
-    { heading: "Follow-up timing, personalisation and consent", paragraphs: ["Agree on a realistic first-response target based on staffing and customer expectations. Use reminders to make overdue work visible, but let employees review context before sending a message. A useful follow-up answers the person's question, acknowledges the request and offers a clear next step. Avoid repeated generic messages that feel automated or ignore what the customer has already said.", "Record marketing preferences separately from communications needed to respond to a specific enquiry. Respect opt-outs and applicable privacy rules, and restrict access to customer records based on role. A CRM should help the team communicate responsibly; it should not be used to collect unrelated personal details or continue promotional messages after someone has objected."] },
-    { heading: "Which CRM metrics matter most?", paragraphs: ["Start with response time, percentage of leads with an owner, overdue follow-ups, stage conversion and documented reasons for losses. Check data completeness and duplicates because unreliable records make every report less useful. Interpret metrics by lead source and customer type where sample sizes allow, but avoid treating a small change as proof of a lasting trend.", "Review the pipeline in a regular team meeting and agree on actions, not just numbers. Look for bottlenecks such as proposals waiting for approval or enquiries that never receive a second response. Update training and workflow rules when a pattern appears. A CRM becomes useful when it supports consistent decisions and customer service, not when the organisation merely collects more data."] },
-    { heading: "CRM implementation questions", paragraphs: ["Is a spreadsheet enough? It can be a reasonable starting point for a small team with limited complexity, provided access, ownership and backups are controlled. When should you move to a CRM? Consider it when hand-offs, duplicate records, reporting or follow-up are repeatedly failing and the team is ready to maintain shared records.", "Can a CRM guarantee more sales? No. It can make the process more visible and consistent, but offer quality, timing, pricing and customer fit still matter. What is the first step? Map the current journey, define the stages and select a small number of measures. Then pilot the process with users and improve it before adding automation or extensive customisation."] }
-  ],
-"business-automation-for-small-businesses": [
-    { heading: "Which tasks are good candidates for automation?", paragraphs: ["Good candidates are frequent, rule-based and easy to verify: assigning new enquiries, acknowledging receipt, creating routine tasks, sending internal reminders, preparing standard reports and synchronising approved records. A process with clear inputs and outputs is easier to automate safely. Tasks involving sensitive judgement, negotiation or unusual customer circumstances often need human review even when some steps can be supported by software.", "Estimate how often the task occurs, how long it takes, the cost of errors and the impact of a failure. A process performed rarely may not justify automation. Before building anything, remove unnecessary steps and agree on who owns the result. Automating a confusing workflow can simply make the confusion happen faster and at a larger scale."] },
-    { heading: "Design a safe automation workflow", paragraphs: ["Document the trigger, required data, action, responsible person, expected result and exception path. Validate inputs before acting, record outcomes and alert a person when a step fails. Use limited service permissions and avoid putting passwords or sensitive data in logs. Decide how staff can pause the workflow, correct a record and resume work after an outage.", "Test duplicates, missing fields, invalid values, delayed responses and repeated events. If a workflow sends messages to customers, check consent, timing and message content before enabling it broadly. Start with a small pilot and retain a manual fallback for critical operations. Monitor the first runs closely, because real-world data often contains exceptions that were absent from a demonstration."] },
-    { heading: "Calculate the value of automation", paragraphs: ["Record a baseline before launch: task volume, average handling time, error rate, delays and support effort. After implementation, compare similar periods and account for changes in staffing or demand. Estimate the full cost, including development, subscriptions, monitoring, maintenance and staff training. Time saved is valuable only when the organisation can use that time productively or improve service in a measurable way.", "Review failure rates and user feedback as well as speed. A workflow that completes quickly but creates incorrect records is not an improvement. Assign an owner to review alerts, update rules and confirm that integrations still work after other systems change. Retire automations that are no longer useful, and document each one so the business is not dependent on one person's memory."] },
-    { heading: "Automation questions business owners ask", paragraphs: ["Will automation replace employees? Its purpose should be defined by the business: reduce repetitive effort, improve consistency or free people to handle higher-value work. Do you need a custom application? Not necessarily; an existing platform may handle a straightforward workflow, while custom software can help when rules or integrations are specific.", "How should you start? Choose one repeatable process with a clear owner, measure its current performance and pilot a small improvement. What is the biggest risk? Often it is weak process design, poor data quality or missing exception handling—not the automation tool itself. Plan security, monitoring, ownership and recovery before connecting a workflow to important business operations."] }
-  ],
-"technical-seo-checklist-for-business-websites": [
-    { heading: "Make important pages discoverable and understandable", paragraphs: ["Search engines need crawlable links, useful page content and clear signals about which URL represents a page. Give every important service and article a purpose, link to it from relevant navigation or content, and avoid leaving valuable pages isolated. Use descriptive URLs and consistent internal links. A sitemap can help discovery, but it does not guarantee indexing or replace a logical site structure.", "Review redirects, broken links, duplicate pages, canonical tags and accidental noindex directives after major changes. Keep robots.txt focused on crawl management; it is not a security mechanism and should not be used to protect confidential information. Use search performance reports to identify pages that are discovered but not indexed, then investigate the specific reason rather than blindly resubmitting everything."] },
-    { heading: "On-page SEO that helps real readers", paragraphs: ["Write a unique title that accurately describes the page and a meta description that helps a searcher decide whether it answers their question. Use one clear main heading, meaningful subheadings, descriptive image alt text and link wording that explains the destination. Include the primary phrase naturally when relevant, alongside related concepts users need to understand the topic.", "Avoid keyword stuffing, near-duplicate pages and articles created only to target slight wording variations. Helpful content explains the issue, gives steps, addresses limitations and cites authoritative sources where appropriate. Keep author and update information accurate. If an article changes materially, update it and ensure its dateModified metadata reflects the real change rather than changing dates simply to appear fresh."] },
-    { heading: "Performance, mobile usability and structured data", paragraphs: ["Check mobile layout, text readability, tap targets, keyboard access and form behaviour. Optimise image size and format, avoid unnecessary scripts and reserve image dimensions to reduce layout shifts. Monitor real-user performance when possible; a perfect lab score does not mean every visitor has the same device or connection. Make key content available without requiring an interaction that search crawlers or assistive technology may not handle well.", "Structured data should describe content users can actually see and must follow the relevant search engine guidelines. Validate it with official testing tools, but remember that correct markup does not guarantee rich results or rankings. Keep analytics and advertising tags proportionate to the site's needs and review privacy choices. Technical SEO works best alongside clear content, accessibility and a genuinely useful page experience."] },
-    { heading: "Technical SEO questions", paragraphs: ["How long does SEO take? Results vary with competition, site history, content quality and crawl/indexing behaviour; no checklist guarantees a ranking or timeline. Does a sitemap make Google index every page? No. It helps discovery, while search engines decide what to index based on many signals.", "What should be checked first? Confirm that important pages work, are internally linked and are not blocked by mistakes. Then review titles, duplicate URLs, mobile experience and performance. How do you track progress? Use Search Console to monitor impressions, clicks, indexing and queries, and use analytics carefully to understand user actions. Evaluate trends over time instead of judging SEO from one day's position."] }
-  ],
-"cybersecurity-basics-for-small-businesses-in-ghana": [
-    { heading: "Protect accounts, devices and business email", paragraphs: ["Start with unique passwords, a reputable password manager and multi-factor authentication for email, finance, domain registration, cloud hosting and social media accounts. Remove access when a staff member leaves or changes roles, and use individual accounts instead of shared credentials wherever possible. Keep devices and applications updated, and limit administrator rights to people who genuinely need them.", "Business email deserves special attention because it can be used to reset other accounts or redirect payments. Train staff to verify unexpected payment changes through a separate trusted channel, inspect suspicious links and report unusual requests without fear of blame. Establish a known process for reporting lost devices, suspected phishing or compromised credentials before an incident occurs."] },
-    { heading: "Backups, recovery and customer data", paragraphs: ["Identify the records and systems the business cannot afford to lose, such as customer details, accounting data, contracts, product information and website files. Back up those assets on a schedule that matches how quickly they change. Keep recovery copies protected from the same account or device that could be compromised, and test restoring files rather than assuming that a backup is usable.", "Collect only information the business needs, restrict who can access it and establish sensible retention and deletion rules. Review the security settings of cloud services and third-party providers. For businesses operating in Ghana, confirm applicable obligations with qualified local guidance, particularly where customer information, financial records or regulated services are involved."] },
-    { heading: "Prepare a practical incident response plan", paragraphs: ["Write down who should be contacted if an account is compromised, a device is lost, data is exposed or a payment request looks fraudulent. Include steps to isolate affected systems, reset credentials from a trusted device, preserve useful evidence, contact service providers and communicate with affected parties where required. Keep the plan accessible offline in case email or cloud accounts are unavailable.", "Run a short tabletop exercise using a realistic scenario, such as a staff member clicking a phishing link or a laptop going missing. Review what was unclear and update the contact list. If an incident is serious, seek qualified security and legal assistance promptly; delaying while trying to solve everything internally can increase the impact."] },
-    { heading: "Cybersecurity questions for small businesses", paragraphs: ["Do small businesses get targeted? Attackers may target organisations of many sizes, and smaller teams can have fewer resources for recovery. Is antivirus enough? No single tool covers every risk; account security, updates, backups, staff awareness and recovery planning work together.", "What is the first step on a limited budget? Secure critical accounts with unique passwords and multi-factor authentication, then confirm that backups can be restored. How often should security be reviewed? Review it after major staff, device or service changes and on a regular schedule. Practical, repeatable safeguards are more sustainable than a complex policy that nobody follows."] }
-  ],
-"digital-marketing-metrics-small-businesses-should-track": [
-    { heading: "Choose metrics that connect activity to business outcomes", paragraphs: ["Start with the objective: awareness, qualified enquiries, sales, repeat purchases or customer retention. Then select a small set of measures that can reasonably indicate progress. Reach and impressions can describe exposure, while click-through rate and landing-page engagement help show whether people respond to a message. Leads, qualified opportunities and revenue are closer to business outcomes but require reliable tracking and agreed definitions.", "Document what each metric means, where the data comes from and how often it is reviewed. Compare like-for-like periods and annotate major campaign, pricing or seasonal changes. Avoid changing several campaign variables simultaneously if you need to learn which adjustment mattered. Good reporting supports a decision; a dashboard full of numbers without an owner or action rarely improves marketing."] },
-    { heading: "Understand conversion and attribution carefully", paragraphs: ["A conversion should be defined before reporting begins. It might be a completed enquiry, qualified lead, purchase or booked consultation, depending on the campaign. Check that tracking fires once per real event and that internal traffic, spam submissions and duplicate purchases are handled consistently. Test the customer journey from the original link through to the final confirmation, including mobile devices and consent settings.", "Attribution models assign credit to touchpoints according to chosen rules; they do not prove that one advertisement caused the sale. Customers may encounter several channels, hear about a business offline or convert after a delay. Use attribution alongside customer feedback, controlled experiments where practical and broader business results. Treat the model as useful evidence with limitations, not as a complete account of causality."] },
-    { heading: "How to improve campaign performance", paragraphs: ["Review the path from message to landing page to enquiry or purchase. Make sure the offer matches the audience's needs, the page answers likely objections and the next step is obvious. Test one meaningful change at a time, define the primary metric before the test and avoid drawing conclusions from very small samples. A higher click rate is not helpful if the resulting visitors are a poor fit.", "Check lead quality with the sales or service team, not only inside the advertising platform. Track response time and what happens after a lead arrives. Review cost per qualified enquiry or acquisition only when costs and outcomes are measured consistently. Use findings to refine audience, message and experience while respecting privacy, consent and platform policies."] },
-    { heading: "Digital marketing measurement FAQs", paragraphs: ["Which metric matters most? The answer depends on the objective; a brand awareness campaign and a sales campaign should not be judged by the same single number. Is more traffic always better? No. Relevant visitors who take a useful action matter more than a large volume of unqualified sessions.", "How often should reports be reviewed? Check delivery and technical issues frequently, but judge performance over a period that fits the sales cycle and sample size. What if analytics and sales records disagree? Investigate tracking, consent settings, time zones, duplicate events and attribution differences. Explain the discrepancy rather than selecting whichever number makes a campaign look best."] }
-  ],
-"crm-data-quality-and-customer-follow-up": [
-    { heading: "Set simple data standards for every customer record", paragraphs: ["Define the minimum fields needed to serve a customer, such as a name, usable contact route, enquiry context, owner and next action. Standardise formats for phone numbers, locations and status values, and make required fields genuinely necessary. Use validation where it prevents obvious mistakes, but avoid making forms so demanding that staff invent values just to save a record.", "Agree on how duplicates are identified and merged, which fields are authoritative and who may correct records. Record the date and source of important information when it helps staff understand its reliability. Avoid collecting sensitive details without a clear need. Data quality is a continuing responsibility that depends on simple rules, useful interfaces and regular review—not a one-time spreadsheet cleanup."] },
-    { heading: "Improve follow-up with ownership and context", paragraphs: ["Every active customer or lead should have a clear owner and next action. Set realistic due dates, use reminders for missed tasks and make recent interactions easy to find. Before contacting someone, read the latest notes, confirm the current status and use the communication channel the person expects. This avoids asking customers to repeat themselves and reduces contradictory messages from different employees.", "Define when an enquiry should be escalated, reassigned or closed, and capture a concise reason when it is lost or postponed. Separate service communications from promotional campaigns and respect consent and opt-out preferences. Follow-up quality is not measured by message volume alone; useful communication addresses the customer's situation and makes the next step clear."] },
-    { heading: "Review and maintain CRM health", paragraphs: ["A monthly review can identify duplicate contacts, missing owners, overdue actions, stale opportunities and fields that no longer support a decision. Use a small set of reports and assign an owner to resolve recurring issues. Ask users which parts of the CRM create friction; a confusing process often causes workarounds that make data less reliable.", "Restrict access by role, back up critical records and test exports before changing vendors. Document retention and deletion rules so information is not kept indefinitely without a reason. When integrating the CRM with email, forms or accounting tools, decide which system owns each field and monitor sync errors. Reliable records make reporting, customer support and hand-offs more dependable."] },
-    { heading: "CRM data quality FAQs", paragraphs: ["How accurate should CRM data be? The required level depends on the task, but records used for billing, service delivery or important decisions need clear validation and correction processes. Who owns data quality? Everyone who enters or changes data has a role, while a designated process owner sets standards and monitors recurring issues.", "Should old records be deleted? Review their purpose, legal obligations, retention rules and business need before deletion or anonymisation. How can a team improve adoption? Keep fields useful, reduce duplicate entry, train users on the shared workflow and show how accurate records help them. Data quality improves when the system makes the right behaviour easier than the workaround."] }
-  ],
-"using-business-data-to-make-better-decisions": [
-    { heading: "Start with a decision, not a dashboard", paragraphs: ["Before collecting a new report, write down the decision it should support. Examples include which service to promote, where stock is running low, which enquiries need attention or where delivery delays occur. Identify the person who will use the report, the action they can take and the time frame in which the information is still useful.", "Choose a small number of trustworthy measures and define them consistently. Document the source, update frequency, filters and known limitations. If sales are counted differently in the website, accounting system and CRM, reconcile the definitions before comparing totals. A clear spreadsheet based on reliable data can support better decisions than an attractive dashboard built on conflicting numbers."] },
-    { heading: "Check data quality and interpret patterns", paragraphs: ["Review missing values, duplicates, unusual spikes, inconsistent dates and changes in how data is collected. Ask whether the sample represents the customers or period you want to understand. Seasonal demand, price changes, staff changes and one-off events can affect a trend. Record these factors before explaining why a metric moved, and be transparent when the evidence is incomplete.", "A relationship between two measures does not automatically show that one caused the other. For example, higher advertising spend and higher sales may occur together because of seasonality or another campaign. Use experiments where feasible, compare suitable groups and combine quantitative evidence with customer feedback. Distinguish observed facts from estimates and hypotheses so decisions can be revised when new information arrives."] },
-    { heading: "Turn analysis into an action and review loop", paragraphs: ["A useful review ends with a decision, an owner, a due date and a measure for checking the result. Start with a small change, record the expected outcome and review what happened after a suitable interval. If results differ from expectations, investigate rather than hiding the miss. This makes analysis a repeatable management process instead of a report that is read once and forgotten.", "Protect the information used for analysis. Limit access to identifiable customer data, remove unnecessary personal fields and follow appropriate retention rules. Keep definitions and transformations documented so another team member can reproduce the result. When reports inform financial, employment or other high-impact decisions, use qualified human judgement and verify important conclusions before acting."] },
-    { heading: "Business analytics FAQs", paragraphs: ["Do you need advanced analytics software? Not necessarily. Start with a clear question, consistent data and a repeatable review process; use more specialised tools when volume or complexity makes them worthwhile. How often should data be reviewed? It depends on how quickly the decision changes and how frequently reliable data is available.", "What if the data is incomplete? State the limitation, seek another source if appropriate and avoid presenting estimates as confirmed facts. How do you know analysis helped? Track whether the agreed action occurred and whether the intended measure changed, while considering other influences. Good business analytics makes assumptions visible and improves decisions over time rather than promising certainty."] }
-  ]
-};
+const serviceLabel = (path: string) => SERVICES.find((s) => s.path === path)?.name ?? "CINTEXA solutions";
 
 export function BlogArticle() {
   const [, params] = useRoute("/blog/:slug");
-  const post = POSTS.find((item) => item.slug === params?.slug);
-  useArticleSeo(post);
-  if (!post) return <div className="cx-section"><div className="cx-container"><h1 className="cx-display text-3xl">Article not found</h1><Link href="/blog" className="cx-btn cx-btn-primary mt-6">Back to blog</Link></div></div>;
-  const related = POSTS.filter((item) => item.slug !== post.slug).slice(0, 3);
-  const articleSections = [...post.sections, ...(EDITORIAL_EXPANSIONS[post.slug] ?? [])];
-  const structured = { "@context": "https://schema.org", "@type": "BlogPosting", headline: post.title, description: post.excerpt, image: post.image, datePublished: post.date, dateModified: post.updated || post.date, author: { "@type": "Organization", name: "CINTEXA Editorial Team", url: "https://cintexa.com/about" }, publisher: { "@type": "Organization", name: "CINTEXA", url: "https://cintexa.com" }, mainEntityOfPage: `https://cintexa.com/blog/${post.slug}`, keywords: post.keyword };
-  return <article className="cx-section"><div className="cx-container max-w-3xl">
-    <nav aria-label="Breadcrumb" className="text-sm text-[hsl(var(--fg-muted))]"><Link href="/" className="underline">Home</Link> / <Link href="/blog" className="underline">Blog</Link> / <span>{post.category}</span></nav>
-    <p className="cx-eyebrow mt-6">{post.category} · {post.readTime} read</p><h1 className="cx-display mt-3 text-3xl sm:text-5xl">{post.title}</h1>
-    <p className="mt-5 text-lg text-[hsl(var(--fg-muted))]">{post.excerpt}</p>
-    <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[hsl(var(--fg-muted))]"><span>Author: CINTEXA Editorial Team</span><time dateTime={post.date}>Published {post.date}</time>{post.updated && <time dateTime={post.updated}>Updated {post.updated}</time>}</div>
-    <img src={post.image} alt={post.imageAlt} className="mt-8 aspect-[16/9] w-full rounded-2xl object-cover" loading="eager" />
-    <p className="mt-8 text-base leading-8">{post.intro}</p>
-    <div className="mt-8 space-y-8">{articleSections.map((section) => <section key={section.heading}><h2 className="cx-display text-2xl">{section.heading}</h2>{section.paragraphs.map((p) => <p key={p} className="mt-3 leading-8 text-[hsl(var(--fg-muted))]">{p}</p>)}{section.bullets && <ul className="mt-4 list-disc space-y-2 pl-6 text-[hsl(var(--fg-muted))]">{section.bullets.map((b) => <li key={b}>{b}</li>)}</ul>}</section>)}</div>
-    <section className="mt-10 border-t border-[hsl(var(--border))] pt-6"><h2 className="cx-display text-xl">Sources and further reading</h2><ul className="mt-3 list-disc space-y-2 pl-6">{post.references.map((r) => <li key={r.url}><a className="underline text-[hsl(var(--accent))]" href={r.url} target="_blank" rel="noopener noreferrer">{r.label}</a></li>)}</ul><p className="mt-4 text-sm text-[hsl(var(--fg-muted))]">This article is general educational information, not legal, financial or cybersecurity advice for a specific situation.</p></section>
-    <section className="mt-10"><h2 className="cx-display text-xl">Related articles</h2><div className="mt-4 grid gap-3 sm:grid-cols-2">{related.map((r) => <Link key={r.slug} href={`/blog/${r.slug}`} className="cx-card block"><span className="cx-eyebrow">{r.category}</span><span className="mt-2 block font-medium">{r.title}</span></Link>)}</div></section>
-    <div className="cx-card mt-10"><h2 className="cx-display text-xl">Need a digital solution for your business?</h2><p className="mt-2 text-[hsl(var(--fg-muted))]">Tell CINTEXA what you are trying to improve and we can discuss a practical next step.</p><div className="mt-4 flex flex-wrap gap-3"><Link href="/get-started" className="cx-btn cx-btn-primary">Get started</Link><Link href="/contact" className="cx-btn cx-btn-secondary">Contact CINTEXA</Link></div></div>
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }} />
-  </div></article>;
+  const post = getPost(params?.slug);
+  useEffect(() => applyPageSeo(blogSeoForSlug(params?.slug)), [params?.slug]);
+
+  if (!post)
+    return (
+      <div className="cx-section">
+        <div className="cx-container">
+          <h1 className="cx-display text-3xl">Article not found</h1>
+          <p className="mt-3 text-[hsl(var(--fg-muted))]">This article may have moved. Browse all articles instead.</p>
+          <Link href="/blog" className="cx-btn cx-btn-primary mt-6">
+            Back to blog
+          </Link>
+        </div>
+      </div>
+    );
+
+  const related = relatedPosts(post, 3);
+  const sections = postSections(post);
+  const servicePath = CATEGORY_SERVICE[post.category] ?? "/platform";
+
+  return (
+    <article className="cx-section">
+      <div className="cx-container max-w-3xl">
+        <Breadcrumbs trail={blogPostCrumbs(post)} />
+        <p className="cx-eyebrow mt-6">
+          {post.category} · {post.readTime} read
+        </p>
+        <h1 className="cx-display mt-3 text-3xl sm:text-5xl">{post.title}</h1>
+        <p className="mt-5 text-lg text-[hsl(var(--fg-muted))]">{post.excerpt}</p>
+        <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[hsl(var(--fg-muted))]">
+          <span>
+            Author: <Link href="/about" className="underline">CINTEXA Editorial Team</Link>
+          </span>
+          <time dateTime={post.date}>Published {post.date}</time>
+          {post.updated && <time dateTime={post.updated}>Updated {post.updated}</time>}
+        </div>
+        <img
+          src={post.image}
+          alt={post.imageAlt}
+          width={POST_IMAGE_SIZE.width}
+          height={POST_IMAGE_SIZE.height}
+          className="mt-8 aspect-[16/9] w-full rounded-2xl object-cover"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
+        <p className="mt-8 text-base leading-8">{post.intro}</p>
+
+        {sections.length >= 4 && (
+          <nav aria-label="Table of contents" className="cx-card mt-8">
+            <p className="cx-eyebrow">In this article</p>
+            <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm">
+              {sections.map((s) => (
+                <li key={s.heading}>
+                  <a href={`#${sectionId(s.heading)}`} className="text-[hsl(var(--accent))] underline">
+                    {s.heading}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
+        <div className="mt-8 space-y-8">
+          {sections.map((section) => (
+            <section key={section.heading} id={sectionId(section.heading)} className="scroll-mt-24">
+              <h2 className="cx-display text-2xl">{section.heading}</h2>
+              {section.paragraphs.map((p) => (
+                <p key={p} className="mt-3 leading-8 text-[hsl(var(--fg-muted))]">
+                  {p}
+                </p>
+              ))}
+              {section.bullets && (
+                <ul className="mt-4 list-disc space-y-2 pl-6 text-[hsl(var(--fg-muted))]">
+                  {section.bullets.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+        </div>
+
+        <section className="mt-10 border-t border-[hsl(var(--border))] pt-6">
+          <h2 className="cx-display text-xl">Sources and further reading</h2>
+          <ul className="mt-3 list-disc space-y-2 pl-6">
+            {post.references.map((r) => (
+              <li key={r.url}>
+                <a className="text-[hsl(var(--accent))] underline" href={r.url} target="_blank" rel="noopener noreferrer">
+                  {r.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm text-[hsl(var(--fg-muted))]">This article is general educational information, not legal, financial or cybersecurity advice for a specific situation.</p>
+        </section>
+
+        <section className="mt-10" aria-label="Related service">
+          <h2 className="cx-display text-xl">How CINTEXA can help</h2>
+          <p className="mt-2 text-[hsl(var(--fg-muted))]">
+            Read about our{" "}
+            <Link href={servicePath} className="text-[hsl(var(--accent))] underline">
+              {serviceLabel(servicePath).toLowerCase()}
+            </Link>{" "}
+            or see <Link href="/platform" className="text-[hsl(var(--accent))] underline">all CINTEXA solutions</Link>.
+          </p>
+        </section>
+
+        <section className="mt-10" aria-label="Related articles">
+          <h2 className="cx-display text-xl">Related articles</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {related.map((r) => (
+              <Link key={r.slug} href={`/blog/${r.slug}`} className="cx-card block">
+                <span className="cx-eyebrow">{r.category}</span>
+                <span className="mt-2 block font-medium">{r.title}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <div className="cx-card mt-10">
+          <h2 className="cx-display text-xl">Need a digital solution for your business?</h2>
+          <p className="mt-2 text-[hsl(var(--fg-muted))]">Tell CINTEXA what you are trying to improve and we can discuss a practical next step.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/get-started" className="cx-btn cx-btn-primary">
+              Get started
+            </Link>
+            <Link href="/contact" className="cx-btn cx-btn-secondary">
+              Contact CINTEXA
+            </Link>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
 }
 
 export function Blog() {
-  return <div className="cx-section"><div className="cx-container max-w-5xl">
-    <p className="cx-eyebrow">CINTEXA Blog</p><h1 className="cx-display mt-3 text-3xl sm:text-5xl">Practical Technology Advice for Growing Businesses</h1>
-    <p className="mt-4 max-w-3xl text-[hsl(var(--fg-muted))]">Original, practical guidance on software development, business automation, website development, SEO, e-commerce, digital marketing, CRM, cybersecurity, productivity, analytics and technology for businesses in Ghana and across Africa.</p>
-    <div className="mt-10 grid gap-5 md:grid-cols-2">{[...POSTS].sort((a, b) => b.date.localeCompare(a.date)).map((post) => <article key={post.slug} className="cx-card cx-card-interactive overflow-hidden"><Link href={`/blog/${post.slug}`}><img src={post.image} alt={post.imageAlt} className="aspect-[16/9] w-full rounded-xl object-cover" loading="lazy" /><p className="cx-eyebrow mt-5">{post.category} · {post.readTime} read</p><h2 className="cx-display mt-2 text-xl">{post.title}</h2><p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">{post.excerpt}</p><p className="mt-4 text-sm font-medium text-[hsl(var(--accent))]">Read article →</p></Link><meta itemProp="keywords" content={post.keyword} /></article>)}</div>
-    <div className="cx-card mt-10"><h2 className="cx-display text-xl">Have a business technology question?</h2><p className="mt-2 text-[hsl(var(--fg-muted))]">Contact us to discuss a website, software project or business process improvement.</p><Link href="/get-started" className="cx-btn cx-btn-primary mt-4">Get started</Link></div>
-  </div></div>;
+  const page = getStaticPage("/blog")!;
+  return (
+    <div className="cx-section">
+      <div className="cx-container max-w-5xl">
+        <Breadcrumbs trail={breadcrumbTrail(page)} />
+        <p className="cx-eyebrow mt-6">CINTEXA Blog</p>
+        <h1 className="cx-display mt-3 text-3xl sm:text-5xl">{page.h1}</h1>
+        <p className="mt-4 max-w-3xl text-[hsl(var(--fg-muted))]">
+          Original, practical guidance on software development, business automation, website development, SEO, e-commerce, digital marketing, CRM, cybersecurity, productivity, analytics and technology for businesses in Ghana and across Africa.
+        </p>
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+          {postsNewestFirst().map((post, i) => (
+            <article key={post.slug} className="cx-card cx-card-interactive overflow-hidden">
+              <Link href={`/blog/${post.slug}`}>
+                <img
+                  src={post.image}
+                  alt={post.imageAlt}
+                  width={POST_IMAGE_SIZE.width}
+                  height={POST_IMAGE_SIZE.height}
+                  className="aspect-[16/9] w-full rounded-xl object-cover"
+                  loading={i < 2 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+                <p className="cx-eyebrow mt-5">
+                  {post.category} · {post.readTime} read
+                </p>
+                <h2 className="cx-display mt-2 text-xl">{post.title}</h2>
+                <p className="mt-2 text-sm text-[hsl(var(--fg-muted))]">{post.excerpt}</p>
+                <p className="mt-4 text-sm font-medium text-[hsl(var(--accent))]">Read article →</p>
+              </Link>
+            </article>
+          ))}
+        </div>
+        <div className="cx-card mt-10">
+          <h2 className="cx-display text-xl">Have a business technology question?</h2>
+          <p className="mt-2 text-[hsl(var(--fg-muted))]">Contact us to discuss a website, software project or business process improvement.</p>
+          <Link href="/get-started" className="cx-btn cx-btn-primary mt-4">
+            Get started
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }
 export default Blog;

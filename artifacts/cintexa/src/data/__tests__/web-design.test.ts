@@ -52,7 +52,8 @@ describe("Web design & development page data + SEO", () => {
     expect(g.find((n) => n["@type"] === "Service")?.provider).toEqual({ "@id": "https://cintexa.com/#organization" });
     const bc = g.find((n) => n["@type"] === "BreadcrumbList")!;
     expect(bc.itemListElement.map((i: any) => i.item)).toEqual(["https://cintexa.com/", WEB_DESIGN_URL]);
-    expect(JSON.stringify(g)).not.toMatch(/"(aggregateRating|review|priceRange|telephone|openingHours)":/);
+    // telephone is allowed: it is the published contact number carried by the shared Organization node (data/site-entity.ts).
+    expect(JSON.stringify(g)).not.toMatch(/"(aggregateRating|review|priceRange|openingHours)":/);
   });
 
   it("prerenders crawlable HTML with real content and the full head", () => {

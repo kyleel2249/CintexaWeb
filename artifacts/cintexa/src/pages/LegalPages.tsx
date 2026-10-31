@@ -1,27 +1,15 @@
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Link } from "wouter";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { breadcrumbTrail, getStaticPage } from "@/data/seo-pages";
 
 const UPDATED = "October 9, 2026";
 
-function PageMeta({ title, description, path }: { title: string; description: string; path: string }) {
-  useEffect(() => {
-    document.title = title + " | CINTEXA";
-    let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-    if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
-    meta.content = description;
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
-    canonical.href = `https://cintexa.com${path}`;
-    let robots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
-    if (!robots) { robots = document.createElement("meta"); robots.name = "robots"; document.head.appendChild(robots); }
-    robots.content = "index, follow";
-  }, [title, description, path]);
-  return null;
-}
-
-function Shell({ eyebrow, title, intro, children, path, description }: { eyebrow: string; title: string; intro: string; children: ReactNode; path: string; description: string }) {
-  return <div className="cx-section"><PageMeta title={title} description={description} path={path} /><div className="cx-container max-w-4xl">
-    <p className="cx-eyebrow">{eyebrow}</p><h1 className="cx-display mt-3 text-3xl sm:text-5xl">{title}</h1>
+function Shell({ eyebrow, title, intro, children, path }: { eyebrow: string; title: string; intro: string; children: ReactNode; path: string; description: string }) {
+  const page = getStaticPage(path);
+  return <div className="cx-section"><div className="cx-container max-w-4xl">
+    {page && <Breadcrumbs trail={breadcrumbTrail(page)} />}
+    <p className="cx-eyebrow mt-6">{eyebrow}</p><h1 className="cx-display mt-3 text-3xl sm:text-5xl">{title}</h1>
     <p className="mt-5 max-w-3xl text-lg leading-8 text-[hsl(var(--fg-muted))]">{intro}</p>
     <p className="mt-3 text-sm text-[hsl(var(--fg-muted))]">Last updated: {UPDATED}</p>
     <div className="mt-10 space-y-8">{children}</div>

@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && node scripts/generate-sitemap.mjs && vite build && tsx scripts/prerender-careers.mjs && tsx scripts/prerender-case-studies.mjs && tsx scripts/prerender-services.mjs",
+    "build": "tsc -b && node scripts/generate-sitemap.mjs && vite build && tsx scripts/prerender-careers.mjs && tsx scripts/prerender-case-studies.mjs && tsx scripts/prerender-services.mjs && tsx scripts/prerender-pages.mjs && tsx scripts/check-seo.mjs",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
-    "prerender": "tsx scripts/prerender-careers.mjs && tsx scripts/prerender-case-studies.mjs && tsx scripts/prerender-services.mjs",
+    "prerender": "tsx scripts/prerender-careers.mjs && tsx scripts/prerender-case-studies.mjs && tsx scripts/prerender-services.mjs && tsx scripts/prerender-pages.mjs && tsx scripts/check-seo.mjs",
+    "check:seo": "tsx scripts/check-seo.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run"

@@ -11,6 +11,7 @@ const CHANNELS = [
 export function MarketingTech() {
   return (
     <SolutionPageShell
+      path="/solutions/marketing"
       eyebrow="Solutions · Marketing technology"
       title="Marketing Technology & Automation That Attracts Customers"
       intro="A shared calendar and content pipeline for the whole marketing stack, so channels stop working in isolation."

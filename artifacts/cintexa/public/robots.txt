@@ -31,6 +31,8 @@ Allow: /disclaimer
 Allow: /contact
 Allow: /get-started
 Allow: /sitemap.xml
+Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /ads.txt
 Allow: /robots.txt
 
@@ -40,6 +42,8 @@ Disallow: /dashboard/
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
+Disallow: /sign-in
+Disallow: /sign-up
 
 # Query noise (does NOT apply to Mediapartners-Google / AdsBot above)
 Disallow: /*?*utm_

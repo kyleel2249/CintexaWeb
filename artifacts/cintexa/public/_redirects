@@ -1,7 +1,20 @@
-# Preferred marketing URL for the web design & development service → the canonical page (single URL, no duplicate content)
+# --- Canonical URL redirects (301) ---------------------------------------------------------------------------
+# Preferred marketing URL for the web design & development service → the canonical page (single URL, no duplicates)
 /services/web-design-development    /solutions/website-development    301
 /services/web-design-development/   /solutions/website-development    301
+# Old "pricing" links: there is no public price list; plan questions go to the contact page.
+/pricing    /contact    301
+/pricing/   /contact    301
+# NOTE: www → apex (https://cintexa.com) is a Cloudflare dashboard setting (Redirect Rules / Bulk Redirects),
+# not expressible here. See docs/SEO_AEO_GEO.md.
 
-# SPA fallback for Cloudflare Pages / Netlify-style hosts
-# Ensures client routes never hard-404 when refreshed
-/*    /index.html   200
+# --- Client-only app routes ----------------------------------------------------------------------------------
+# These have no prerendered file. They are served the neutral, noindex app shell (NOT the home page) with HTTP 200
+# so the React router can take over. Everything else that is not a real file falls through to /404.html, which
+# Cloudflare Pages serves with a genuine 404 status — so unknown URLs are no longer soft-404s.
+/sign-in           /app-shell/    200
+/sign-up           /app-shell/    200
+/dashboard         /app-shell/    200
+/dashboard/*       /app-shell/    200
+/admin             /app-shell/    200
+/admin/*           /app-shell/    200

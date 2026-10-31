@@ -182,3 +182,10 @@ All performance figures on marketing/ads demos are clearly labeled sample data â
 - Fixed an unrelated duplicate `## API` heading in `DEPLOYMENT.md` found while editing nearby
 - Re-verified from a fully clean install (confirmed React still resolves to 19.2.8): 72 tests passing
   (51 backend + 21 frontend), typecheck clean, both build:pages and api-server builds clean
+
+## SEO / AEO / GEO integration (unreleased)
+- Central entity, schema, page and content data modules; answer-first blocks, FAQs, breadcrumbs, related links on solution pages, home, about, blog.
+- New `/platform` solutions hub; `/pricing` â†’ `/contact` (301).
+- Prerendered HTML for all public pages, articles, 404 and noindex app shell; generated `llms.txt` / `llms-full.txt`.
+- `_redirects`: real 404s for unknown URLs (previously SPA catch-all soft-404).
+- `scripts/check-seo.mjs` build audit; first-party OG image and logo; WebP hero carousel.

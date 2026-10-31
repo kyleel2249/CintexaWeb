@@ -5,6 +5,7 @@ import { SolutionPageShell } from "./SolutionPageShell";
 export function Ecommerce() {
   return (
     <SolutionPageShell
+      path="/solutions/ecommerce"
       eyebrow="Solutions · E-commerce"
       title="Ecommerce Platform & Digital Store Technology"
       intro="A full commerce toolkit with a 3D storefront preview — sample products only, wired to your real catalog on launch."

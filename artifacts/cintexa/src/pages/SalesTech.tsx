@@ -5,6 +5,7 @@ const STAGES = ["Visitor", "Lead", "Opportunity", "Customer", "Loyal"];
 export function SalesTech() {
   return (
     <SolutionPageShell
+      path="/solutions/sales"
       eyebrow="Solutions · Sales technology"
       title="Sales Technology for Lead Capture, Pipeline & Conversion"
       intro="Track every account from first visit to repeat purchase, with the loyalty and contribution data your CRM was missing."

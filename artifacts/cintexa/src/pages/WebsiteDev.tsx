@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { Link } from "wouter";
+import { RelatedArticles } from "@/components/seo/RelatedLinks";
 import { getCaseStudies, STATUS_LABEL } from "@/data/case-studies";
+import { SOLUTION_CONTENT } from "@/data/page-content";
 import { WEB_DESIGN, WEB_DESIGN_LABEL, WEB_DESIGN_PATH } from "@/data/web-design";
 import { webDesignSeo } from "@/data/web-design-seo";
 import { applyPageSeo } from "@/lib/seo-dom";
@@ -119,6 +121,8 @@ export function WebsiteDev() {
             ))}
           </div>
         </section>
+
+        <RelatedArticles articles={SOLUTION_CONTENT["website-development"].articles} className="mt-14" />
 
         <section className="mt-14" aria-labelledby="related-title">
           <h2 id="related-title" className="cx-display text-xl">Related services</h2>

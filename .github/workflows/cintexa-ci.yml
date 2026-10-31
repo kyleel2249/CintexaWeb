@@ -22,6 +22,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Install Firebase Functions dependencies
+        run: npm ci --prefix functions
       - name: Build production workspaces
         run: npm run build
       - name: Run type checks
